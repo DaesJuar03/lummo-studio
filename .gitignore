@@ -16,6 +16,14 @@ release
 *.7z
 *.local
 
+# Local databases and backups
+.lummo_backups/
+lummo_local.db
+*.db
+*.sqlite
+*.sqlite3
+lummo_projects.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

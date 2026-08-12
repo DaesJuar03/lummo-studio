@@ -25,13 +25,22 @@ export default function StandaloneLogWindow({ projectId, projectName }) {
         }
       });
 
-      const unsubscribe = window.electronAPI.onProcessLog(({ projectId: id, message }) => {
+      const unsubscribeLog = window.electronAPI.onProcessLog(({ projectId: id, message }) => {
         if (id === projectId) {
           setLogs((prev) => [...prev, stripAnsi(message)]);
         }
       });
 
-      return () => unsubscribe();
+      const unsubscribeCleared = window.electronAPI.onLogsCleared?.(({ projectId: id, all }) => {
+        if (all || id === projectId) {
+          setLogs([]);
+        }
+      });
+
+      return () => {
+        unsubscribeLog();
+        if (unsubscribeCleared) unsubscribeCleared();
+      };
     }
   }, [projectId]);
 
@@ -45,8 +54,11 @@ export default function StandaloneLogWindow({ projectId, projectName }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleClearLogs = () => {
+  const handleClearLogs = async () => {
     setLogs([]);
+    if (window.electronAPI?.clearProjectLogs) {
+      await window.electronAPI.clearProjectLogs(projectId);
+    }
   };
 
   const filteredLogs = logs.filter(l => l.toLowerCase().includes(searchTerm.toLowerCase()));

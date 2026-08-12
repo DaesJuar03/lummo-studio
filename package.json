@@ -2,7 +2,7 @@
   "name": "lummo",
   "productName": "Lummo Studio",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Modern Dev Server & Database Control Panel",
   "main": "electron/main.cjs",
   "type": "module",
@@ -18,8 +18,11 @@
     "express": "^4.21.2",
     "framer-motion": "^13.1.0",
     "lucide-react": "^0.475.0",
+    "mysql2": "^3.23.3",
+    "pg": "^8.23.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "sql.js": "^1.14.1",
     "tailwind-merge": "^3.0.1"
   },
   "devDependencies": {

@@ -61,23 +61,23 @@ export default function HomeDashboard({
 
   const runningCount = projects.filter(p => p.status === 'RUNNING').length;
 
-  // Maximum 5 items displayed directly on the Home Dashboard card list
-  const displayedList = combinedList.slice(0, 5);
+  // Maximum 4 items displayed directly on the Home Dashboard card list to keep layout compact
+  const displayedList = combinedList.slice(0, 4);
 
   return (
-    <div className={`p-8 max-w-7xl w-full mx-auto space-y-10 flex-1 flex flex-col justify-center my-auto min-h-[calc(100vh-60px)] ${
+    <div className={`py-4 px-6 md:px-8 max-w-7xl w-full mx-auto space-y-5 flex-1 flex flex-col justify-center overflow-hidden ${
       isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
     }`}>
 
       {/* Page Header Title with Simple Telemetry Text */}
-      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6 ${
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4 ${
         isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
       }`}>
         <div>
-          <h2 className={`text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Lanzador de Entornos Locales
           </h2>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-slate-500 text-xs md:text-sm mt-0.5">
             Administra tus proyectos de desarrollo y bases de datos con un solo clic.
           </p>
         </div>
@@ -106,24 +106,24 @@ export default function HomeDashboard({
       </div>
 
       {/* Main Grid: Left Launcher Cards & Right Recent List */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
 
         {/* Left Column: Launcher Cards (Including Git Clone Card) */}
-        <div className="lg:col-span-5 space-y-4">
+        <div className="lg:col-span-5 space-y-3">
           
           {/* Card 1: Import Local Project Folder */}
-          <div className={`pure-card p-6 border space-y-4 transition-all hover:border-blue-500/50 ${
+          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
             isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
           }`}>
-            <div className="flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
-                <FolderPlus className="h-5 w-5" />
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
+                <FolderPlus className="h-4.5 w-4.5" />
               </div>
               <div>
-                <h3 className={`text-base font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Importar Proyecto Local
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   Arrastra o selecciona una carpeta de tu equipo para comenzar.
                 </p>
               </div>
@@ -131,7 +131,7 @@ export default function HomeDashboard({
 
             <button
               onClick={onAddProject}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center justify-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Importar Proyecto</span>
@@ -139,18 +139,18 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 2: Clone Git Repository */}
-          <div className={`pure-card p-6 border space-y-4 transition-all hover:border-blue-500/50 ${
+          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
             isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
           }`}>
-            <div className="flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
-                <GitBranch className="h-5 w-5" />
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
+                <GitBranch className="h-4.5 w-4.5" />
               </div>
               <div>
-                <h3 className={`text-base font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Clonar Repositorio Git
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   Pega el link de GitHub/GitLab y elige la carpeta de destino.
                 </p>
               </div>
@@ -158,7 +158,7 @@ export default function HomeDashboard({
 
             <button
               onClick={() => setShowCloneRepoModal(true)}
-              className={`w-full font-bold text-xs py-2.5 px-4 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
+              className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
                 isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-200 hover:bg-[#252525]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
@@ -168,18 +168,18 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 3: Projects Panel Shortcut */}
-          <div className={`pure-card p-6 border space-y-4 transition-all hover:border-blue-500/50 ${
+          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
             isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
           }`}>
-            <div className="flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
-                <Layers className="h-5 w-5" />
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
+                <Layers className="h-4.5 w-4.5" />
               </div>
               <div>
-                <h3 className={`text-base font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Gestor de Proyectos
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   React, Vite, PHP, Express, Python y Node.js
                 </p>
               </div>
@@ -187,7 +187,7 @@ export default function HomeDashboard({
 
             <button
               onClick={onOpenProjectsTab}
-              className={`w-full font-bold text-xs py-2.5 px-4 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
+              className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
                 isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-200 hover:bg-[#252525]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
@@ -197,18 +197,18 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 4: Databases Panel Shortcut */}
-          <div className={`pure-card p-6 border space-y-4 transition-all hover:border-blue-500/50 ${
+          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
             isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
           }`}>
-            <div className="flex items-center space-x-3.5">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
-                <Database className="h-5 w-5" />
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
+                <Database className="h-4.5 w-4.5" />
               </div>
               <div>
-                <h3 className={`text-base font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Gestor de Bases de Datos
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   MySQL, PostgreSQL & SQLite nativo
                 </p>
               </div>
@@ -216,7 +216,7 @@ export default function HomeDashboard({
 
             <button
               onClick={onOpenDatabasesTab}
-              className={`w-full font-bold text-xs py-2.5 px-4 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
+              className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
                 isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-200 hover:bg-[#252525]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
@@ -232,10 +232,10 @@ export default function HomeDashboard({
           initial={{ opacity: 0, x: 12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="lg:col-span-7 space-y-6 lg:pl-2"
+          className="lg:col-span-7 space-y-4 lg:pl-2"
         >
           {/* Header Title with Clean Proyectos Recientes... */}
-          <div className={`flex items-center justify-between border-b pb-4 ${
+          <div className={`flex items-center justify-between border-b pb-3 ${
             isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
           }`}>
             <div>
@@ -372,6 +372,11 @@ export default function HomeDashboard({
                               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-200 shrink-0">
                                 :{item.port}
                               </span>
+                              {item.hasBackend && (
+                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-purple-500/10 text-purple-400 border-purple-500/30 shrink-0">
+                                  Entorno Dual
+                                </span>
+                              )}
                             </div>
                             <p className="text-xs text-slate-500 font-mono mt-0.5 truncate">{item.techStack}</p>
                           </div>

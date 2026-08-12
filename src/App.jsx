@@ -141,12 +141,35 @@ export default function App() {
         );
       });
 
+      const unsubscribeCleared = window.electronAPI.onLogsCleared?.(({ projectId, all }) => {
+        if (all) {
+          setLogs({});
+        } else if (projectId) {
+          setLogs((prev) => ({ ...prev, [projectId]: [] }));
+        }
+      });
+
       return () => {
         unsubscribeLog();
         unsubscribeStatus();
+        if (unsubscribeCleared) unsubscribeCleared();
       };
     }
   }, []);
+
+  const handleClearProjectLogs = async (projectId) => {
+    setLogs((prev) => ({ ...prev, [projectId]: [] }));
+    if (window.electronAPI?.clearProjectLogs) {
+      await window.electronAPI.clearProjectLogs(projectId);
+    }
+  };
+
+  const handleClearAllLogs = async () => {
+    setLogs({});
+    if (window.electronAPI?.clearAllLogs) {
+      await window.electronAPI.clearAllLogs();
+    }
+  };
 
   const handleScanEnv = async () => {
     setIsScanning(true);
@@ -168,17 +191,25 @@ export default function App() {
   };
 
   const loadRecentProjects = async () => {
-    if (window.electronAPI) {
+    if (window.electronAPI?.getRecentProjects) {
       const recents = await window.electronAPI.getRecentProjects();
       if (Array.isArray(recents) && recents.length > 0) {
         setProjects(recents);
+        try {
+          localStorage.setItem('lummo-projects', JSON.stringify(recents));
+        } catch (e) {}
       }
     }
   };
 
   const saveProjects = async (updatedProjects) => {
     setProjects(updatedProjects);
-    if (window.electronAPI) {
+    try {
+      localStorage.setItem('lummo-projects', JSON.stringify(updatedProjects));
+    } catch (e) {
+      console.error(e);
+    }
+    if (window.electronAPI?.saveRecentProjects) {
       await window.electronAPI.saveRecentProjects(updatedProjects);
     }
   };
@@ -231,6 +262,43 @@ export default function App() {
     }
   };
 
+  const reorderTabs = (draggedId, targetId) => {
+    setOpenTabs((prev) => {
+      const draggedIndex = prev.findIndex((t) => t.id === draggedId);
+      const targetIndex = prev.findIndex((t) => t.id === targetId);
+      if (draggedIndex < 0 || targetIndex < 0 || draggedIndex === targetIndex) return prev;
+      const copy = [...prev];
+      const [removed] = copy.splice(draggedIndex, 1);
+      copy.splice(targetIndex, 0, removed);
+      return copy;
+    });
+  };
+
+  const togglePinTab = (tabId) => {
+    setOpenTabs((prev) =>
+      prev.map((t) => (t.id === tabId ? { ...t, pinned: !t.pinned } : t))
+    );
+  };
+
+  const closeOtherTabs = (tabId) => {
+    setOpenTabs((prev) => prev.filter((t) => t.id === 'home' || t.id === tabId));
+    setActiveTabId(tabId);
+  };
+
+  const duplicateTab = (tabId) => {
+    const tabToDup = openTabs.find((t) => t.id === tabId);
+    if (!tabToDup) return;
+    const dupId = `${tabToDup.id}_dup_${Date.now()}`;
+    const dupTab = {
+      ...tabToDup,
+      id: dupId,
+      title: `${tabToDup.title} (Copia)`,
+      closable: true
+    };
+    setOpenTabs((prev) => [...prev, dupTab]);
+    setActiveTabId(dupId);
+  };
+
   const handleGoBack = () => {
     if (navIndex > 0) {
       const prevTabId = navHistory[navIndex - 1];
@@ -258,22 +326,37 @@ export default function App() {
       detected = await window.electronAPI.detectProject(folderPath);
     }
 
-    let freePort = 5173;
-    if (window.electronAPI?.findFreePort) {
+    const existingIndex = projects.findIndex(p => p.path === folderPath || (p.path && p.path.toLowerCase() === folderPath.toLowerCase()));
+    const existingProject = existingIndex >= 0 ? projects[existingIndex] : null;
+
+    let freePort = existingProject ? existingProject.port : (detected.defaultPort || 3000);
+    if (!existingProject && window.electronAPI?.findFreePort) {
       freePort = await window.electronAPI.findFreePort(detected.defaultPort || 3000);
     }
 
     const newProject = {
-      id: 'proj-' + Date.now(),
+      id: existingProject ? existingProject.id : 'proj-' + Date.now(),
       name: detected.name,
       path: folderPath,
       techStack: detected.techStack,
       command: detected.command,
       port: freePort,
-      status: 'STOPPED'
+      status: existingProject ? existingProject.status : 'STOPPED',
+      hasBackend: detected.hasBackend || false,
+      backend: detected.backend || null,
+      envApiUrl: detected.envApiUrl || null,
+      dualLabel: detected.dualLabel || null
     };
 
-    saveProjects([newProject, ...projects]);
+    let updatedProjects;
+    if (existingIndex >= 0) {
+      updatedProjects = [...projects];
+      updatedProjects[existingIndex] = newProject;
+    } else {
+      updatedProjects = [newProject, ...projects];
+    }
+
+    saveProjects(updatedProjects);
     openTab({ id: newProject.id, title: `Proyecto / ${newProject.name}`, type: 'project-detail', project: newProject });
   };
 
@@ -325,7 +408,8 @@ export default function App() {
 
   const handleOpenEditor = (folderPath) => {
     if (window.electronAPI) {
-      window.electronAPI.openInEditor(folderPath);
+      const preferredCmd = localStorage.getItem('lummo-preferred-editor') || 'code';
+      window.electronAPI.openInEditor(folderPath, preferredCmd);
     }
   };
 
@@ -405,12 +489,16 @@ export default function App() {
         canGoForward={navIndex < navHistory.length - 1}
         onGoBack={handleGoBack}
         onGoForward={handleGoForward}
+        onReorderTabs={reorderTabs}
+        onTogglePinTab={togglePinTab}
+        onCloseOtherTabs={closeOtherTabs}
+        onDuplicateTab={duplicateTab}
         theme={theme}
         language={language}
       />
 
       {/* Main Content Pane rendered according to Active Tab */}
-      <main className="flex-1 overflow-y-auto custom-scrollbar">
+      <main className={`flex-1 flex flex-col ${activeTabObj?.type === 'home' ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'}`}>
         <ErrorBoundary>
           {activeTabObj?.type === 'home' && (
             <HomeDashboard
@@ -491,7 +579,7 @@ export default function App() {
           activeProjectId={activeLogsProject}
           projects={projects}
           onClose={() => setActiveLogsProject(null)}
-          onClearLogs={(id) => setLogs(prev => ({ ...prev, [id]: [] }))}
+          onClearLogs={handleClearProjectLogs}
         />
       )}
 
@@ -507,6 +595,7 @@ export default function App() {
           language={language}
           onSelectLanguage={(lang) => setLanguage(lang)}
           onOpenOnboarding={() => setShowOnboarding(true)}
+          onClearAllLogs={handleClearAllLogs}
         />
       )}
 
@@ -526,6 +615,7 @@ export default function App() {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImportFolder={handleImportFolderPath}
+        projects={projects}
         theme={theme}
         language={language}
       />

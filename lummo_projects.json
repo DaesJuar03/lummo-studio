@@ -1,0 +1,24 @@
+[
+  {
+    "id": "proj-1786498697220",
+    "name": "web",
+    "path": "C:\\Users\\desau\\OneDrive\\Escritorio\\inmobiliaria_crm\\web",
+    "techStack": "Next.js App",
+    "command": "npm run dev",
+    "port": 3000,
+    "status": "STOPPED",
+    "hasBackend": true,
+    "backend": {
+      "name": "Servidor Backend API",
+      "path": "C:\\Users\\desau\\OneDrive\\Escritorio\\inmobiliaria_crm\\web",
+      "subfolder": "",
+      "techStack": "Backend Configurado en .env",
+      "icon": "node",
+      "command": "npm run dev:api",
+      "defaultPort": 3000,
+      "availableCommands": []
+    },
+    "envApiUrl": "http://localhost:3000/api",
+    "dualLabel": "Entorno Dual: Next.js App + Backend"
+  }
+]

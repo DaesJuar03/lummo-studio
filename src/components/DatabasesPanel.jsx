@@ -137,7 +137,7 @@ export default function DatabasesPanel({
   const notDetectedEngines = databases.filter(db => !db.installed);
 
   return (
-    <div className={`p-8 max-w-7xl mx-auto space-y-8 min-h-[calc(100vh-60px)] ${
+    <div className={`py-6 px-8 max-w-7xl w-full mx-auto space-y-8 flex-1 ${
       isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
     }`}>
       
@@ -160,7 +160,7 @@ export default function DatabasesPanel({
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-2xl flex items-center space-x-2 shadow-md shadow-blue-600/20 transition-all text-xs"
         >
           <Plus className="h-4 w-4" />
-          <span>+ Crear Nueva BD</span>
+          <span>Crear Nueva BD</span>
         </motion.button>
       </div>
 

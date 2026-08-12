@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { X, Play, Table, Check } from 'lucide-react';
+import { X, Play, Table, Check, Network, Download } from 'lucide-react';
+import ErDiagramModal from './ErDiagramModal';
+import DataExportModal from './DataExportModal';
 
 export default function SQLiteWorkbench({ onClose, theme }) {
   const [query, setQuery] = useState('SELECT * FROM users;');
   const [selectedTable, setSelectedTable] = useState('users');
+  const [tablesList, setTablesList] = useState(['users', 'projects', 'sessions', 'settings_config']);
+  const [showErModal, setShowErModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [results, setResults] = useState([
     { id: 1, name: 'Admin Lummo', email: 'admin@lummo.local', role: 'Administrator', status: 'Active' },
     { id: 2, name: 'Desarrollador', email: 'dev@lummo.local', role: 'Developer', status: 'Active' },
@@ -13,27 +18,66 @@ export default function SQLiteWorkbench({ onClose, theme }) {
 
   const isDark = theme === 'dark';
 
-  const tablesList = ['users', 'projects', 'sessions', 'settings_config'];
+  React.useEffect(() => {
+    if (window.electronAPI?.db?.getSchema) {
+      window.electronAPI.db.getSchema({ id: 'sqlite' }).then((res) => {
+        if (res.success && res.tables) {
+          const keys = Object.keys(res.tables);
+          if (keys.length > 0) {
+            setTablesList(keys);
+            const firstTbl = keys[0];
+            setSelectedTable(firstTbl);
+            setResults(res.tables[firstTbl] || []);
+            setQuery(`SELECT * FROM ${firstTbl};`);
+          }
+        }
+      });
+    }
+  }, []);
 
-  const handleRunQuery = () => {
-    setMessage(`Consulta "${query.substring(0, 30)}..." ejecutada correctamente.`);
+  const handleRunQuery = async () => {
+    if (window.electronAPI?.db?.executeQuery) {
+      const res = await window.electronAPI.db.executeQuery({ id: 'sqlite' }, query);
+      if (res.success) {
+        setResults(res.rows || []);
+        setMessage(`Consulta ejecutada con éxito (${res.count} filas / ${res.executionTimeMs || 0} ms)`);
+        if (/CREATE|INSERT|UPDATE|DELETE|DROP|ALTER/i.test(query)) {
+          const schemaRes = await window.electronAPI.db.getSchema({ id: 'sqlite' });
+          if (schemaRes.success) setTablesList(Object.keys(schemaRes.tables));
+        }
+      } else {
+        setMessage(`Error SQL: ${res.error}`);
+      }
+    } else {
+      setMessage(`Consulta "${query.substring(0, 30)}..." ejecutada correctamente.`);
+    }
   };
 
-  const handleSelectTable = (tbl) => {
+  const handleSelectTable = async (tbl) => {
     setSelectedTable(tbl);
-    setQuery(`SELECT * FROM ${tbl};`);
-    if (tbl === 'projects') {
-      setResults([
-        { id: 101, project_name: 'mi-proyecto-react', port: 5173, status: 'RUNNING' },
-        { id: 102, project_name: 'api-express', port: 3000, status: 'STOPPED' }
-      ]);
-      setMessage('Consulta "SELECT * FROM projects;" ejecutada (2 filas)');
+    const sqlStr = `SELECT * FROM ${tbl};`;
+    setQuery(sqlStr);
+
+    if (window.electronAPI?.db?.executeQuery) {
+      const res = await window.electronAPI.db.executeQuery({ id: 'sqlite' }, sqlStr);
+      if (res.success) {
+        setResults(res.rows || []);
+        setMessage(`Consulta "${sqlStr}" ejecutada (${res.count} filas)`);
+      }
     } else {
-      setResults([
-        { id: 1, name: 'Admin Lummo', email: 'admin@lummo.local', role: 'Administrator', status: 'Active' },
-        { id: 2, name: 'Desarrollador', email: 'dev@lummo.local', role: 'Developer', status: 'Active' }
-      ]);
-      setMessage(`Consulta "SELECT * FROM ${tbl};" ejecutada`);
+      if (tbl === 'projects') {
+        setResults([
+          { id: 101, project_name: 'mi-proyecto-react', port: 5173, status: 'RUNNING' },
+          { id: 102, project_name: 'api-express', port: 3000, status: 'STOPPED' }
+        ]);
+        setMessage('Consulta "SELECT * FROM projects;" ejecutada (2 filas)');
+      } else {
+        setResults([
+          { id: 1, name: 'Admin Lummo', email: 'admin@lummo.local', role: 'Administrator', status: 'Active' },
+          { id: 2, name: 'Desarrollador', email: 'dev@lummo.local', role: 'Developer', status: 'Active' }
+        ]);
+        setMessage(`Consulta "SELECT * FROM ${tbl};" ejecutada`);
+      }
     }
   };
 
@@ -50,14 +94,38 @@ export default function SQLiteWorkbench({ onClose, theme }) {
             <h3 className="font-extrabold text-base">Visualizador de Tablas & Workbench SQL</h3>
             <p className="text-xs text-slate-500">Explorador de registros y ejecutor de consultas en tiempo real</p>
           </div>
-          <button 
-            onClick={onClose} 
-            className={`p-2 rounded-xl transition-colors ${
-              isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
-            }`}
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowErModal(true)}
+              className={`text-xs py-1.5 px-3 rounded-xl border font-semibold flex items-center gap-1.5 transition-colors ${
+                isDark ? 'bg-slate-800 border-slate-700 text-purple-400 hover:bg-slate-700' : 'bg-slate-100 border-slate-300 text-purple-600 hover:bg-slate-200'
+              }`}
+              title="Ver Diagrama ER"
+            >
+              <Network className="w-3.5 h-3.5" />
+              <span>Diagrama ER</span>
+            </button>
+
+            <button
+              onClick={() => setShowExportModal(true)}
+              className={`text-xs py-1.5 px-3 rounded-xl border font-semibold flex items-center gap-1.5 transition-colors ${
+                isDark ? 'bg-slate-800 border-slate-700 text-emerald-400 hover:bg-slate-700' : 'bg-slate-100 border-slate-300 text-emerald-600 hover:bg-slate-200'
+              }`}
+              title="Exportar Datos (CSV, JSON, Excel, SQL)"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Exportar</span>
+            </button>
+
+            <button 
+              onClick={onClose} 
+              className={`p-2 rounded-xl transition-colors ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+              }`}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Content Layout */}
@@ -165,6 +233,22 @@ export default function SQLiteWorkbench({ onClose, theme }) {
 
         </div>
       </div>
+
+      {/* ER Diagram Modal */}
+      <ErDiagramModal
+        isOpen={showErModal}
+        onClose={() => setShowErModal(false)}
+        dbConfig={{ id: 'sqlite', name: 'SQLite (Lummo Local)' }}
+      />
+
+      {/* Advanced Multi-format Data Export Modal */}
+      <DataExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        tableName={selectedTable}
+        rows={results}
+        columns={results.length > 0 ? Object.keys(results[0]) : []}
+      />
     </div>
   );
 }

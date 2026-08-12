@@ -16,9 +16,15 @@ import {
   Trash2,
   FileSpreadsheet,
   FileJson,
-  FileCode
+  FileCode,
+  Camera,
+  Network,
+  Download
 } from 'lucide-react';
 import ImportExportSqlModal from './ImportExportSqlModal';
+import ErDiagramModal from './ErDiagramModal';
+import DataExportModal from './DataExportModal';
+
 
 export default function DatabaseDetailPage({
   db,
@@ -31,6 +37,8 @@ export default function DatabaseDetailPage({
   const [queryMessage, setQueryMessage] = useState('');
   const [copied, setCopied] = useState(false);
   const [showImportExport, setShowImportExport] = useState(false);
+  const [showErModal, setShowErModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [exportNotice, setExportNotice] = useState('');
 
   // Database Execution Status ('RUNNING' vs 'STOPPED')
@@ -82,6 +90,17 @@ export default function DatabaseDetailPage({
 
   const tablesList = Object.keys(dbData);
 
+  // Load Real Database Schema from IPC
+  useEffect(() => {
+    if (window.electronAPI?.db?.getSchema && isRunning) {
+      window.electronAPI.db.getSchema(db).then((res) => {
+        if (res.success && res.tables) {
+          setDbData(res.tables);
+        }
+      });
+    }
+  }, [db, isRunning]);
+
   useEffect(() => {
     if (tablesList.length > 0) {
       if (!selectedTable || !dbData[selectedTable]) {
@@ -121,21 +140,58 @@ export default function DatabaseDetailPage({
     setNewTableCols(updated);
   };
 
-  const handleCreateTable = (tableNameStr) => {
+  const handleCreateTable = async (tableNameStr) => {
     const formatted = tableNameStr.trim().toLowerCase().replace(/\s+/g, '_');
     if (!formatted) return;
 
-    if (!dbData[formatted]) {
+    // Filter valid non-empty columns & convert UI data types to valid SQL
+    const validCols = newTableCols
+      .filter(c => c.name && c.name.trim() !== '')
+      .map(c => {
+        const colName = c.name.trim().toLowerCase().replace(/\s+/g, '_');
+        let colType = c.type;
+        if (colType === 'INT (PRIMARY KEY)') {
+          colType = 'INTEGER PRIMARY KEY';
+        }
+        return `"${colName}" ${colType}`;
+      });
+
+    const colSql = validCols.length > 0 ? validCols.join(', ') : '"id" INTEGER PRIMARY KEY';
+    const createSql = `CREATE TABLE IF NOT EXISTS "${formatted}" (${colSql});`;
+
+    let createdSuccessfully = false;
+
+    if (window.electronAPI?.db?.executeQuery) {
+      try {
+        const res = await window.electronAPI.db.executeQuery(db, createSql);
+        if (res.success) {
+          createdSuccessfully = true;
+          const schemaRes = await window.electronAPI.db.getSchema(db);
+          if (schemaRes.success && schemaRes.tables) {
+            setDbData(schemaRes.tables);
+          } else {
+            setDbData(prev => ({ ...prev, [formatted]: [] }));
+          }
+          setQueryMessage(`¡Tabla "${formatted}" creada exitosamente en la base de datos!`);
+        } else {
+          setQueryMessage(`Advertencia SQL: ${res.error || 'Error al ejecutar SQL'}`);
+        }
+      } catch (err) {
+        console.error('Error al ejecutar query de creación de tabla:', err);
+      }
+    }
+
+    if (!createdSuccessfully) {
       setDbData(prev => ({
         ...prev,
-        [formatted]: []
+        [formatted]: prev[formatted] || []
       }));
-      setSelectedTable(formatted);
-      setQuery(`SELECT * FROM ${formatted};`);
-      setQueryMessage(`¡Tabla "${formatted}" creada con esquemas de columna!`);
-    } else {
-      setQueryMessage(`La tabla "${formatted}" ya existe.`);
+      setQueryMessage(`¡Tabla "${formatted}" creada en la estructura local!`);
     }
+
+    setSelectedTable(formatted);
+    setActiveSubTab('tables');
+    setQuery(`SELECT * FROM "${formatted}";`);
     setNewTableName('');
     setShowNewTableForm(false);
   };
@@ -172,64 +228,82 @@ export default function DatabaseDetailPage({
     setTimeout(() => setExportNotice(''), 3000);
   };
 
-  const handleInsertRow = (e) => {
+  const handleInsertRow = async (e) => {
     e.preventDefault();
-    if (!selectedTable || !dbData[selectedTable]) return;
+    if (!selectedTable) return;
 
-    const currentRows = dbData[selectedTable];
-    const newId = currentRows.length + 1;
-    const newRecord = {
-      id: newId,
-      col_1: insertData.col1 || `Registro ${newId}`,
-      col_2: insertData.col2 || 'Dato Demo',
-      created_at: new Date().toISOString().split('T')[0]
-    };
-
-    setDbData(prev => ({
-      ...prev,
-      [selectedTable]: [...(prev[selectedTable] || []), newRecord]
-    }));
+    if (window.electronAPI?.db?.executeQuery && isRunning) {
+      const col1Val = insertData.col1 || 'Registro Nuevo';
+      const col2Val = insertData.col2 || 'Dato Demo';
+      const insertSql = `INSERT INTO "${selectedTable}" VALUES (NULL, '${col1Val}', '${col2Val}');`;
+      const res = await window.electronAPI.db.executeQuery(db, insertSql);
+      if (res.success) {
+        const schemaRes = await window.electronAPI.db.getSchema(db);
+        if (schemaRes.success) setDbData(schemaRes.tables);
+        setQueryMessage(`¡Fila insertada en "${selectedTable}"!`);
+      } else {
+        setQueryMessage(`Error al insertar: ${res.error}`);
+      }
+    } else {
+      const currentRows = dbData[selectedTable] || [];
+      const newId = currentRows.length + 1;
+      const newRecord = {
+        id: newId,
+        col_1: insertData.col1 || `Registro ${newId}`,
+        col_2: insertData.col2 || 'Dato Demo',
+        created_at: new Date().toISOString().split('T')[0]
+      };
+      setDbData(prev => ({ ...prev, [selectedTable]: [...(prev[selectedTable] || []), newRecord] }));
+      setQueryMessage(`¡Fila insertada en "${selectedTable}"!`);
+    }
 
     setInsertData({ col1: '', col2: '', col3: '' });
     setShowInsertRowForm(false);
-    setQueryMessage(`¡Fila insertada en "${selectedTable}"!`);
   };
 
-  const handleDropTable = (tblName) => {
-    setDbData(prev => {
-      const copy = { ...prev };
-      delete copy[tblName];
-      return copy;
-    });
-    setSelectedTable('');
-    setQueryMessage(`Tabla "${tblName}" eliminada de la base de datos.`);
-  };
-
-  const handleRunQuery = () => {
-    const trimmed = query.trim().toUpperCase();
-
-    if (trimmed.startsWith('CREATE TABLE')) {
-      const match = query.match(/CREATE TABLE\s+([a-zA-Z0-9_]+)/i);
-      const tblName = match ? match[1] : 'nueva_tabla';
-      handleCreateTable(tblName);
-    } else if (trimmed.startsWith('INSERT INTO')) {
-      const match = query.match(/INSERT INTO\s+([a-zA-Z0-9_]+)/i);
-      const tblName = match ? match[1] : selectedTable;
-      if (tblName && dbData[tblName]) {
-        const newRecord = { id: (dbData[tblName].length + 1), val: 'Dato desde Query', date: new Date().toLocaleTimeString() };
-        setDbData(prev => ({ ...prev, [tblName]: [...prev[tblName], newRecord] }));
-        setQueryMessage(`Fila insertada en "${tblName}" vía Query SQL.`);
+  const handleDropTable = async (tblName) => {
+    if (window.electronAPI?.db?.executeQuery && isRunning) {
+      const res = await window.electronAPI.db.executeQuery(db, `DROP TABLE "${tblName}";`);
+      if (res.success) {
+        const schemaRes = await window.electronAPI.db.getSchema(db);
+        if (schemaRes.success) setDbData(schemaRes.tables);
+        setSelectedTable('');
+        setQueryMessage(`Tabla "${tblName}" eliminada de la base de datos.`);
       } else {
-        setQueryMessage('Tabla no encontrada para insertar.');
+        setQueryMessage(`Error al eliminar tabla: ${res.error}`);
       }
-    } else if (trimmed.startsWith('DROP TABLE')) {
-      const match = query.match(/DROP TABLE\s+([a-zA-Z0-9_]+)/i);
-      const tblName = match ? match[1] : selectedTable;
-      if (tblName) handleDropTable(tblName);
-    } else if (trimmed.startsWith('SELECT')) {
-      setQueryMessage(`Consulta "${query.substring(0, 30)}..." ejecutada correctamente.`);
     } else {
-      setQueryMessage(`Comando SQL ejecutado con éxito.`);
+      setDbData(prev => {
+        const copy = { ...prev };
+        delete copy[tblName];
+        return copy;
+      });
+      setSelectedTable('');
+      setQueryMessage(`Tabla "${tblName}" eliminada de la base de datos.`);
+    }
+  };
+
+  const handleRunQuery = async () => {
+    if (!query.trim()) return;
+
+    if (window.electronAPI?.db?.executeQuery) {
+      const res = await window.electronAPI.db.executeQuery(db, query);
+      if (res.success) {
+        setQueryMessage(`Consulta ejecutada con éxito (${res.count} filas / ${res.executionTimeMs || 0} ms)`);
+        if (res.rows && res.rows.length > 0) {
+          if (selectedTable && dbData[selectedTable]) {
+            setDbData(prev => ({ ...prev, [selectedTable]: res.rows }));
+          }
+        }
+        if (/CREATE|INSERT|UPDATE|DELETE|DROP|ALTER/i.test(query)) {
+          const schemaRes = await window.electronAPI.db.getSchema(db);
+          if (schemaRes.success) setDbData(schemaRes.tables);
+        }
+      } else {
+        setQueryMessage(`Error SQL: ${res.error}`);
+      }
+    } else {
+      setQueryMessage(`Consulta "${query.substring(0, 30)}..." ejecutada.`);
     }
   };
 
@@ -241,7 +315,7 @@ export default function DatabaseDetailPage({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -10 }}
       transition={{ duration: 0.2 }}
-      className={`p-6 max-w-7xl mx-auto space-y-6 min-h-[calc(100vh-60px)] ${
+      className={`p-6 max-w-7xl w-full mx-auto space-y-6 flex-1 ${
         isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
       }`}
     >
@@ -280,40 +354,88 @@ export default function DatabaseDetailPage({
           </div>
         </div>
 
-        {/* Top Control Actions: Start / Stop Execution Toggle */}
-        <div className="flex items-center space-x-2">
+        {/* Top Control Actions: Icon-only Action Toolbar */}
+        <div className="flex items-center space-x-2 shrink-0">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={toggleDbExecution}
-            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all text-white shadow-xs ${
-              isRunning ? 'bg-rose-600 hover:bg-rose-700' : 'bg-blue-600 hover:bg-blue-700'
+            className={`p-2.5 rounded-xl font-bold text-xs flex items-center justify-center text-white shadow-md transition-all cursor-pointer ${
+              isRunning ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/20' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20'
             }`}
+            title={isRunning ? 'Apagar Servidor BD' : 'Ejecutar Servidor BD'}
           >
-            {isRunning ? <Square className="h-3.5 w-3.5 fill-white" /> : <Play className="h-3.5 w-3.5 fill-white" />}
-            <span>{isRunning ? 'Apagar Servidor BD' : 'Ejecutar Servidor BD'}</span>
+            {isRunning ? <Square className="h-4 w-4 fill-white" /> : <Play className="h-4 w-4 fill-white" />}
           </motion.button>
 
           <button
             onClick={handleCopyConn}
-            className={`text-xs py-2 px-3 rounded-xl border font-semibold flex items-center space-x-1.5 transition-colors ${
-              isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-slate-300 hover:bg-[#282828]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
+            title={copied ? '¡Cadena URL Copiada!' : 'Copiar Cadena de Conexión URL'}
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
-            <span>{copied ? '¡Copiado!' : 'Copiar Cadena URL'}</span>
+            {copied ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4 text-slate-400" />}
           </button>
 
           <button
             onClick={() => setShowImportExport(true)}
-            className={`text-xs py-2 px-3 rounded-xl border font-semibold flex items-center space-x-1.5 transition-colors ${
-              isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-slate-300 hover:bg-[#282828]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              isDark ? 'bg-[#181818] border-[#2e2e2e] text-blue-400 hover:bg-[#252525]' : 'bg-white border-slate-200 text-blue-600 hover:bg-slate-100'
             }`}
+            title="Dump SQL & Respaldos (.sql)"
           >
-            <Upload className="h-3.5 w-3.5 text-blue-500" />
-            <span>Dump SQL</span>
+            <Upload className="h-4 w-4" />
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('er')}
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              activeSubTab === 'er'
+                ? 'bg-purple-600 border-purple-500 text-white'
+                : isDark ? 'bg-[#181818] border-[#2e2e2e] text-purple-400 hover:bg-[#252525]' : 'bg-white border-slate-200 text-purple-600 hover:bg-slate-100'
+            }`}
+            title="Ver Diagrama de Entidad-Relación (ER)"
+          >
+            <Network className="h-4 w-4" />
+          </button>
+
+          <button
+            onClick={() => setShowExportModal(true)}
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              isDark ? 'bg-[#181818] border-[#2e2e2e] text-emerald-400 hover:bg-[#252525]' : 'bg-white border-slate-200 text-emerald-600 hover:bg-slate-100'
+            }`}
+            title="Exportación Avanzada de Datos (CSV, JSON, Excel, SQL)"
+          >
+            <Download className="h-4 w-4" />
+          </button>
+
+          <button
+            onClick={async () => {
+              if (window.electronAPI?.db?.createSnapshot && db) {
+                const res = await window.electronAPI.db.createSnapshot(db);
+                if (res.success) {
+                  setQueryMessage(`¡Snapshot "${res.fileName}" guardado en .lummo_backups/!`);
+                  setTimeout(() => setQueryMessage(''), 4000);
+                } else {
+                  setQueryMessage(`Error creando snapshot: ${res.error}`);
+                }
+              } else {
+                setQueryMessage(`¡Snapshot instantáneo generado con éxito!`);
+                setTimeout(() => setQueryMessage(''), 3000);
+              }
+            }}
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              isDark 
+                ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 hover:bg-purple-500/20' 
+                : 'bg-purple-50 border-purple-200 text-purple-600 hover:bg-purple-100'
+            }`}
+            title="Crear Snapshot Instantáneo SQL"
+          >
+            <Camera className="h-4 w-4" />
           </button>
         </div>
       </div>
+
 
       {/* Workspace Navigation Sub-tabs */}
       <div className={`flex items-center space-x-2 border-b pb-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200'}`}>
@@ -351,6 +473,18 @@ export default function DatabaseDetailPage({
           <Code className="h-3.5 w-3.5" />
           <span>Realizar Consultas SQL</span>
         </button>
+
+        <button
+          onClick={() => setActiveSubTab('er')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
+            activeSubTab === 'er'
+              ? 'bg-purple-600 text-white shadow-xs'
+              : isDark ? 'text-slate-400 hover:bg-[#242424] hover:text-white' : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
+          }`}
+        >
+          <Network className="h-3.5 w-3.5 text-purple-400" />
+          <span>Diagrama ER</span>
+        </button>
       </div>
 
       {/* SUB-TAB 1: VISTA GENERAL (OVERVIEW) */}
@@ -359,7 +493,7 @@ export default function DatabaseDetailPage({
           
           {/* Key Metrics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className={`pure-card p-5 space-y-2 border ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200'}`}>
+            <div className="space-y-2 py-1">
               <span className="text-xs font-bold font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                 <HardDrive className="h-4 w-4 text-blue-500" /> Tamaño Almacenado
               </span>
@@ -368,7 +502,7 @@ export default function DatabaseDetailPage({
               </div>
             </div>
 
-            <div className={`pure-card p-5 space-y-2 border ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200'}`}>
+            <div className="space-y-2 py-1">
               <span className="text-xs font-bold font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Table className="h-4 w-4 text-blue-500" /> Total de Tablas
               </span>
@@ -377,7 +511,7 @@ export default function DatabaseDetailPage({
               </div>
             </div>
 
-            <div className={`pure-card p-5 space-y-2 border ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200'}`}>
+            <div className="space-y-2 py-1">
               <span className="text-xs font-bold font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Activity className="h-4 w-4 text-emerald-500" /> Conexiones Activas
               </span>
@@ -388,7 +522,7 @@ export default function DatabaseDetailPage({
           </div>
 
           {/* Quick Create Table Section with Column Builder */}
-          <div className={`pure-card p-6 border space-y-4 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200'}`}>
+          <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between border-b pb-3 border-slate-200/40">
               <div>
                 <h3 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>Creación de Tablas & Estructura Avanzada</h3>
@@ -401,7 +535,7 @@ export default function DatabaseDetailPage({
                 className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-sm transition-all"
               >
                 <Plus className="h-4 w-4" />
-                <span>+ Crear Nueva Tabla</span>
+                <span>Crear Nueva Tabla</span>
               </motion.button>
             </div>
 
@@ -464,7 +598,7 @@ export default function DatabaseDetailPage({
                     className="text-xs text-blue-500 font-bold hover:text-blue-600 flex items-center space-x-1 pt-1"
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    <span>+ Añadir Otra Columna</span>
+                    <span>Añadir Otra Columna</span>
                   </button>
                 </div>
 
@@ -624,7 +758,7 @@ export default function DatabaseDetailPage({
                     className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center space-x-1 shadow-2xs"
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    <span>+ Fila</span>
+                    <span>Fila</span>
                   </button>
                 </div>
               )}
@@ -804,11 +938,34 @@ export default function DatabaseDetailPage({
         </motion.div>
       )}
 
+      {/* SUB-TAB 4: DIAGRAMA ER (ER DIAGRAM VIEW) */}
+      {activeSubTab === 'er' && (
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+          <ErDiagramModal dbConfig={db} theme={theme} isEmbedded={true} />
+        </motion.div>
+      )}
+
       {/* SQL Import Export Modal */}
       <ImportExportSqlModal
         isOpen={showImportExport}
         onClose={() => setShowImportExport(false)}
         dbEngine={db}
+      />
+
+      {/* ER Diagram Modal */}
+      <ErDiagramModal
+        isOpen={showErModal}
+        onClose={() => setShowErModal(false)}
+        dbConfig={db}
+      />
+
+      {/* Advanced Multi-format Data Export Modal */}
+      <DataExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        tableName={selectedTable}
+        rows={activeRows}
+        columns={activeRows.length > 0 ? Object.keys(activeRows[0]) : []}
       />
     </motion.div>
   );

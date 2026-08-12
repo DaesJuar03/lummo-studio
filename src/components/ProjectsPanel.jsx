@@ -80,7 +80,7 @@ export default function ProjectsPanel({
   );
 
   return (
-    <div className={`p-8 max-w-7xl mx-auto space-y-8 min-h-[calc(100vh-60px)] ${
+    <div className={`py-6 px-8 max-w-7xl w-full mx-auto space-y-8 flex-1 ${
       isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
     }`}>
       
@@ -163,46 +163,52 @@ export default function ProjectsPanel({
               >
                 {/* Top Info Row */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center space-x-3.5 min-w-0">
-                    <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center font-bold shrink-0 ${
+                  <div className="flex items-center space-x-3 min-w-0">
+                    <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-medium shrink-0 ${
                       isRunning 
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' 
                         : isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
                     }`}>
-                      <Code className="h-5 w-5" />
+                      <Code className="h-4 w-4" />
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center space-x-2.5">
-                        <h3 className={`font-extrabold text-lg tracking-tight truncate hover:text-blue-500 transition-colors ${
+                      <div className="flex items-center space-x-2">
+                        <h3 className={`font-semibold text-base tracking-tight truncate hover:text-blue-500 transition-colors ${
                           isDark ? 'text-white' : 'text-slate-900'
                         }`}>
                           {project.name}
                         </h3>
-                        <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-md border flex items-center gap-1.5 ${
-                          isRunning ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : isDark ? 'bg-[#181818] text-slate-400 border-[#2e2e2e]' : 'bg-slate-100 text-slate-600 border-slate-200'
+                        <span className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border flex items-center gap-1.5 ${
+                          isRunning ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' : isDark ? 'bg-[#181818] text-slate-400 border-[#2e2e2e]' : 'bg-slate-100 text-slate-600 border-slate-200'
                         }`}>
-                          <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
                           {isRunning ? 'RUNNING' : 'STOPPED'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 font-mono mt-0.5 truncate" title={project.path}>
+                      <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate" title={project.path}>
                         {project.path}
                       </p>
                     </div>
                   </div>
 
                   {/* Right Status Controls */}
-                  <div className="flex items-center space-x-3 shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg border bg-blue-50 text-blue-700 border-blue-200">
+                  <div className="flex items-center space-x-2 shrink-0 flex-wrap gap-y-1" onClick={(e) => e.stopPropagation()}>
+                    <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border bg-blue-500/10 text-blue-400 border-blue-500/20">
                       {project.techStack || 'Web Project'}
                     </span>
 
+                    {project.hasBackend && (
+                      <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border bg-purple-500/10 text-purple-400 border-purple-500/20">
+                        Entorno Dual: Backend ({project.backend?.techStack || 'API'})
+                      </span>
+                    )}
+
                     {/* Start / Stop Toggle */}
                     <motion.button
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.96 }}
                       onClick={() => onToggleProject(project)}
-                      className={`w-32 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all shadow-xs text-white ${
-                        isRunning ? 'bg-rose-600 hover:bg-rose-700' : 'bg-blue-600 hover:bg-blue-700'
+                      className={`w-28 py-2 rounded-xl text-xs font-medium flex items-center justify-center space-x-1.5 transition-all shadow-2xs text-white cursor-pointer ${
+                        isRunning ? 'bg-rose-600 hover:bg-rose-500' : 'bg-blue-600 hover:bg-blue-500'
                       }`}
                     >
                       {isRunning ? <Square className="h-3.5 w-3.5 fill-white" /> : <Play className="h-3.5 w-3.5 fill-white" />}

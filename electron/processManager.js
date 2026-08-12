@@ -149,3 +149,43 @@ export function stopProjectProcess(id, emitLog, emitStatus) {
     }
   }
 }
+
+export function runProjectScript(projectId, folderPath, scriptCommand, emitLog) {
+  if (!folderPath || !scriptCommand) {
+    if (emitLog) emitLog(projectId, '[Lummo Script Error] Ruta de carpeta o comando inválidos.');
+    return Promise.resolve({ success: false, error: 'Comando o carpeta vacíos' });
+  }
+
+  return new Promise((resolve) => {
+    emitLog(projectId, `\n[Lummo Script] === Ejecutando: "${scriptCommand}" ===`);
+    emitLog(projectId, `[Lummo Script] Carpeta: ${folderPath}`);
+
+    const child = spawn(scriptCommand, [], {
+      cwd: folderPath,
+      shell: true,
+      env: { ...process.env }
+    });
+
+    child.stdout.on('data', (data) => {
+      if (emitLog) emitLog(projectId, data.toString());
+    });
+
+    child.stderr.on('data', (data) => {
+      if (emitLog) emitLog(projectId, data.toString());
+    });
+
+    child.on('error', (err) => {
+      if (emitLog) emitLog(projectId, `[Lummo Script Error] ${err.message}`);
+      resolve({ success: false, error: err.message });
+    });
+
+    child.on('close', (code) => {
+      const msg = code === 0 
+        ? `[Lummo Script] Comando "${scriptCommand}" completado exitosamente.`
+        : `[Lummo Script] Comando "${scriptCommand}" finalizó con código de salida ${code}.`;
+      if (emitLog) emitLog(projectId, msg);
+      resolve({ success: code === 0, code });
+    });
+  });
+}
+

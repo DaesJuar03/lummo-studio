@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Settings as SettingsIcon, Cpu, Hash, Code, Sliders, RefreshCw, Sun, Moon, Languages } from 'lucide-react';
+import { X, Settings as SettingsIcon, Cpu, Hash, Code, Sliders, RefreshCw, Sun, Moon, Languages, Check } from 'lucide-react';
 import { availableLocales, getTranslations } from '../locales';
 
 export default function SettingsModal({ 
@@ -11,9 +11,41 @@ export default function SettingsModal({
   theme, 
   onToggleTheme,
   language = 'es',
-  onSelectLanguage
+  onSelectLanguage,
+  onClearAllLogs
 }) {
   const [activeCategory, setActiveCategory] = useState('services');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
+    return localStorage.getItem('lummo-notifications') !== 'false';
+  });
+  const [clearedLogsNotice, setClearedLogsNotice] = useState(false);
+
+  const [detectedEditors, setDetectedEditors] = useState([]);
+  const [isScanningEditors, setIsScanningEditors] = useState(false);
+  const [selectedEditorCmd, setSelectedEditorCmd] = useState(() => {
+    return localStorage.getItem('lummo-preferred-editor') || 'code';
+  });
+
+  const handleScanEditors = async () => {
+    if (window.electronAPI?.detectEditors) {
+      setIsScanningEditors(true);
+      const editors = await window.electronAPI.detectEditors();
+      setDetectedEditors(editors || []);
+      setIsScanningEditors(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (activeCategory === 'editor') {
+      handleScanEditors();
+    }
+  }, [activeCategory]);
+
+  const handleClearLogsAction = () => {
+    if (onClearAllLogs) onClearAllLogs();
+    setClearedLogsNotice(true);
+    setTimeout(() => setClearedLogsNotice(false), 2500);
+  };
 
   const t = getTranslations(language);
 
@@ -188,14 +220,129 @@ export default function SettingsModal({
               {/* Category 3: Editor de Código */}
               {activeCategory === 'editor' && (
                 <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-6">
-                  <div className={`border-b pb-4 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
-                    <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.codeEditorTab}</h4>
-                    <p className="text-xs text-slate-500">Editor predeterminado para abrir las carpetas de tus proyectos</p>
+                  <div className={`border-b pb-4 flex items-center justify-between ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
+                    <div>
+                      <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.codeEditorTab}</h4>
+                      <p className="text-xs text-slate-500">Selecciona el editor o IDE para abrir tus proyectos</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleScanEditors}
+                      disabled={isScanningEditors}
+                      className={`px-3 py-1.5 rounded-xl border flex items-center space-x-1.5 text-xs font-bold transition-all shadow-2xs ${
+                        isDark ? 'bg-[#242424] border-[#333333] text-slate-200 hover:bg-[#2c2c2c]' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${isScanningEditors ? 'animate-spin text-blue-500' : 'text-slate-400'}`} />
+                      <span>{isScanningEditors ? 'Escaneando...' : 'Re-escanear'}</span>
+                    </button>
                   </div>
 
-                  <div className="p-4 rounded-2xl border bg-blue-500/10 border-blue-500/30 text-blue-500 text-xs font-semibold">
-                    Se utilizará `Visual Studio Code` (`code`) mediante comandos de terminal. Si no se encuentra, se abrirá el Explorador de archivos de Windows.
+                  {/* Enterprise Dropdown Selector */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider block">
+                      Editor Predeterminado Seleccionado:
+                    </label>
+                    <select
+                      value={selectedEditorCmd}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setSelectedEditorCmd(val);
+                        localStorage.setItem('lummo-preferred-editor', val);
+                      }}
+                      className={`w-full p-3.5 rounded-2xl border text-xs font-bold font-mono focus:outline-none transition-all cursor-pointer shadow-2xs ${
+                        isDark 
+                          ? 'bg-[#181818] border-[#2e2e2e] text-white focus:border-blue-500' 
+                          : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-blue-600'
+                      }`}
+                    >
+                      {(detectedEditors || []).filter(e => e?.installed).length > 0 && (
+                        <optgroup label="Editores Instalados en el Sistema">
+                          {(detectedEditors || []).filter(e => e?.installed).map((ed) => (
+                            <option key={ed.id} value={ed.cmd}>
+                              {ed.name} ({ed.cmd})
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+
+                      {(detectedEditors || []).filter(e => e && !e.installed).length > 0 && (
+                        <optgroup label="Otros Editores e IDEs (No detectados en PATH)">
+                          {(detectedEditors || []).filter(e => e && !e.installed).map((ed) => (
+                            <option key={ed.id} value={ed.cmd}>
+                              {ed.name} ({ed.cmd})
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+
+                      {(!detectedEditors || detectedEditors.length === 0) && (
+                        <>
+                          <option value="code">Visual Studio Code (code)</option>
+                          <option value="cursor">Cursor AI Editor (cursor)</option>
+                          <option value="windsurf">Windsurf IDE (windsurf)</option>
+                          <option value="subl">Sublime Text (subl)</option>
+                          <option value="webstorm">JetBrains WebStorm (webstorm)</option>
+                          <option value="phpstorm">JetBrains PhpStorm (phpstorm)</option>
+                          <option value="explorer">Explorador de Archivos (explorer)</option>
+                        </>
+                      )}
+                    </select>
                   </div>
+
+                  {/* Grid List of Detected System Editors */}
+                  <div className="space-y-2 pt-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider block">
+                      Catálogo de Editores e IDEs Compatibles:
+                    </label>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-56 overflow-y-auto pr-1">
+                      {(detectedEditors || []).map((ed) => {
+                        const isSelected = selectedEditorCmd === ed.cmd;
+                        return (
+                          <button
+                            key={ed.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedEditorCmd(ed.cmd);
+                              localStorage.setItem('lummo-preferred-editor', ed.cmd);
+                            }}
+                            className={`p-3.5 rounded-2xl border flex items-center justify-between text-left transition-all cursor-pointer ${
+                              isSelected
+                                ? isDark
+                                  ? 'bg-[#2b2b2b] border-blue-500/60 ring-1 ring-blue-500 text-white'
+                                  : 'bg-blue-50/80 border-blue-500 ring-2 ring-blue-100 text-blue-900 font-bold'
+                                : isDark
+                                  ? 'bg-[#181818] border-[#2e2e2e] text-slate-400 hover:text-white hover:bg-[#222222]'
+                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                            }`}
+                          >
+                            <div className="space-y-0.5">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-bold text-xs">{ed.name}</span>
+                                <span className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-bold uppercase tracking-tight ${
+                                  ed.installed 
+                                    ? isDark
+                                      ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30'
+                                      : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                    : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'
+                                }`}>
+                                  {ed.installed ? 'Disponible' : 'No en PATH'}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-500 font-mono font-semibold">{ed.cmd}</p>
+                            </div>
+
+                            {isSelected && (
+                              <Check className="h-4 w-4 text-blue-500 shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                 </motion.div>
               )}
 
@@ -289,6 +436,48 @@ export default function SettingsModal({
                           </div>
                         </div>
                         {isDark && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* System Notifications & Logs Memory Management */}
+                  <div className="space-y-4 pt-4 border-t border-slate-200/40">
+                    <div className="flex items-center justify-between p-4 rounded-2xl border bg-slate-500/5 border-slate-200/50">
+                      <div>
+                        <span className="block text-xs font-bold">Notificaciones Nativas de Windows</span>
+                        <span className="block text-[11px] text-slate-500">Recibe alertas del sistema cuando tus servidores se inicien, fallen o finalicen.</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = !notificationsEnabled;
+                          setNotificationsEnabled(next);
+                          localStorage.setItem('lummo-notifications', String(next));
+                          if (next && window.electronAPI?.sendNotification) {
+                            window.electronAPI.sendNotification('Lummo Studio', 'Notificaciones del sistema activadas correctamente 🔔');
+                          }
+                        }}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold font-mono transition-all ${
+                          notificationsEnabled
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : 'bg-slate-300 text-slate-700'
+                        }`}
+                      >
+                        {notificationsEnabled ? 'ACTIVADAS' : 'DESACTIVADAS'}
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 rounded-2xl border bg-rose-500/5 border-rose-500/20">
+                      <div>
+                        <span className="block text-xs font-bold text-rose-500">Memoria de Logs de Servidores</span>
+                        <span className="block text-[11px] text-slate-500">Purga todas las líneas de salida almacenadas en la tienda del sistema.</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleClearLogsAction}
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition-all shadow-xs flex items-center gap-1.5"
+                      >
+                        {clearedLogsNotice ? '¡Memoria Limpiada!' : 'Limpiar Todos los Logs'}
                       </button>
                     </div>
                   </div>

@@ -66,8 +66,22 @@ export default function CloneRepoModal({
 
   const handleStartClone = async (e) => {
     e.preventDefault();
-    if (!repoUrl.trim()) {
+    const cleanUrl = (repoUrl || '').trim();
+    if (!cleanUrl) {
       setErrorMessage('Por favor ingresa una URL válida de repositorio Git.');
+      return;
+    }
+    if (cleanUrl.startsWith('-')) {
+      setErrorMessage('URL inválida. No se permiten opciones o argumentos de comando en la URL.');
+      return;
+    }
+    if (/[\x00-\x1F\x7F\r\n]/.test(cleanUrl)) {
+      setErrorMessage('La URL contiene caracteres prohibidos o saltos de línea.');
+      return;
+    }
+    const validGitProtocol = /^(https?:\/\/|git@|ssh:\/\/|git:\/\/)/i;
+    if (!validGitProtocol.test(cleanUrl)) {
+      setErrorMessage('Formato de URL no soportado. Debe comenzar con https://, http://, git@, ssh:// o git://');
       return;
     }
     if (!destinationFolder.trim()) {

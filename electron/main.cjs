@@ -20,6 +20,30 @@ function sanitizeShellCommand(cmd) {
   return clean;
 }
 
+function validateAndSanitizeGitUrl(repoUrl) {
+  if (typeof repoUrl !== 'string') {
+    return { valid: false, error: 'URL del repositorio no válida.' };
+  }
+  const cleanUrl = repoUrl.trim();
+  if (!cleanUrl) {
+    return { valid: false, error: 'Por favor ingresa una URL de repositorio Git.' };
+  }
+  if (cleanUrl.startsWith('-')) {
+    return { valid: false, error: 'URL inválida. No se permiten opciones de comando en la URL.' };
+  }
+  if (/[\x00-\x1F\x7F\r\n]/.test(cleanUrl)) {
+    return { valid: false, error: 'La URL contiene caracteres prohibidos o saltos de línea.' };
+  }
+  const validGitProtocol = /^(https?:\/\/|git@|ssh:\/\/|git:\/\/)/i;
+  if (!validGitProtocol.test(cleanUrl)) {
+    return { 
+      valid: false, 
+      error: 'Formato de URL no soportado. Debe comenzar con https://, http://, git@, ssh:// o git://' 
+    };
+  }
+  return { valid: true, cleanUrl };
+}
+
 function runProjectScript(projectId, folderPath, scriptCommand, emitLog) {
   const cleanCmd = sanitizeShellCommand(scriptCommand);
   if (!folderPath || !cleanCmd || !fs.existsSync(folderPath)) {
@@ -527,10 +551,16 @@ ipcMain.handle('cancel-clone-repository', async () => {
 ipcMain.handle('clone-repository', async (event, { repoUrl, destinationParentFolder }) => {
   return new Promise((resolve) => {
     try {
-      let cleanUrl = (repoUrl || '').trim();
+      const validation = validateAndSanitizeGitUrl(repoUrl);
+      if (!validation.valid) {
+        return resolve({ success: false, error: validation.error });
+      }
+
+      const cleanUrl = validation.cleanUrl;
       let repoName = path.basename(cleanUrl, '.git') || 'cloned-repo';
       if (repoName.endsWith('/')) repoName = repoName.slice(0, -1);
       repoName = path.basename(repoName, '.git');
+      repoName = repoName.replace(/[^a-zA-Z0-9_\-\.]/g, '_') || 'cloned-repo';
 
       const targetFolder = path.join(destinationParentFolder, repoName);
 
@@ -542,8 +572,8 @@ ipcMain.handle('clone-repository', async (event, { repoUrl, destinationParentFol
 
       emitProgress(10, 'Iniciando conexión con el servidor Git remoto...');
 
-      const child = spawn('git', ['clone', '--progress', cleanUrl, `"${targetFolder}"`], {
-        shell: true,
+      const child = spawn('git', ['clone', '--progress', '--', cleanUrl, targetFolder], {
+        shell: false,
         cwd: destinationParentFolder
       });
 

@@ -177,6 +177,35 @@ export default function SQLiteWorkbench({ onClose, theme }) {
                   isDark ? 'bg-slate-950 border-slate-800 text-blue-400 focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-blue-600 focus:border-blue-600'
                 }`}
               />
+
+              {/* SQL Autocomplete Helper Chips */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[10px] font-mono font-bold text-slate-500 mr-1">Autocompletar:</span>
+                {['SELECT * FROM', 'WHERE', 'ORDER BY id DESC', 'LIMIT 50'].map((kw) => (
+                  <button
+                    key={kw}
+                    type="button"
+                    onClick={() => setQuery((prev) => `${prev} ${kw}`.trim())}
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-md border font-semibold transition-all ${
+                      isDark ? 'bg-slate-800/80 border-slate-700 text-blue-400 hover:bg-slate-700' : 'bg-slate-100 border-slate-300 text-blue-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    + {kw}
+                  </button>
+                ))}
+                {tablesList.map((tbl) => (
+                  <button
+                    key={tbl}
+                    type="button"
+                    onClick={() => setQuery((prev) => `${prev} "${tbl}"`.trim())}
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-md border font-semibold transition-all ${
+                      isDark ? 'bg-purple-950/40 border-purple-800/40 text-purple-300 hover:bg-purple-900/60' : 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100'
+                    }`}
+                  >
+                    + "{tbl}"
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center justify-between border-b pb-3 border-slate-200/40">

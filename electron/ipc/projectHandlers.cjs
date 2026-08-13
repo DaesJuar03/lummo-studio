@@ -279,6 +279,12 @@ function registerProjectHandlers({
     return { success: true };
   });
 
+  safeHandle('write-project-stdin', (event, { projectId, input }) => {
+    if (!projectId || !input) return { success: false, error: 'Id o entrada vacíos' };
+    const result = processManager.sendProjectStdin(projectId, input, emitLog);
+    return { success: result };
+  });
+
   safeHandle('clear-all-logs', () => {
     projectLogsStore.clear();
     const win = getMainWindow();

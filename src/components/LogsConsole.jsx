@@ -129,6 +129,33 @@ export default function LogsConsole({ logs, activeProjectId, projects, onClose, 
           )}
           <div ref={endRef} />
         </div>
+
+        {/* Interactive Stdin CLI Bar */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const inputVal = e.target.stdinInput.value.trim();
+            if (inputVal && window.electronAPI?.writeProjectStdin) {
+              window.electronAPI.writeProjectStdin(activeProjectId, inputVal);
+              e.target.stdinInput.value = '';
+            }
+          }}
+          className="px-4 py-2 border-t border-slate-800 bg-slate-950 flex items-center gap-2"
+        >
+          <span className="text-blue-400 font-mono font-bold text-xs shrink-0">&gt;</span>
+          <input
+            name="stdinInput"
+            type="text"
+            placeholder="Escribe un comando o interactúa con la consola (stdin)..."
+            className="flex-1 bg-transparent text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white font-mono text-[11px] font-bold rounded-lg transition-colors shadow-2xs"
+          >
+            Enviar (Enter)
+          </button>
+        </form>
       </motion.div>
     </AnimatePresence>
   );

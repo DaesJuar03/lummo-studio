@@ -65,6 +65,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openLogWindow: (projectId, projectName) => ipcRenderer.invoke('open-log-window', { projectId, projectName }),
   getProjectLogs: (projectId) => ipcRenderer.invoke('get-project-logs', projectId),
   clearProjectLogs: (projectId) => ipcRenderer.invoke('clear-project-logs', projectId),
+  writeProjectStdin: (projectId, input) => ipcRenderer.invoke('write-project-stdin', { projectId, input }),
   clearAllLogs: () => ipcRenderer.invoke('clear-all-logs'),
 
   // Native System Notifications

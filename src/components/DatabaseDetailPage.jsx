@@ -25,6 +25,8 @@ import ImportExportSqlModal from './ImportExportSqlModal';
 import ErDiagramModal from './ErDiagramModal';
 import DataExportModal from './DataExportModal';
 import VirtualizedTable from './VirtualizedTable';
+import MockDataGeneratorModal from './MockDataGeneratorModal';
+import SchemaDesignerModal from './SchemaDesignerModal';
 
 
 export default function DatabaseDetailPage({
@@ -40,6 +42,8 @@ export default function DatabaseDetailPage({
   const [showImportExport, setShowImportExport] = useState(false);
   const [showErModal, setShowErModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showMockModal, setShowMockModal] = useState(false);
+  const [showSchemaDesigner, setShowSchemaDesigner] = useState(false);
   const [exportNotice, setExportNotice] = useState('');
 
   // Database Execution Status ('RUNNING' vs 'STOPPED')
@@ -432,6 +436,26 @@ export default function DatabaseDetailPage({
             title="Dump SQL & Respaldos (.sql)"
           >
             <Upload className="h-4 w-4" />
+          </button>
+
+          <button
+            onClick={() => setShowSchemaDesigner(true)}
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              isDark ? 'bg-[#181818] border-[#2e2e2e] text-blue-400 hover:bg-[#252525]' : 'bg-white border-slate-200 text-blue-600 hover:bg-slate-100'
+            }`}
+            title="Diseñador Visual de Esquemas & ORMs"
+          >
+            <Code className="h-4 w-4" />
+          </button>
+
+          <button
+            onClick={() => setShowMockModal(true)}
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              isDark ? 'bg-[#181818] border-[#2e2e2e] text-purple-400 hover:bg-[#252525]' : 'bg-white border-slate-200 text-purple-600 hover:bg-slate-100'
+            }`}
+            title="Generar Datos Sintéticos (Mock Data)"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
           </button>
 
           <button
@@ -974,6 +998,25 @@ export default function DatabaseDetailPage({
         tableName={selectedTable}
         rows={activeRows}
         columns={activeRows.length > 0 ? Object.keys(activeRows[0]) : []}
+      />
+
+      {/* Mock Data Generator Modal */}
+      <MockDataGeneratorModal
+        isOpen={showMockModal}
+        onClose={() => setShowMockModal(false)}
+        dbConfig={db}
+        tableName={selectedTable || 'usuarios'}
+        columns={activeRows.length > 0 ? Object.keys(activeRows[0]).map(k => ({ name: k, type: 'VARCHAR' })) : [{ name: 'id', pk: true }, { name: 'nombre', type: 'VARCHAR' }, { name: 'email', type: 'VARCHAR' }]}
+        onGenerated={() => loadTablesAndSchema()}
+        theme={theme}
+      />
+
+      {/* Visual Schema Designer & ORMs Export Modal */}
+      <SchemaDesignerModal
+        isOpen={showSchemaDesigner}
+        onClose={() => setShowSchemaDesigner(false)}
+        tableName={selectedTable || 'nueva_tabla'}
+        theme={theme}
       />
     </motion.div>
   );

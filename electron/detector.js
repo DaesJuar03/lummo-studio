@@ -13,7 +13,8 @@ function analyzeSingleFolder(folderPath) {
     hasPackageJson: false,
     availableCommands: [],
     isBackend: false,
-    isFrontend: false
+    isFrontend: false,
+    hasDocker: false
   };
 
   if (!fs.existsSync(folderPath)) {
@@ -110,8 +111,13 @@ function analyzeSingleFolder(folderPath) {
     return result;
   }
 
-  // Docker
-  if (files.includes('docker-compose.yml') || files.includes('Dockerfile')) {
+  // Check for Docker files
+  if (files.includes('docker-compose.yml') || files.includes('docker-compose.yaml') || files.includes('Dockerfile')) {
+    result.hasDocker = true;
+  }
+
+  // Docker fallback stack
+  if (files.includes('docker-compose.yml') || files.includes('docker-compose.yaml')) {
     result.techStack = 'Docker Container Environment';
     result.icon = 'docker';
     result.command = 'docker compose up';

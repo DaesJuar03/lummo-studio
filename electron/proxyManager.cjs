@@ -75,6 +75,28 @@ function initProxyServer() {
   }
 }
 
+const fs = require('fs');
+const path = require('path');
+
+function updateWindowsHostsFile(domain) {
+  if (process.platform !== 'win32') return { hostsUpdated: false, reason: 'Not Windows' };
+  const hostsPath = 'C:\\Windows\\System32\\drivers\\etc\\hosts';
+  try {
+    if (fs.existsSync(hostsPath)) {
+      const content = fs.readFileSync(hostsPath, 'utf-8');
+      const cleanDomain = domain.toLowerCase().trim();
+      if (!content.toLowerCase().includes(cleanDomain)) {
+        fs.appendFileSync(hostsPath, `\n127.0.0.1       ${cleanDomain}\n`, 'utf-8');
+        return { hostsUpdated: true, message: `Dominio ${cleanDomain} agregado a hosts file.` };
+      }
+      return { hostsUpdated: true, message: `Dominio ${cleanDomain} ya existía en hosts file.` };
+    }
+  } catch (err) {
+    return { hostsUpdated: false, error: err.message, manualLine: `127.0.0.1       ${domain}` };
+  }
+  return { hostsUpdated: false };
+}
+
 function registerDomain(domain, port) {
   if (!domain || !port) return;
   const cleanDomain = domain.toLowerCase().trim();
@@ -95,10 +117,27 @@ function getRegisteredDomains() {
   return list;
 }
 
+function setLocalDomain(domain, port) {
+  if (!domain || !port) return { success: false, error: 'Dominio o puerto no especificado' };
+  const cleanDomain = domain.toLowerCase().trim();
+  registerDomain(cleanDomain, port);
+  const hostsRes = updateWindowsHostsFile(cleanDomain);
+  return {
+    success: true,
+    domain: cleanDomain,
+    port: Number(port),
+    proxyUrl: `http://localhost:${proxyPort}/proxy/${port}`,
+    localUrl: `http://${cleanDomain}:${proxyPort}`,
+    ...hostsRes
+  };
+}
+
 module.exports = {
   initProxyServer,
   registerDomain,
   unregisterDomain,
   getRegisteredDomains,
+  setLocalDomain,
+  updateWindowsHostsFile,
   proxyPort
 };

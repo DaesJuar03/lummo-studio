@@ -20,7 +20,8 @@ import {
   RefreshCw,
   Server,
   Share2,
-  Zap
+  Zap,
+  Boxes
 } from 'lucide-react';
 import NetworkTunnelModal from './NetworkTunnelModal';
 import ScriptLauncherModal from './ScriptLauncherModal';
@@ -360,6 +361,21 @@ export default function ProjectDetailPage({
             title="Abrir Consola de Logs Independiente"
           >
             <Terminal className="h-4 w-4" />
+          </button>
+
+          <button
+            onClick={() => {
+              if (window.electronAPI?.runProjectScript) {
+                window.electronAPI.runProjectScript(project.id, project.path, 'docker compose up -d');
+              }
+            }}
+            className={`p-2.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
+              isDark ? 'bg-cyan-950/30 border-cyan-500/30 text-cyan-400 hover:bg-cyan-900/50' : 'bg-cyan-50 border-cyan-200 text-cyan-700 hover:bg-cyan-100'
+            }`}
+            title="Ejecutar docker compose up"
+          >
+            <Boxes className="h-4 w-4" />
+            <span>Docker Up</span>
           </button>
 
           <button

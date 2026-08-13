@@ -21,8 +21,8 @@ import {
   CheckCircle2,
   Globe
 } from 'lucide-react';
-import { availableLocales, getTranslations } from '../locales';
-import lummoLogo from '../assets/Lummo.png';
+import { availableLocales, getTranslations } from '../../locales';
+import lummoLogo from '../../assets/Lummo.png';
 
 export default function OnboardingWizard({
   isOpen,

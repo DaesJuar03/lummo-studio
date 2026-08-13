@@ -164,9 +164,26 @@ export default function NetworkTunnelModal({
               </div>
 
               {domainSaveMsg && (
-                <span className="text-xs text-purple-400 font-mono font-bold block pt-1">
-                  {domainSaveMsg}
-                </span>
+                <div className={`p-3 rounded-xl font-mono text-xs border ${
+                  typeof domainSaveMsg === 'object' && domainSaveMsg.type === 'warning'
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                    : typeof domainSaveMsg === 'object' && domainSaveMsg.type === 'error'
+                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                    : 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+                }`}>
+                  <p className="leading-relaxed">
+                    {typeof domainSaveMsg === 'string' ? domainSaveMsg : domainSaveMsg.text}
+                  </p>
+                  {typeof domainSaveMsg === 'object' && domainSaveMsg.url && (
+                    <button
+                      onClick={() => onOpenBrowser(domainSaveMsg.url)}
+                      className="mt-2 flex items-center gap-1.5 font-bold text-emerald-400 hover:underline cursor-pointer"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span>Abrir {domainSaveMsg.url}</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
 

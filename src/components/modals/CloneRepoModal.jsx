@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, GitBranch, Folder, Download, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { getTranslations } from '../locales';
+import { getTranslations } from '../../locales';
 
 export default function CloneRepoModal({
   isOpen,

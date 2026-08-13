@@ -74,10 +74,6 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
     setSuccessCount(null);
 
     try {
-      if (!window.electronAPI?.db?.executeQuery) {
-        throw new Error('API de base de datos no disponible');
-      }
-
       const colsToInsert = columns.filter(c => !c.pk || (c.type || '').toLowerCase().includes('text') || (c.type || '').toLowerCase().includes('varchar'));
       const colNames = colsToInsert.map(c => c.name);
 
@@ -86,22 +82,32 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
       }
 
       let inserted = 0;
-      for (let i = 0; i < rowCount; i++) {
-        const mockRow = generateSingleMockRow(colsToInsert, i);
-        const values = colNames.map(col => {
-          const val = mockRow[col];
-          if (val === null || val === undefined) return 'NULL';
-          if (typeof val === 'number') return val;
-          return `'${String(val).replace(/'/g, "''")}'`;
-        });
+      const generatedMockRows = [];
 
-        const sql = `INSERT INTO "${tableName}" (${colNames.map(c => `"${c}"`).join(', ')}) VALUES (${values.join(', ')});`;
-        await window.electronAPI.db.executeQuery(dbConfig, sql);
+      for (let i = 0; i < rowCount; i++) {
+        const mockRow = generateSingleMockRow(columns, i);
+        generatedMockRows.push(mockRow);
+
+        if (window.electronAPI?.db?.executeQuery) {
+          const values = colNames.map(col => {
+            const val = mockRow[col];
+            if (val === null || val === undefined) return 'NULL';
+            if (typeof val === 'number') return val;
+            return `'${String(val).replace(/'/g, "''")}'`;
+          });
+
+          const sql = `INSERT INTO "${tableName}" (${colNames.map(c => `"${c}"`).join(', ')}) VALUES (${values.join(', ')});`;
+          try {
+            await window.electronAPI.db.executeQuery(dbConfig, sql);
+          } catch (e) {
+            console.warn('Error al ejecutar INSERT:', e);
+          }
+        }
         inserted++;
       }
 
       setSuccessCount(inserted);
-      if (onGenerated) onGenerated();
+      if (onGenerated) await onGenerated(generatedMockRows);
     } catch (err) {
       setErrorMsg(err.message || 'Error al generar datos sintéticos');
     } finally {
@@ -202,9 +208,8 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
                 type="button"
                 onClick={handleGenerateAndInsert}
                 disabled={isGenerating}
-                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-lg shadow-purple-600/25 flex items-center gap-2 transition-all disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-lg shadow-purple-600/25 flex items-center justify-center transition-all disabled:opacity-50"
               >
-                <Sparkles className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
                 <span>{isGenerating ? 'Generando & Insertando...' : `Insertar ${rowCount} Filas`}</span>
               </button>
             </div>

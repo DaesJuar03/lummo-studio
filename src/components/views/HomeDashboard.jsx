@@ -18,9 +18,9 @@ import {
   GitBranch,
   Download
 } from 'lucide-react';
-import CreateDatabaseModal from './CreateDatabaseModal';
-import CloneRepoModal from './CloneRepoModal';
-import { getTranslations } from '../locales';
+import CreateDatabaseModal from '../modals/CreateDatabaseModal';
+import CloneRepoModal from '../modals/CloneRepoModal';
+import { getTranslations } from '../../locales';
 
 export default function HomeDashboard({
   projects = [],

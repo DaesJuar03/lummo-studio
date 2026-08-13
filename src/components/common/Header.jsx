@@ -14,7 +14,7 @@ import {
   Copy,
   FolderX
 } from 'lucide-react';
-import { getTranslations } from '../locales';
+import { getTranslations } from '../../locales';
 
 export default function Header({
   openTabs = [],

@@ -13,6 +13,10 @@ const { registerDbHandlers } = require('./ipc/dbHandlers.cjs');
 const { registerTunnelProxyHandlers } = require('./ipc/tunnelProxyHandlers.cjs');
 const { registerProjectHandlers } = require('./ipc/projectHandlers.cjs');
 
+// Modular Window and Tray Managers
+const { createMainWindow } = require('./managers/windowManager.cjs');
+const { createSystemTray: initSystemTray } = require('./managers/trayManager.cjs');
+
 function sanitizeShellCommand(cmd) {
   if (typeof cmd !== 'string') return '';
   // Remover caracteres de control nulos o no imprimibles
@@ -119,35 +123,7 @@ app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
 app.commandLine.appendSwitch('disable-http-cache');
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    minWidth: 900,
-    minHeight: 600,
-    title: 'Lummo Studio',
-    icon: fs.existsSync(appIconPath) ? appIconPath : path.join(__dirname, '../public/Lummo.png'),
-    frame: false,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.cjs'),
-      contextIsolation: true,
-      nodeIntegration: false
-    }
-  });
-
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
-  }
-
-  // Minimize to System Tray when closing the main window
-  mainWindow.on('close', (event) => {
-    if (!isQuitting) {
-      event.preventDefault();
-      mainWindow.hide();
-      return false;
-    }
-  });
+  mainWindow = createMainWindow(appIconPath, () => isQuitting);
 }
 
 let updateTrayContextMenu = () => {};
@@ -196,87 +172,21 @@ function stopAllProjects() {
 function createSystemTray() {
   if (tray) return;
 
-  const iconPath = fs.existsSync(appIconPath) ? appIconPath : path.join(__dirname, '../public/Lummo.png');
-  tray = new Tray(iconPath);
-  tray.setToolTip('Lummo Studio - Entornos de Desarrollo Locales');
-
-  updateTrayContextMenu = () => {
-    if (!tray) return;
-
-    const activeCount = runningProcesses.size;
-    const activeItems = [];
-
-    runningProcesses.forEach((item, projectId) => {
-      const name = item.name || projectId;
-      const port = item.port || 3000;
-      activeItems.push({
-        label: `  ⚡ ${name} (http://localhost:${port})`,
-        submenu: [
-          {
-            label: `Abrir en navegador (http://localhost:${port})`,
-            click: () => shell.openExternal(`http://localhost:${port}`)
-          },
-          {
-            label: 'Detener Servidor',
-            click: () => stopProjectById(projectId)
-          }
-        ]
-      });
-    });
-
-    const menuTemplate = [
-      { 
-        label: 'Lummo Studio v1.0', 
-        enabled: false 
-      },
-      {
-        label: activeCount > 0 ? `🟢 ${activeCount} Servidor(es) en ejecución` : '⚪ Sin servidores activos',
-        enabled: false
-      },
-      ...activeItems,
-      { type: 'separator' },
-      { 
-        label: 'Abrir Lummo Studio', 
-        click: () => {
-          if (mainWindow) {
-            mainWindow.show();
-            mainWindow.focus();
-          }
-        } 
-      },
-      ...(activeCount > 0 ? [
-        {
-          label: 'Detener Todos los Servidores',
-          click: () => stopAllProjects()
-        }
-      ] : []),
-      { type: 'separator' },
-      { 
-        label: 'Salir de Lummo (Cerrar todos los procesos)', 
-        click: () => {
-          isQuitting = true;
-          stopAllProjects();
-          app.quit();
-        } 
-      }
-    ];
-
-    tray.setContextMenu(Menu.buildFromTemplate(menuTemplate));
-  };
-
-  updateTrayContextMenu();
-
-  // Click on System Tray Icon restores/shows main window
-  tray.on('click', () => {
-    if (mainWindow) {
-      if (mainWindow.isVisible()) {
-        mainWindow.focus();
-      } else {
-        mainWindow.show();
-        mainWindow.focus();
-      }
+  const res = initSystemTray({
+    appIconPath,
+    getMainWindow: () => mainWindow,
+    runningProcesses,
+    stopProjectById,
+    stopAllProjects,
+    setQuittingAndQuit: () => {
+      isQuitting = true;
+      stopAllProjects();
+      app.quit();
     }
   });
+
+  tray = res.tray;
+  updateTrayContextMenu = res.updateTrayContextMenu;
 }
 
 function openLogWindow(projectId, projectName) {
@@ -324,14 +234,28 @@ app.whenReady().then(() => {
   // Register Modular IPC Handlers
   registerSystemHandlers(() => mainWindow, appIconPath);
   registerDbHandlers(() => mainWindow);
-  registerTunnelProxyHandlers((projectId, msg) => {
-    let existing = projectLogsStore.get(projectId) || [];
-    existing.push(msg);
-    projectLogsStore.set(projectId, existing);
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('process-log', { projectId, message: msg });
+  registerTunnelProxyHandlers(
+    (projectId, msg) => {
+      let existing = projectLogsStore.get(projectId) || [];
+      existing.push(msg);
+      if (existing.length > MAX_LOG_LINES) existing = existing.slice(-MAX_LOG_LINES);
+      projectLogsStore.set(projectId, existing);
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('process-log', { projectId, message: msg });
+      }
+    },
+    (projectId, url) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('tunnel-url', { projectId, tunnelUrl: url });
+      }
+      if (url) {
+        showNativeNotification({
+          title: 'Túnel Público Activo 🌐',
+          body: `URL Pública lista: ${url}`
+        });
+      }
     }
-  });
+  );
   registerProjectHandlers({
     getMainWindow: () => mainWindow,
     runningProcesses,
@@ -417,50 +341,8 @@ ipcMain.handle('clear-all-logs', () => {
 
 
 // --------------------------------------------------------------------------
-// Public Tunnels (Cloudflare / Localtunnel)
+// Public Tunnels (Cloudflare / Localtunnel) - Handled in registerTunnelProxyHandlers
 // --------------------------------------------------------------------------
-ipcMain.handle('start-tunnel', async (event, { projectId, port }) => {
-  const emitLog = (id, message) => {
-    let existing = projectLogsStore.get(id) || [];
-    existing.push(message);
-    if (existing.length > MAX_LOG_LINES) existing = existing.slice(-MAX_LOG_LINES);
-    projectLogsStore.set(id, existing);
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('process-log', { projectId: id, message });
-    }
-  };
-
-  const emitUrl = (id, url) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('tunnel-url', { projectId: id, tunnelUrl: url });
-    }
-    if (url) {
-      showNativeNotification({
-        title: 'Túnel Público Activo 🌐',
-        body: `URL Pública lista: ${url}`
-      });
-    }
-  };
-
-  tunnelManager.startTunnel(projectId, port, emitLog, emitUrl);
-  return { success: true };
-});
-
-ipcMain.handle('stop-tunnel', async (event, projectId) => {
-  const emitLog = (id, message) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('process-log', { projectId: id, message });
-    }
-  };
-  const emitUrl = (id, url) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('tunnel-url', { projectId: id, tunnelUrl: url });
-    }
-  };
-
-  tunnelManager.stopTunnel(projectId, emitLog, emitUrl);
-  return { success: true };
-});
 
 // --------------------------------------------------------------------------
 // Local Custom Domains (.test Proxy)
@@ -676,6 +558,17 @@ ipcMain.handle('start-project', async (event, project) => {
     }
   };
 
+  if (!project.path || !fs.existsSync(project.path)) {
+    const errorMsg = `[Lummo Studio Error] La carpeta del proyecto no existe: "${project.path}"`;
+    emitLog(project.id, errorMsg);
+    emitStatus(project.id, 'ERROR');
+    showNativeNotification({
+      title: 'Error al iniciar ⚠️',
+      body: `La carpeta no existe: ${project.path}`
+    });
+    return { success: false, error: errorMsg };
+  }
+
   const baseCommand = project.command || 'npm run dev';
   const port = project.port || 3000;
 
@@ -697,49 +590,66 @@ ipcMain.handle('start-project', async (event, project) => {
 
   emitLog(project.id, `[Lummo Studio] Ejecutando: ${finalCommand} en ${project.path} (Puerto ${port})...`);
 
-  const child = spawn(finalCommand, {
-    cwd: project.path,
-    shell: true,
-    env: { 
-      ...process.env, 
-      PORT: String(port), 
-      VITE_PORT: String(port),
-      NEXT_PUBLIC_PORT: String(port)
-    }
-  });
+  try {
+    const child = spawn(finalCommand, [], {
+      cwd: project.path,
+      shell: true,
+      env: { 
+        ...process.env, 
+        PORT: String(port), 
+        VITE_PORT: String(port),
+        NEXT_PUBLIC_PORT: String(port)
+      }
+    });
 
-  runningProcesses.set(project.id, { child, name: project.name || 'Proyecto', port, path: project.path });
-  emitStatus(project.id, 'RUNNING');
-  updateTrayContextMenu();
-
-  showNativeNotification({
-    title: 'Servidor Iniciado 🟢',
-    body: `${project.name || 'Proyecto'} escuchando en http://localhost:${port}`
-  });
-
-  child.stdout.on('data', (data) => {
-    emitLog(project.id, data.toString());
-  });
-
-  child.stderr.on('data', (data) => {
-    emitLog(project.id, data.toString());
-  });
-
-  child.on('close', (code) => {
-    emitLog(project.id, `[Lummo Studio] El proceso terminó con código ${code}`);
-    runningProcesses.delete(project.id);
-    updateTrayContextMenu();
-    emitStatus(project.id, 'STOPPED');
-
-    if (code !== 0 && code !== null) {
+    child.on('error', (err) => {
+      emitLog(project.id, `[Lummo Studio Error] Error al iniciar proceso: ${err.message}`);
+      runningProcesses.delete(project.id);
+      updateTrayContextMenu();
+      emitStatus(project.id, 'ERROR');
       showNativeNotification({
-        title: 'Servidor Finalizado ⚠️',
-        body: `${project.name || 'El proceso'} terminó con código de salida ${code}`
+        title: 'Error al iniciar ⚠️',
+        body: err.message
       });
-    }
-  });
+    });
 
-  return { success: true };
+    runningProcesses.set(project.id, { child, name: project.name || 'Proyecto', port, path: project.path });
+    emitStatus(project.id, 'RUNNING');
+    updateTrayContextMenu();
+
+    showNativeNotification({
+      title: 'Servidor Iniciado 🟢',
+      body: `${project.name || 'Proyecto'} escuchando en http://localhost:${port}`
+    });
+
+    child.stdout.on('data', (data) => {
+      emitLog(project.id, data.toString());
+    });
+
+    child.stderr.on('data', (data) => {
+      emitLog(project.id, data.toString());
+    });
+
+    child.on('close', (code) => {
+      emitLog(project.id, `[Lummo Studio] El proceso terminó con código ${code}`);
+      runningProcesses.delete(project.id);
+      updateTrayContextMenu();
+      emitStatus(project.id, 'STOPPED');
+
+      if (code !== 0 && code !== null) {
+        showNativeNotification({
+          title: 'Servidor Finalizado ⚠️',
+          body: `${project.name || 'El proceso'} terminó with código de salida ${code}`
+        });
+      }
+    });
+
+    return { success: true };
+  } catch (err) {
+    emitLog(project.id, `[Lummo Studio Error] No se pudo lanzar el proceso: ${err.message}`);
+    emitStatus(project.id, 'ERROR');
+    return { success: false, error: err.message };
+  }
 });
 
 ipcMain.handle('stop-project', async (event, projectId) => {

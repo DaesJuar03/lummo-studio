@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Database, X, ZoomIn, ZoomOut, RotateCcw, Key, Link2, Table, Loader2 } from 'lucide-react';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../../context/ToastContext';
 
 export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme = 'dark', isEmbedded = false }) {
   const [loading, setLoading] = useState(true);

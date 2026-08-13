@@ -1,21 +1,22 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import Header from './components/Header';
-import HomeDashboard from './components/HomeDashboard';
-import ProjectsPanel from './components/ProjectsPanel';
-import DatabasesPanel from './components/DatabasesPanel';
-import LogsConsole from './components/LogsConsole';
-import ErrorBoundary from './components/ErrorBoundary';
+import Header from './components/common/Header';
+import HomeDashboard from './components/views/HomeDashboard';
+import ProjectsPanel from './components/views/ProjectsPanel';
+import DatabasesPanel from './components/views/DatabasesPanel';
+import LogsConsole from './components/common/LogsConsole';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import { useTabNavigation } from './hooks/useTabNavigation';
 import { getTranslations, detectSystemLanguage } from './locales';
 
 // Code Splitting with React.lazy for heavy modals and detail pages
-const SettingsModal = lazy(() => import('./components/SettingsModal'));
-const CommandPaletteModal = lazy(() => import('./components/CommandPaletteModal'));
-const NewTabActionModal = lazy(() => import('./components/NewTabActionModal'));
-const ImportProjectModal = lazy(() => import('./components/ImportProjectModal'));
-const OnboardingWizard = lazy(() => import('./components/OnboardingWizard'));
-const StandaloneLogWindow = lazy(() => import('./components/StandaloneLogWindow'));
-const ProjectDetailPage = lazy(() => import('./components/ProjectDetailPage'));
-const DatabaseDetailPage = lazy(() => import('./components/DatabaseDetailPage'));
+const SettingsModal = lazy(() => import('./components/modals/SettingsModal'));
+const CommandPaletteModal = lazy(() => import('./components/modals/CommandPaletteModal'));
+const NewTabActionModal = lazy(() => import('./components/modals/NewTabActionModal'));
+const ImportProjectModal = lazy(() => import('./components/modals/ImportProjectModal'));
+const OnboardingWizard = lazy(() => import('./components/views/OnboardingWizard'));
+const StandaloneLogWindow = lazy(() => import('./components/views/StandaloneLogWindow'));
+const ProjectDetailPage = lazy(() => import('./components/views/ProjectDetailPage'));
+const DatabaseDetailPage = lazy(() => import('./components/views/DatabaseDetailPage'));
 
 export default function App() {
   const [projects, setProjects] = useState([]);
@@ -49,15 +50,23 @@ export default function App() {
 
   const t = getTranslations(language);
 
-  // Firefox / Chrome Browser-style Dynamic Tab System
-  const [openTabs, setOpenTabs] = useState([
-    { id: 'home', title: t.home, type: 'home', closable: false }
-  ]);
-  const [activeTabId, setActiveTabId] = useState('home');
-
-  // Navigation History Pointer for Back (<) and Forward (>)
-  const [navHistory, setNavHistory] = useState(['home']);
-  const [navIndex, setNavIndex] = useState(0);
+  // Custom Hook para Pestañas e Historial de Navegación
+  const {
+    openTabs,
+    setOpenTabs,
+    activeTabId,
+    setActiveTabId,
+    navIndex,
+    navHistory,
+    openTab,
+    closeTab,
+    reorderTabs,
+    togglePinTab,
+    closeOtherTabs,
+    duplicateTab,
+    handleGoBack,
+    handleGoForward
+  } = useTabNavigation(t);
 
   // Theme State ('light' vs 'dark')
   const [theme, setTheme] = useState(() => {
@@ -82,15 +91,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Update tabs title when language changes
+  // Guardar preferencia de idioma en localStorage
   useEffect(() => {
     localStorage.setItem('lummo-language', language);
-    setOpenTabs(prev => prev.map(tab => {
-      if (tab.id === 'home') return { ...tab, title: t.home };
-      if (tab.id === 'projects') return { ...tab, title: t.projects };
-      if (tab.id === 'databases') return { ...tab, title: t.databases };
-      return tab;
-    }));
   }, [language]);
 
   // Save custom databases to localStorage
@@ -241,100 +244,7 @@ export default function App() {
     closeTab(`db-${dbId}`);
   };
 
-  // Open / Select Tab Helper with Prefix Formatting
-  const openTab = ({ id, title, type, project = null, db = null }) => {
-    let tabTitle = title;
-    if (type === 'project-detail') {
-      const name = project?.name || title.replace(/^(Proyecto|Base de Datos)\s*\/\s*/, '');
-      tabTitle = `Proyecto / ${name}`;
-    } else if (type === 'database-detail') {
-      const name = db?.name || title.replace(/^(Proyecto|Base de Datos)\s*\/\s*/, '');
-      tabTitle = `Base de Datos / ${name}`;
-    }
 
-    const exists = openTabs.find(t => t.id === id);
-    if (!exists) {
-      const newTabObj = { id, title: tabTitle, type, project, db, closable: id !== 'home' };
-      setOpenTabs(prev => [...prev, newTabObj]);
-    } else {
-      setOpenTabs(prev => prev.map(t => t.id === id ? { ...t, title: tabTitle, project: project || t.project } : t));
-    }
-    setActiveTabId(id);
-
-    const newHistory = navHistory.slice(0, navIndex + 1);
-    newHistory.push(id);
-    setNavHistory(newHistory);
-    setNavIndex(newHistory.length - 1);
-  };
-
-  const closeTab = (tabId) => {
-    if (tabId === 'home') return; // Cannot close Home
-
-    const updated = openTabs.filter(t => t.id !== tabId);
-    setOpenTabs(updated);
-
-    if (activeTabId === tabId) {
-      const fallbackTab = updated[updated.length - 1] || updated[0];
-      if (fallbackTab) setActiveTabId(fallbackTab.id);
-    }
-  };
-
-  const reorderTabs = (draggedId, targetId) => {
-    setOpenTabs((prev) => {
-      const draggedIndex = prev.findIndex((t) => t.id === draggedId);
-      const targetIndex = prev.findIndex((t) => t.id === targetId);
-      if (draggedIndex < 0 || targetIndex < 0 || draggedIndex === targetIndex) return prev;
-      const copy = [...prev];
-      const [removed] = copy.splice(draggedIndex, 1);
-      copy.splice(targetIndex, 0, removed);
-      return copy;
-    });
-  };
-
-  const togglePinTab = (tabId) => {
-    setOpenTabs((prev) =>
-      prev.map((t) => (t.id === tabId ? { ...t, pinned: !t.pinned } : t))
-    );
-  };
-
-  const closeOtherTabs = (tabId) => {
-    setOpenTabs((prev) => prev.filter((t) => t.id === 'home' || t.id === tabId));
-    setActiveTabId(tabId);
-  };
-
-  const duplicateTab = (tabId) => {
-    const tabToDup = openTabs.find((t) => t.id === tabId);
-    if (!tabToDup) return;
-    const dupId = `${tabToDup.id}_dup_${Date.now()}`;
-    const dupTab = {
-      ...tabToDup,
-      id: dupId,
-      title: `${tabToDup.title} (Copia)`,
-      closable: true
-    };
-    setOpenTabs((prev) => [...prev, dupTab]);
-    setActiveTabId(dupId);
-  };
-
-  const handleGoBack = () => {
-    if (navIndex > 0) {
-      const prevTabId = navHistory[navIndex - 1];
-      setNavIndex(navIndex - 1);
-      if (openTabs.some(t => t.id === prevTabId)) {
-        setActiveTabId(prevTabId);
-      }
-    }
-  };
-
-  const handleGoForward = () => {
-    if (navIndex < navHistory.length - 1) {
-      const nextTabId = navHistory[navIndex + 1];
-      setNavIndex(navIndex + 1);
-      if (openTabs.some(t => t.id === nextTabId)) {
-        setActiveTabId(nextTabId);
-      }
-    }
-  };
 
   const handleImportFolderPath = async (folderPath) => {
     let detected = { name: 'proyecto-local', techStack: 'Vite + React', command: 'npm run dev', defaultPort: 5173 };

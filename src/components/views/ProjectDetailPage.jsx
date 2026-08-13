@@ -23,9 +23,9 @@ import {
   Zap,
   Boxes
 } from 'lucide-react';
-import NetworkTunnelModal from './NetworkTunnelModal';
-import ScriptLauncherModal from './ScriptLauncherModal';
-import ExecutionConfigModal from './ExecutionConfigModal';
+import NetworkTunnelModal from '../modals/NetworkTunnelModal';
+import ScriptLauncherModal from '../modals/ScriptLauncherModal';
+import ExecutionConfigModal from '../modals/ExecutionConfigModal';
 
 export default function ProjectDetailPage({
   project,
@@ -68,6 +68,19 @@ export default function ProjectDetailPage({
       setLocalDomainInput(`${project.id || 'app'}.test`);
     }
   }, [project?.port, project?.command, project?.id]);
+
+  useEffect(() => {
+    if (!window.electronAPI?.onTunnelUrl || !project?.id) return;
+    const unsub = window.electronAPI.onTunnelUrl(({ projectId, tunnelUrl: newUrl }) => {
+      if (projectId === project.id) {
+        setTunnelUrl(newUrl || '');
+        setIsStartingTunnel(false);
+      }
+    });
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
+  }, [project?.id]);
 
   // .env Variables State
   const [envContent, setEnvContent] = useState('');
@@ -157,26 +170,30 @@ export default function ProjectDetailPage({
     if (tunnelUrl) {
       // Stop active tunnel
       if (window.electronAPI?.stopTunnel) {
-        await window.electronAPI.stopTunnel(project.port);
+        await window.electronAPI.stopTunnel(project.id);
       }
       setTunnelUrl('');
     } else {
       // Start tunnel
       setIsStartingTunnel(true);
       if (window.electronAPI?.startTunnel) {
-        const res = await window.electronAPI.startTunnel(project.port);
-        if (res.success) {
-          setTunnelUrl(res.url);
+        const res = await window.electronAPI.startTunnel(project.id, project.port);
+        if (res && res.success) {
+          if (res.url) {
+            setTunnelUrl(res.url);
+            setIsStartingTunnel(false);
+          }
         } else {
-          alert(`Error iniciando túnel: ${res.error}`);
+          setIsStartingTunnel(false);
+          alert(`Error iniciando túnel: ${res?.error || 'No se pudo iniciar'}`);
         }
       } else {
         // Fallback simulation
         setTimeout(() => {
           setTunnelUrl(`https://lummo-preview-${project.port}.loca.lt`);
+          setIsStartingTunnel(false);
         }, 1000);
       }
-      setIsStartingTunnel(false);
     }
   };
 
@@ -188,15 +205,33 @@ export default function ProjectDetailPage({
   };
 
   const handleSaveLocalDomain = async () => {
+    const domain = localDomainInput.trim();
+    if (!domain) return;
     if (window.electronAPI?.setLocalDomain) {
-      const res = await window.electronAPI.setLocalDomain(localDomainInput.trim(), project.port);
+      const res = await window.electronAPI.setLocalDomain(domain, project.port);
       if (res.success) {
-        setDomainSaveMsg(`¡Dominio http://${localDomainInput.trim()} configurado!`);
-        setTimeout(() => setDomainSaveMsg(''), 3000);
+        if (res.hostsUpdated) {
+          setDomainSaveMsg({
+            type: 'success',
+            text: `Dominio activo: http://${domain}:3838 (o http://localhost:3838/proxy/${project.port})`,
+            url: res.localUrl || `http://${domain}:3838`
+          });
+        } else {
+          setDomainSaveMsg({
+            type: 'warning',
+            text: `Proxy activo: http://localhost:3838/proxy/${project.port} (Nota: Para usar ${domain} directamente, ejecuta Lummo como Administrador).`,
+            url: res.proxyUrl || `http://localhost:3838/proxy/${project.port}`
+          });
+        }
+      } else {
+        setDomainSaveMsg({ type: 'error', text: res.error || 'Error al configurar dominio' });
       }
     } else {
-      setDomainSaveMsg(`¡Dominio http://${localDomainInput.trim()} asignado a puerto ${project.port}!`);
-      setTimeout(() => setDomainSaveMsg(''), 3000);
+      setDomainSaveMsg({
+        type: 'success',
+        text: `¡Dominio http://${domain}:3838 configurado!`,
+        url: `http://${domain}:3838`
+      });
     }
   };
 
@@ -206,9 +241,9 @@ export default function ProjectDetailPage({
     setScriptMsg(`Ejecutando "${scriptCmd}"...`);
 
     if (window.electronAPI?.runProjectScript) {
-      const res = await window.electronAPI.runProjectScript(project.path, scriptCmd);
+      const res = await window.electronAPI.runProjectScript(project.id, project.path, scriptCmd);
       if (res.success) {
-        setScriptMsg(`¡Comando "${scriptCmd}" ejecutado con éxito (PID: ${res.pid})!`);
+        setScriptMsg(`¡Comando "${scriptCmd}" ejecutado con éxito!`);
       } else {
         setScriptMsg(`Error al ejecutar: ${res.error}`);
       }

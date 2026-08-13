@@ -1,6 +1,7 @@
 import { spawn, exec } from 'child_process';
 import net from 'net';
 import express from 'express';
+import fs from 'fs';
 
 const activeProcesses = new Map();
 const activeStaticServers = new Map();
@@ -37,6 +38,12 @@ export function startProjectProcess(project, emitLog, emitStatus) {
 
   if (activeProcesses.has(id) || activeStaticServers.has(id)) {
     emitLog(id, '[Lummo] El proyecto ya está en ejecución.');
+    return;
+  }
+
+  if (!folderPath || !fs.existsSync(folderPath)) {
+    emitLog(id, `[Lummo Error] La carpeta del proyecto no existe: "${folderPath}"`);
+    emitStatus(id, 'ERROR');
     return;
   }
 

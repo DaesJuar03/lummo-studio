@@ -12,8 +12,8 @@ import {
   Table,
   ChevronRight
 } from 'lucide-react';
-import CreateDatabaseModal from './CreateDatabaseModal';
-import ImportExportSqlModal from './ImportExportSqlModal';
+import CreateDatabaseModal from '../modals/CreateDatabaseModal';
+import ImportExportSqlModal from '../modals/ImportExportSqlModal';
 
 export default function DatabasesPanel({ 
   envStatus, 

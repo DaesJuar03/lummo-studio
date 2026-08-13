@@ -10,12 +10,19 @@ const activeTunnels = new Map();
  * @param {function} emitUrl 
  */
 function startTunnel(projectId, port, emitLog, emitUrl) {
+  const log = (id, msg) => {
+    if (typeof emitLog === 'function') emitLog(id, msg);
+  };
+  const urlCB = (id, url) => {
+    if (typeof emitUrl === 'function') emitUrl(id, url);
+  };
+
   if (activeTunnels.has(projectId)) {
-    emitLog(projectId, '[Lummo Tunnel] Ya existe un túnel activo para este proyecto.');
+    log(projectId, '[Lummo Tunnel] Ya existe un túnel activo para este proyecto.');
     return;
   }
 
-  emitLog(projectId, `[Lummo Tunnel] Creando túnel público en el puerto ${port}...`);
+  log(projectId, `[Lummo Tunnel] Creando túnel público en el puerto ${port}...`);
 
   const cmd = `npx -y localtunnel --port ${port}`;
   const child = spawn(cmd, [], { shell: true });
@@ -24,37 +31,37 @@ function startTunnel(projectId, port, emitLog, emitUrl) {
 
   child.stdout.on('data', (data) => {
     const output = data.toString();
-    emitLog(projectId, `[Lummo Tunnel] ${output}`);
+    log(projectId, `[Lummo Tunnel] ${output}`);
 
     // Extraer URL del túnel (ej. "your url is: https://abc-123.loca.lt")
     const match = output.match(/your url is:\s*(https:\/\/[^\s]+)/i) || output.match(/(https:\/\/[a-zA-Z0-9-]+\.loca\.lt)/i);
     if (match && match[1]) {
       const tunnelUrl = match[1].trim();
-      emitLog(projectId, `[Lummo Tunnel] ¡Túnel listo! URL Pública: ${tunnelUrl}`);
-      emitUrl(projectId, tunnelUrl);
+      log(projectId, `[Lummo Tunnel] ¡Túnel listo! URL Pública: ${tunnelUrl}`);
+      urlCB(projectId, tunnelUrl);
     }
   });
 
   child.stderr.on('data', (data) => {
     const errStr = data.toString();
-    emitLog(projectId, `[Lummo Tunnel] ${errStr}`);
+    log(projectId, `[Lummo Tunnel] ${errStr}`);
     const match = errStr.match(/your url is:\s*(https:\/\/[^\s]+)/i) || errStr.match(/(https:\/\/[a-zA-Z0-9-]+\.loca\.lt)/i);
     if (match && match[1]) {
       const tunnelUrl = match[1].trim();
-      emitUrl(projectId, tunnelUrl);
+      urlCB(projectId, tunnelUrl);
     }
   });
 
   child.on('error', (err) => {
-    emitLog(projectId, `[Lummo Tunnel Error] ${err.message}`);
+    log(projectId, `[Lummo Tunnel Error] ${err.message}`);
     activeTunnels.delete(projectId);
-    emitUrl(projectId, null);
+    urlCB(projectId, null);
   });
 
   child.on('close', (code) => {
-    emitLog(projectId, `[Lummo Tunnel] Túnel cerrado (Código: ${code})`);
+    log(projectId, `[Lummo Tunnel] Túnel cerrado (Código: ${code})`);
     activeTunnels.delete(projectId);
-    emitUrl(projectId, null);
+    urlCB(projectId, null);
   });
 }
 

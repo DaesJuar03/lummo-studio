@@ -7,19 +7,19 @@ function safeHandle(channel, listener) {
   ipcMain.handle(channel, listener);
 }
 
-function registerTunnelProxyHandlers(emitLogToProject) {
+function registerTunnelProxyHandlers(emitLogToProject, emitUrlToProject) {
   safeHandle('start-tunnel', async (event, { projectId, port }) => {
     try {
-      if (emitLogToProject) {
-        emitLogToProject(projectId, `\n[Túnel Público] Solicitando enlace público para puerto local ${port}...`);
-      }
-      const tunnelUrl = await tunnelManager.startTunnel(projectId, port);
-      if (emitLogToProject) {
-        emitLogToProject(projectId, `[Túnel Público Activo] Enlace asignado: ${tunnelUrl}`);
-      }
-      return { success: true, url: tunnelUrl };
+      const emitLog = (id, msg) => {
+        if (typeof emitLogToProject === 'function') emitLogToProject(id, msg);
+      };
+      const emitUrl = (id, url) => {
+        if (typeof emitUrlToProject === 'function') emitUrlToProject(id, url);
+      };
+      tunnelManager.startTunnel(projectId, port, emitLog, emitUrl);
+      return { success: true };
     } catch (err) {
-      if (emitLogToProject) {
+      if (typeof emitLogToProject === 'function') {
         emitLogToProject(projectId, `[Túnel Error] No se pudo establecer el túnel: ${err.message}`);
       }
       return { success: false, error: err.message };
@@ -28,11 +28,14 @@ function registerTunnelProxyHandlers(emitLogToProject) {
 
   safeHandle('stop-tunnel', async (event, projectId) => {
     try {
-      const result = tunnelManager.stopTunnel(projectId);
-      if (emitLogToProject) {
-        emitLogToProject(projectId, `[Túnel] Túnel cerrado correctamente.`);
-      }
-      return { success: true, result };
+      const emitLog = (id, msg) => {
+        if (typeof emitLogToProject === 'function') emitLogToProject(id, msg);
+      };
+      const emitUrl = (id, url) => {
+        if (typeof emitUrlToProject === 'function') emitUrlToProject(id, url);
+      };
+      tunnelManager.stopTunnel(projectId, emitLog, emitUrl);
+      return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
     }

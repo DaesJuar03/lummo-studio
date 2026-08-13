@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Settings as SettingsIcon, Cpu, Hash, Code, Sliders, RefreshCw, Sun, Moon, Languages, Check } from 'lucide-react';
-import { availableLocales, getTranslations } from '../locales';
+import { availableLocales, getTranslations } from '../../locales';
 
 export default function SettingsModal({ 
   onClose, 

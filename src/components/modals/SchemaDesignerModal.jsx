@@ -144,7 +144,9 @@ export default function SchemaDesignerModal({ isOpen, onClose, tableName: initia
           {/* Layout Content */}
           <div className="flex-1 flex overflow-hidden">
             {/* Left: Column Builder */}
-            <div className="w-1/2 p-5 border-r border-slate-800 space-y-4 overflow-y-auto">
+            <div className={`w-1/2 p-5 space-y-4 overflow-y-auto border-r ${
+              isDark ? 'border-[#27272a]' : 'border-slate-200'
+            }`}>
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider block">Nombre de la Tabla:</label>
                 <input
@@ -232,9 +234,11 @@ export default function SchemaDesignerModal({ isOpen, onClose, tableName: initia
             </div>
 
             {/* Right: Code Generator Preview */}
-            <div className="w-1/2 p-5 space-y-4 flex flex-col bg-slate-950">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
+            <div className={`w-1/2 p-5 space-y-4 flex flex-col ${
+              isDark ? 'bg-[#09090b]' : 'bg-slate-50'
+            }`}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
                   {['sql', 'prisma', 'drizzle', 'laravel'].map((fmt) => (
                     <button
                       key={fmt}
@@ -242,7 +246,9 @@ export default function SchemaDesignerModal({ isOpen, onClose, tableName: initia
                       className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold uppercase transition-all ${
                         activeFormat === fmt
                           ? 'bg-blue-600 text-white shadow-xs'
-                          : 'bg-slate-900 text-slate-400 hover:text-white'
+                          : isDark
+                          ? 'bg-[#18181b] text-slate-400 hover:text-white border border-[#27272a]'
+                          : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-xs'
                       }`}
                     >
                       {fmt}
@@ -252,14 +258,22 @@ export default function SchemaDesignerModal({ isOpen, onClose, tableName: initia
 
                 <button
                   onClick={handleCopyCode}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-colors"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 shrink-0 transition-colors ${
+                    isDark
+                      ? 'bg-[#18181b] hover:bg-[#27272a] text-slate-200 border border-[#27272a]'
+                      : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-xs'
+                  }`}
                 >
                   {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
                   <span>{copied ? '¡Copiado!' : 'Copiar Código'}</span>
                 </button>
               </div>
 
-              <div className="flex-1 rounded-2xl bg-black border border-slate-800 p-4 font-mono text-xs text-blue-400 overflow-auto whitespace-pre leading-relaxed">
+              <div className={`flex-1 rounded-2xl p-4 font-mono text-xs overflow-auto whitespace-pre leading-relaxed border ${
+                isDark
+                  ? 'bg-[#121215] border-[#27272a] text-blue-400'
+                  : 'bg-slate-900 border-slate-800 text-blue-400'
+              }`}>
                 {generatedCode}
               </div>
             </div>

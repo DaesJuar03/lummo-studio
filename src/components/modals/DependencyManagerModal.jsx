@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Package, Download, Terminal, CheckCircle2, AlertCircle, X, Loader2 } from 'lucide-react';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../../context/ToastContext';
 
 export default function DependencyManagerModal({ isOpen, onClose, project }) {
   const [selectedManager, setSelectedManager] = useState('npm');

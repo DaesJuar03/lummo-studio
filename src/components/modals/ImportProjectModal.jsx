@@ -13,7 +13,7 @@ import {
   ArrowRight, 
   AlertTriangle
 } from 'lucide-react';
-import { getTranslations } from '../locales';
+import { getTranslations } from '../../locales';
 
 export default function ImportProjectModal({
   isOpen,

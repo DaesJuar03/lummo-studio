@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Play, Table, Check, Network, Download } from 'lucide-react';
-import ErDiagramModal from './ErDiagramModal';
-import DataExportModal from './DataExportModal';
+import ErDiagramModal from '../modals/ErDiagramModal';
+import DataExportModal from '../modals/DataExportModal';
 
 export default function SQLiteWorkbench({ onClose, theme }) {
   const [query, setQuery] = useState('SELECT * FROM users;');

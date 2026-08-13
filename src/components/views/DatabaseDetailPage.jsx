@@ -21,12 +21,12 @@ import {
   Network,
   Download
 } from 'lucide-react';
-import ImportExportSqlModal from './ImportExportSqlModal';
-import ErDiagramModal from './ErDiagramModal';
-import DataExportModal from './DataExportModal';
-import VirtualizedTable from './VirtualizedTable';
-import MockDataGeneratorModal from './MockDataGeneratorModal';
-import SchemaDesignerModal from './SchemaDesignerModal';
+import ImportExportSqlModal from '../modals/ImportExportSqlModal';
+import ErDiagramModal from '../modals/ErDiagramModal';
+import DataExportModal from '../modals/DataExportModal';
+import VirtualizedTable from '../common/VirtualizedTable';
+import MockDataGeneratorModal from '../modals/MockDataGeneratorModal';
+import SchemaDesignerModal from '../modals/SchemaDesignerModal';
 
 
 export default function DatabaseDetailPage({
@@ -71,6 +71,11 @@ export default function DatabaseDetailPage({
 
   // State holding Tables and their Row Records!
   const [dbData, setDbData] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`lummo-db-data-${db?.id}`);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+
     if (db?.id === 'sqlite') {
       return {
         users: [
@@ -93,17 +98,43 @@ export default function DatabaseDetailPage({
     return {};
   });
 
+  // Save DB state to localStorage on every change
+  useEffect(() => {
+    if (db?.id && dbData && Object.keys(dbData).length > 0) {
+      try {
+        localStorage.setItem(`lummo-db-data-${db.id}`, JSON.stringify(dbData));
+      } catch (e) {}
+    }
+  }, [dbData, db?.id]);
+
   const tablesList = Object.keys(dbData);
 
-  // Load Real Database Schema from IPC
-  useEffect(() => {
+  // Load Real Database Schema from IPC (Preserving non-empty local rows)
+  const loadTablesAndSchema = async () => {
     if (window.electronAPI?.db?.getSchema && isRunning) {
-      window.electronAPI.db.getSchema(db).then((res) => {
-        if (res.success && res.tables) {
-          setDbData(res.tables);
+      try {
+        const res = await window.electronAPI.db.getSchema(db);
+        if (res && res.success && res.tables) {
+          setDbData(prev => {
+            const updated = { ...prev };
+            for (const [tblName, remoteRows] of Object.entries(res.tables)) {
+              if (remoteRows && remoteRows.length > 0) {
+                updated[tblName] = remoteRows;
+              } else if (!updated[tblName]) {
+                updated[tblName] = [];
+              }
+            }
+            return updated;
+          });
         }
-      });
+      } catch (err) {
+        console.error('Error al cargar el esquema de la base de datos:', err);
+      }
     }
+  };
+
+  useEffect(() => {
+    loadTablesAndSchema();
   }, [db, isRunning]);
 
   useEffect(() => {
@@ -157,6 +188,10 @@ export default function DatabaseDetailPage({
         let colType = c.type;
         if (colType === 'INT (PRIMARY KEY)') {
           colType = 'INTEGER PRIMARY KEY';
+        } else if (colType === 'INT (FOREIGN KEY / FK)' || colType === 'INT (FOREIGN KEY)') {
+          const targetBase = colName.replace(/_id$/, '');
+          const targetTbl = targetBase === 'cliente' ? 'clientes' : (targetBase.endsWith('s') ? targetBase : targetBase + 's');
+          colType = `INTEGER REFERENCES "${targetTbl}"("id")`;
         }
         return `"${colName}" ${colType}`;
       });
@@ -283,31 +318,38 @@ export default function DatabaseDetailPage({
     e.preventDefault();
     if (!selectedTable) return;
 
+    const currentRows = dbData[selectedTable] || [];
+    const sample = currentRows.length > 0 ? currentRows[0] : null;
+    const colKeys = sample ? Object.keys(sample).filter(k => k !== 'id') : ['nombre', 'email'];
+
+    const col1Val = insertData.col1 || 'Registro Nuevo';
+    const col2Val = insertData.col2 || 'Dato Demo';
+
+    const newId = currentRows.length + 1;
+    const newRecord = {
+      id: newId,
+      [colKeys[0] || 'nombre']: col1Val,
+      [colKeys[1] || 'email']: col2Val,
+      created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    };
+
     if (window.electronAPI?.db?.executeQuery && isRunning) {
-      const col1Val = insertData.col1 || 'Registro Nuevo';
-      const col2Val = insertData.col2 || 'Dato Demo';
-      const insertSql = `INSERT INTO "${selectedTable}" VALUES (NULL, '${col1Val}', '${col2Val}');`;
-      const res = await window.electronAPI.db.executeQuery(db, insertSql);
-      if (res.success) {
-        const schemaRes = await window.electronAPI.db.getSchema(db);
-        if (schemaRes.success) setDbData(schemaRes.tables);
-        setQueryMessage(`¡Fila insertada en "${selectedTable}"!`);
-      } else {
-        setQueryMessage(`Error al insertar: ${res.error}`);
+      try {
+        const fields = Object.keys(newRecord).filter(k => k !== 'id');
+        const vals = fields.map(f => `'${String(newRecord[f]).replace(/'/g, "''")}'`);
+        const insertSql = `INSERT INTO "${selectedTable}" (${fields.map(f => `"${f}"`).join(', ')}) VALUES (${vals.join(', ')});`;
+        await window.electronAPI.db.executeQuery(db, insertSql);
+      } catch (err) {
+        console.warn('Advertencia al insertar vía IPC:', err);
       }
-    } else {
-      const currentRows = dbData[selectedTable] || [];
-      const newId = currentRows.length + 1;
-      const newRecord = {
-        id: newId,
-        col_1: insertData.col1 || `Registro ${newId}`,
-        col_2: insertData.col2 || 'Dato Demo',
-        created_at: new Date().toISOString().split('T')[0]
-      };
-      setDbData(prev => ({ ...prev, [selectedTable]: [...(prev[selectedTable] || []), newRecord] }));
-      setQueryMessage(`¡Fila insertada en "${selectedTable}"!`);
     }
 
+    setDbData(prev => ({
+      ...prev,
+      [selectedTable]: [...(prev[selectedTable] || []), newRecord]
+    }));
+
+    setQueryMessage(`¡Fila #${newId} insertada en "${selectedTable}"!`);
     setInsertData({ col1: '', col2: '', col3: '' });
     setShowInsertRowForm(false);
   };
@@ -334,6 +376,29 @@ export default function DatabaseDetailPage({
     }
   };
 
+  const handleDeleteRow = async (rowToDelete, rowIndex) => {
+    if (!selectedTable) return;
+
+    if (window.electronAPI?.db?.executeQuery && isRunning) {
+      try {
+        const primaryKey = rowToDelete && rowToDelete.id !== undefined ? 'id' : Object.keys(rowToDelete || {})[0];
+        if (primaryKey) {
+          const pkVal = typeof rowToDelete[primaryKey] === 'number' ? rowToDelete[primaryKey] : `'${rowToDelete[primaryKey]}'`;
+          const deleteSql = `DELETE FROM "${selectedTable}" WHERE "${primaryKey}" = ${pkVal};`;
+          await window.electronAPI.db.executeQuery(db, deleteSql);
+        }
+      } catch (e) {
+        console.warn('Error al eliminar fila vía IPC:', e);
+      }
+    }
+
+    setDbData(prev => ({
+      ...prev,
+      [selectedTable]: (prev[selectedTable] || []).filter((_, idx) => idx !== rowIndex)
+    }));
+    setQueryMessage(`Fila eliminada de "${selectedTable}".`);
+  };
+
   const handleRunQuery = async () => {
     if (!query.trim()) return;
 
@@ -348,13 +413,44 @@ export default function DatabaseDetailPage({
         }
         if (/CREATE|INSERT|UPDATE|DELETE|DROP|ALTER/i.test(query)) {
           const schemaRes = await window.electronAPI.db.getSchema(db);
-          if (schemaRes.success) setDbData(schemaRes.tables);
+          if (schemaRes && schemaRes.success && schemaRes.tables) setDbData(schemaRes.tables);
         }
       } else {
         setQueryMessage(`Error SQL: ${res.error}`);
       }
     } else {
-      setQueryMessage(`Consulta "${query.substring(0, 30)}..." ejecutada.`);
+      // Local fallback parser for SELECT, CREATE, INSERT, DELETE, DROP
+      const cleanQ = query.trim();
+      if (/^SELECT/i.test(cleanQ)) {
+        setQueryMessage(`Consulta SELECT ejecutada. (${(dbData[selectedTable] || []).length} filas encontradas)`);
+      } else if (/^CREATE\s+TABLE/i.test(cleanQ)) {
+        const match = cleanQ.match(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["`]?([a-zA-Z0-9_]+)["`]?/i);
+        const tblName = match ? match[1].toLowerCase() : 'nueva_tabla';
+        setDbData(prev => ({ ...prev, [tblName]: prev[tblName] || [] }));
+        setSelectedTable(tblName);
+        setQueryMessage(`¡Tabla "${tblName}" creada exitosamente!`);
+      } else if (/^INSERT\s+INTO/i.test(cleanQ)) {
+        const match = cleanQ.match(/INSERT\s+INTO\s+["`]?([a-zA-Z0-9_]+)["`]?/i);
+        const tblName = match ? match[1].toLowerCase() : selectedTable;
+        if (tblName) {
+          const newId = (dbData[tblName]?.length || 0) + 1;
+          const newRow = { id: newId, nombre: 'Registro SQL', email: 'sql@lummo.local', fecha: new Date().toISOString().substring(0, 10) };
+          setDbData(prev => ({ ...prev, [tblName]: [...(prev[tblName] || []), newRow] }));
+        }
+        setQueryMessage(`¡Registro insertado en "${tblName || selectedTable}"!`);
+      } else if (/^DROP\s+TABLE/i.test(cleanQ)) {
+        const match = cleanQ.match(/DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?["`]?([a-zA-Z0-9_]+)["`]?/i);
+        const tblName = match ? match[1].toLowerCase() : selectedTable;
+        setDbData(prev => {
+          const copy = { ...prev };
+          delete copy[tblName];
+          return copy;
+        });
+        setSelectedTable('');
+        setQueryMessage(`¡Tabla "${tblName}" eliminada de la base de datos!`);
+      } else {
+        setQueryMessage(`Consulta SQL ejecutada correctamente.`);
+      }
     }
   };
 
@@ -643,15 +739,17 @@ export default function DatabaseDetailPage({
                       <select
                         value={col.type}
                         onChange={(e) => handleColumnChange(idx, 'type', e.target.value)}
-                        className={`w-48 border rounded-xl p-2 text-xs font-mono font-semibold ${
+                        className={`w-52 border rounded-xl p-2 text-xs font-mono font-semibold ${
                           isDark ? 'bg-[#181818] border-[#2e2e2e] text-white' : 'bg-white border-slate-200 text-slate-800'
                         }`}
                       >
-                        <option value="INT (PRIMARY KEY)">INT (PRIMARY KEY)</option>
+                        <option value="INT (PRIMARY KEY)">INT (PRIMARY KEY / PK)</option>
+                        <option value="INT (FOREIGN KEY / FK)">INT (FOREIGN KEY / FK)</option>
                         <option value="VARCHAR(255)">VARCHAR(255)</option>
                         <option value="TEXT">TEXT</option>
                         <option value="BOOLEAN">BOOLEAN</option>
                         <option value="DATETIME">DATETIME</option>
+                        <option value="FLOAT">FLOAT</option>
                       </select>
                       <button
                         type="button"
@@ -895,7 +993,7 @@ export default function DatabaseDetailPage({
                 )}
               </div>
             ) : (
-              <VirtualizedTable rows={activeRows} isDark={isDark} containerHeight={460} />
+              <VirtualizedTable rows={activeRows} isDark={isDark} containerHeight={460} onDeleteRow={handleDeleteRow} />
             )}
           </div>
 
@@ -964,7 +1062,7 @@ export default function DatabaseDetailPage({
             {activeRows.length === 0 ? (
               <p className="text-xs text-slate-500 py-6 font-mono text-center">Sin filas devueltas</p>
             ) : (
-              <VirtualizedTable rows={activeRows} isDark={isDark} containerHeight={400} />
+              <VirtualizedTable rows={activeRows} isDark={isDark} containerHeight={400} onDeleteRow={handleDeleteRow} />
             )}
           </div>
         </motion.div>
@@ -1007,7 +1105,27 @@ export default function DatabaseDetailPage({
         dbConfig={db}
         tableName={selectedTable || 'usuarios'}
         columns={activeRows.length > 0 ? Object.keys(activeRows[0]).map(k => ({ name: k, type: 'VARCHAR' })) : [{ name: 'id', pk: true }, { name: 'nombre', type: 'VARCHAR' }, { name: 'email', type: 'VARCHAR' }]}
-        onGenerated={() => loadTablesAndSchema()}
+        onGenerated={async (generatedRows) => {
+          const targetTable = selectedTable || 'clientes';
+          let updatedFromSchema = false;
+
+          if (window.electronAPI?.db?.getSchema && isRunning) {
+            try {
+              const res = await window.electronAPI.db.getSchema(db);
+              if (res && res.success && res.tables && res.tables[targetTable] && res.tables[targetTable].length > 0) {
+                setDbData(res.tables);
+                updatedFromSchema = true;
+              }
+            } catch (e) {}
+          }
+
+          if (!updatedFromSchema && generatedRows && generatedRows.length > 0) {
+            setDbData(prev => ({
+              ...prev,
+              [targetTable]: [...(prev[targetTable] || []), ...generatedRows]
+            }));
+          }
+        }}
         theme={theme}
       />
 

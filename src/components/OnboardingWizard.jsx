@@ -18,7 +18,8 @@ import {
   Database,
   Terminal,
   Layers,
-  CheckCircle2
+  CheckCircle2,
+  Globe
 } from 'lucide-react';
 import { availableLocales, getTranslations } from '../locales';
 import lummoLogo from '../assets/Lummo.png';
@@ -32,9 +33,12 @@ export default function OnboardingWizard({
   theme,
   onToggleTheme,
   language = 'es',
-  onSelectLanguage
+  onSelectLanguage,
+  detectedLang,
+  isLangSupported = true
 }) {
   const [step, setStep] = useState(1);
+  const [dismissUnsupportedNotice, setDismissUnsupportedNotice] = useState(false);
 
   if (!isOpen) return null;
 
@@ -53,6 +57,130 @@ export default function OnboardingWizard({
     if (window.electronAPI?.windowClose) window.electronAPI.windowClose();
   };
 
+  const showUnsupportedNotice = !isLangSupported && detectedLang && !dismissUnsupportedNotice;
+
+  if (showUnsupportedNotice) {
+    return (
+      <div className={`min-h-screen w-full flex flex-col font-sans select-none overflow-x-hidden transition-colors duration-200 ${
+        isDark ? 'bg-[#09090b] text-[#f4f4f5]' : 'bg-slate-50 text-slate-900'
+      }`}>
+        
+        {/* Electron Custom Title Drag Bar */}
+        <div 
+          className={`h-11 border-b px-6 flex items-center justify-between shrink-0 ${
+            isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-white border-slate-200'
+          }`}
+          style={{ WebkitAppRegion: 'drag' }}
+        >
+          <div className="flex items-center space-x-2.5">
+            <img src={lummoLogo} className="w-6 h-6 object-contain rounded-md" alt="Lummo Studio" />
+            <span className={`text-xs font-extrabold font-mono tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              Lummo Studio — System Language Notice
+            </span>
+          </div>
+
+          {/* Window Controls */}
+          <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' }}>
+            <button
+              onClick={handleMinimize}
+              className={`p-1.5 rounded-lg transition-colors ${
+                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+              }`}
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={handleMaximize}
+              className={`p-1.5 rounded-lg transition-colors ${
+                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+              }`}
+            >
+              <Square className="h-3 w-3" />
+            </button>
+            <button
+              onClick={handleClose}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-rose-600 transition-colors"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Main Unsupported Language Notice Area */}
+        <div className="flex-1 max-w-xl w-full mx-auto p-8 flex flex-col justify-center my-auto space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center space-y-6"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center mx-auto shadow-xl shadow-amber-500/5">
+              <Globe className="h-8 w-8" />
+            </div>
+
+            <div className="space-y-2">
+              <span className="inline-block px-3 py-1 rounded-full text-[11px] font-mono font-extrabold bg-amber-500/10 text-amber-500 border border-amber-500/20 uppercase tracking-wider">
+                Language Notice ({detectedLang.toUpperCase()})
+              </span>
+              <h1 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Your System Language is Not Supported Yet
+              </h1>
+              <p className="text-slate-500 text-sm leading-relaxed max-w-md mx-auto">
+                We detected that your computer language is <strong className={isDark ? 'text-slate-200' : 'text-slate-800'}>"{detectedLang.toUpperCase()}"</strong>, which does not currently have native language support in Lummo Studio.
+              </p>
+              <p className="text-slate-500 text-xs leading-relaxed max-w-md mx-auto">
+                Because <strong>English</strong> is a universal language, Lummo Studio has automatically selected English as your default language. You can keep English or choose Spanish below.
+              </p>
+            </div>
+
+            {/* Language Options */}
+            <div className="space-y-3 pt-2 text-left">
+              <label className="text-[11px] font-bold text-slate-400 font-mono uppercase tracking-wider block text-center">
+                Available App Languages:
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {availableLocales.map((loc) => {
+                  const isSelected = language === loc.code;
+                  return (
+                    <div
+                      key={loc.code}
+                      onClick={() => onSelectLanguage && onSelectLanguage(loc.code)}
+                      className={`p-4 rounded-xl cursor-pointer border flex items-center justify-between transition-all ${
+                        isSelected
+                          ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/10'
+                          : isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs ${
+                          isSelected ? 'bg-blue-600 text-white' : isDark ? 'bg-[#282828] text-slate-400' : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {loc.code.toUpperCase()}
+                        </div>
+                        <div>
+                          <h4 className={`font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>{loc.name}</h4>
+                          <p className="text-[10px] text-slate-500">{loc.label || loc.description}</p>
+                        </div>
+                      </div>
+                      {isSelected && <CheckCircle2 className="h-4 w-4 text-blue-500" />}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setDismissUnsupportedNotice(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 px-6 rounded-xl shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center space-x-2"
+            >
+              <span>Continue Setup in {language === 'es' ? 'Spanish' : 'English'}</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   const handleNext = () => {
     if (step < 4) setStep(step + 1);
     else onComplete();
@@ -64,7 +192,7 @@ export default function OnboardingWizard({
 
   return (
     <div className={`min-h-screen w-full flex flex-col font-sans select-none overflow-x-hidden transition-colors duration-200 ${
-      isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-[#09090b] text-[#f4f4f5]' : 'bg-slate-50 text-slate-900'
     }`}>
       
       {/* Electron Custom Title Drag Bar */}
@@ -166,9 +294,21 @@ export default function OnboardingWizard({
 
             {/* Language Selector */}
             <div className="space-y-3">
-              <label className="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider block">
-                Idioma de Interfaz (Sistema JSON):
-              </label>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <label className="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider block">
+                  Idioma de Interfaz (Sistema JSON):
+                </label>
+                {detectedLang && (
+                  <span className={`text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md flex items-center shrink-0 ${
+                    isLangSupported 
+                      ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
+                      : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                  }`}>
+                    <Globe className="h-3 w-3 inline mr-1.5" />
+                    <span>OS ({detectedLang.toUpperCase()}): {isLangSupported ? 'Detectado & Soportado' : 'Sin soporte (Inglés asignado)'}</span>
+                  </span>
+                )}
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {availableLocales.map((loc) => {
                   const isSelected = language === loc.code;
@@ -211,8 +351,8 @@ export default function OnboardingWizard({
                   onClick={() => theme !== 'light' && onToggleTheme()}
                   className={`pure-card p-5 cursor-pointer border flex items-center justify-between transition-all ${
                     !isDark
-                      ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5'
-                      : 'border-[#2a2a2a] bg-[#1e1e1e]'
+                      ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/5'
+                      : 'border-[#27272a] bg-[#121215]'
                   }`}
                 >
                   <div className="flex items-center space-x-3.5">
@@ -220,11 +360,11 @@ export default function OnboardingWizard({
                       <Sun className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Modo Claro</h4>
+                      <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Modo Claro (Light)</h4>
                       <p className="text-xs text-slate-500">Limpio, brillante y blanco minimalista</p>
                     </div>
                   </div>
-                  {!isDark && <CheckCircle2 className="h-5 w-5 text-amber-500" />}
+                  {!isDark && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
                 </div>
 
                 {/* Dark Mode Card */}
@@ -241,8 +381,8 @@ export default function OnboardingWizard({
                       <Moon className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Modo Oscuro</h4>
-                      <p className="text-xs text-slate-500">Antigravity Matte Charcoal</p>
+                      <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Modo Oscuro (Dark)</h4>
+                      <p className="text-xs text-slate-500">Diseño mate carbón elegante y contrastado</p>
                     </div>
                   </div>
                   {isDark && <CheckCircle2 className="h-5 w-5 text-blue-500" />}

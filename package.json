@@ -2,7 +2,7 @@
   "name": "lummo",
   "productName": "Lummo Studio",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Modern Dev Server & Database Control Panel",
   "main": "electron/main.cjs",
   "type": "module",
@@ -11,7 +11,8 @@
     "electron:dev": "concurrently -k \"vite\" \"electron .\"",
     "electron:start": "electron .",
     "build": "vite build",
-    "dist": "npm run build && electron-builder"
+    "dist": "npm run build && electron-builder",
+    "test": "vitest run"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -35,7 +36,8 @@
     "electron": "^34.2.0",
     "electron-builder": "^25.1.8",
     "tailwindcss": "^4.0.0",
-    "vite": "^6.1.0"
+    "vite": "^6.1.0",
+    "vitest": "^3.2.7"
   },
   "build": {
     "appId": "com.lummo.studio",

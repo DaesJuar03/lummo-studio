@@ -45,4 +45,35 @@ export function getTranslations(langCode = 'es') {
   return localeDictionary[langCode] || localeDictionary.es;
 }
 
+/**
+ * Detect user's OS / browser language and verify if supported by Lummo Studio.
+ * @returns {{ language: string, detectedLang: string, isSupported: boolean, isFirstTime: boolean }}
+ */
+export function detectSystemLanguage() {
+  const savedLang = localStorage.getItem('lummo-language');
+  if (savedLang) {
+    return {
+      language: savedLang,
+      detectedLang: savedLang,
+      isSupported: true,
+      isFirstTime: false
+    };
+  }
+
+  const rawLang = typeof navigator !== 'undefined'
+    ? (navigator.language || (navigator.languages && navigator.languages[0]) || 'es')
+    : 'es';
+
+  const code = rawLang.split('-')[0].toLowerCase();
+  const supportedCodes = availableLocales.map(l => l.code);
+  const isSupported = supportedCodes.includes(code);
+
+  return {
+    language: isSupported ? code : 'en', // Default to English if unsupported
+    detectedLang: code,
+    isSupported,
+    isFirstTime: true
+  };
+}
+
 export { esLocale, enLocale };

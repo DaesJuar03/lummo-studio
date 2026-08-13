@@ -74,14 +74,14 @@ export default function SettingsModal({
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
-          className={`w-full max-w-4xl h-[580px] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
-            isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-[#e4e4e7]' : 'bg-white border-slate-200 text-slate-900'
+          className={`w-full max-w-4xl h-[680px] max-h-[90vh] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
+            isDark ? 'bg-[#121215] border-[#27272a] text-[#f4f4f5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#09090b] border-[#27272a]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
@@ -96,7 +96,7 @@ export default function SettingsModal({
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
               className={`p-2 rounded-xl transition-colors ${
-                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#18181b]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-5 w-5" />
@@ -108,7 +108,7 @@ export default function SettingsModal({
             
             {/* Left Sidebar Categories */}
             <div className={`w-64 border-r p-4 space-y-1 shrink-0 ${
-              isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-slate-50/80 border-slate-200'
+              isDark ? 'bg-[#09090b] border-[#27272a]' : 'bg-slate-50/80 border-slate-200'
             }`}>
               {categories.map((cat) => {
                 const Icon = cat.icon;
@@ -120,10 +120,10 @@ export default function SettingsModal({
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${
                       isActive
                         ? isDark 
-                          ? 'bg-[#2b2b2b] border border-[#3f3f46] text-white shadow-xs' 
+                          ? 'bg-[#1f1f24] border border-[#3f3f46] text-white shadow-xs' 
                           : 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                         : isDark
-                          ? 'text-[#a1a1aa] hover:bg-[#242424] hover:text-white'
+                          ? 'text-[#a1a1aa] hover:bg-[#18181b] hover:text-white'
                           : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
                     }`}
                   >
@@ -135,7 +135,7 @@ export default function SettingsModal({
             </div>
 
             {/* Right Category Details View */}
-            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#161616]' : 'bg-white'}`}>
+            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#121215]' : 'bg-white'}`}>
               
               {/* Category 1: Servicios del Sistema */}
               {activeCategory === 'services' && (
@@ -219,8 +219,8 @@ export default function SettingsModal({
 
               {/* Category 3: Editor de Código */}
               {activeCategory === 'editor' && (
-                <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-6">
-                  <div className={`border-b pb-4 flex items-center justify-between ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
+                <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-3.5">
+                  <div className={`border-b pb-2 flex items-center justify-between ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
                     <div>
                       <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.codeEditorTab}</h4>
                       <p className="text-xs text-slate-500">Selecciona el editor o IDE para abrir tus proyectos</p>
@@ -406,7 +406,7 @@ export default function SettingsModal({
                         className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all ${
                           !isDark 
                             ? 'bg-blue-50 border-blue-600 text-blue-900 ring-2 ring-blue-100 font-bold' 
-                            : 'bg-[#181818] border-[#2e2e2e] text-slate-400 hover:text-white'
+                            : 'bg-[#18181b] border-[#27272a] text-slate-300 hover:text-white hover:border-[#3f3f46]'
                         }`}
                       >
                         <div className="flex items-center space-x-3">
@@ -416,7 +416,7 @@ export default function SettingsModal({
                             <span className="block text-[11px] text-slate-500 font-normal">{t.lightModeDesc}</span>
                           </div>
                         </div>
-                        {!isDark && <span className="w-2 h-2 rounded-full bg-blue-600"></span>}
+                        {!isDark && <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-xs"></span>}
                       </button>
 
                       <button
@@ -424,7 +424,7 @@ export default function SettingsModal({
                         onClick={() => theme !== 'dark' && onToggleTheme()}
                         className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all ${
                           isDark 
-                            ? 'bg-[#2b2b2b] border-[#3f3f46] text-white ring-1 ring-blue-500 font-bold' 
+                            ? 'bg-[#1f1f24] border-blue-500/80 text-white ring-2 ring-blue-500/20 font-bold' 
                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
                         }`}
                       >
@@ -432,17 +432,17 @@ export default function SettingsModal({
                           <Moon className={`h-5 w-5 ${isDark ? 'text-blue-400' : 'text-slate-400'}`} />
                           <div>
                             <span className="block text-xs font-bold">{t.darkMode}</span>
-                            <span className="block text-[11px] text-slate-500 font-normal">{t.darkModeDesc}</span>
+                            <span className="block text-[11px] text-slate-400 font-normal">{t.darkModeDesc}</span>
                           </div>
                         </div>
-                        {isDark && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
+                        {isDark && <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-xs shadow-blue-500/50"></span>}
                       </button>
                     </div>
                   </div>
 
                   {/* System Notifications & Logs Memory Management */}
-                  <div className="space-y-4 pt-4 border-t border-slate-200/40">
-                    <div className="flex items-center justify-between p-4 rounded-2xl border bg-slate-500/5 border-slate-200/50">
+                  <div className="space-y-2.5 pt-2 border-t border-slate-200/40">
+                    <div className="flex items-center justify-between p-3 rounded-2xl border bg-slate-500/5 border-slate-200/50">
                       <div>
                         <span className="block text-xs font-bold">Notificaciones Nativas de Windows</span>
                         <span className="block text-[11px] text-slate-500">Recibe alertas del sistema cuando tus servidores se inicien, fallen o finalicen.</span>
@@ -457,7 +457,7 @@ export default function SettingsModal({
                             window.electronAPI.sendNotification('Lummo Studio', 'Notificaciones del sistema activadas correctamente 🔔');
                           }
                         }}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold font-mono transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all ${
                           notificationsEnabled
                             ? 'bg-emerald-600 text-white shadow-xs'
                             : 'bg-slate-300 text-slate-700'
@@ -467,15 +467,15 @@ export default function SettingsModal({
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 rounded-2xl border bg-rose-500/5 border-rose-500/20">
+                    <div className="flex items-center justify-between p-3 rounded-2xl border bg-rose-500/5 border-rose-500/20">
                       <div>
                         <span className="block text-xs font-bold text-rose-500">Memoria de Logs de Servidores</span>
-                        <span className="block text-[11px] text-slate-500">Purga todas las líneas de salida almacenadas en la tienda del sistema.</span>
+                        <span className="block text-[11px] text-slate-500">Libera memoria RAM borrando el historial de texto acumulado en las consolas.</span>
                       </div>
                       <button
                         type="button"
                         onClick={handleClearLogsAction}
-                        className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition-all shadow-xs flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition-all shadow-xs flex items-center gap-1.5 shrink-0 ml-3"
                       >
                         {clearedLogsNotice ? '¡Memoria Limpiada!' : 'Limpiar Todos los Logs'}
                       </button>

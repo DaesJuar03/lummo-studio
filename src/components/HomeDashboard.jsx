@@ -33,6 +33,7 @@ export default function HomeDashboard({
   onRemoveProject,
   onSelectProjectDetail,
   onSelectDatabaseDetail,
+  onAddCustomDatabase,
   onRemoveDatabase,
   onImportFolder,
   theme,
@@ -45,18 +46,7 @@ export default function HomeDashboard({
 
   const t = getTranslations(language);
 
-  const defaultDatabases = [
-    {
-      id: 'sqlite',
-      name: 'SQLite (Embebido)',
-      port: null,
-      status: 'READY',
-      tech: 'Motor Nativo en Lummo Studio',
-      isDb: true
-    }
-  ];
-
-  const allDbs = [...customDatabases.map(d => ({ ...d, isDb: true })), ...defaultDatabases];
+  const allDbs = customDatabases.map(d => ({ ...d, isDb: true }));
   const combinedList = [...projects.map(p => ({ ...p, isDb: false })), ...allDbs];
 
   const runningCount = projects.filter(p => p.status === 'RUNNING').length;
@@ -66,7 +56,7 @@ export default function HomeDashboard({
 
   return (
     <div className={`py-4 px-6 md:px-8 max-w-7xl w-full mx-auto space-y-5 flex-1 flex flex-col justify-center overflow-hidden ${
-      isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-transparent text-[#f4f4f5]' : 'bg-transparent text-slate-900'
     }`}>
 
       {/* Page Header Title with Simple Telemetry Text */}
@@ -109,12 +99,10 @@ export default function HomeDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
 
         {/* Left Column: Launcher Cards (Including Git Clone Card) */}
-        <div className="lg:col-span-5 space-y-3">
+        <div className="lg:col-span-5 space-y-5">
           
           {/* Card 1: Import Local Project Folder */}
-          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
-            isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
-          }`}>
+          <div className="space-y-3 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <FolderPlus className="h-4.5 w-4.5" />
@@ -139,9 +127,7 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 2: Clone Git Repository */}
-          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
-            isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
-          }`}>
+          <div className="space-y-3 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <GitBranch className="h-4.5 w-4.5" />
@@ -168,9 +154,7 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 3: Projects Panel Shortcut */}
-          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
-            isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
-          }`}>
+          <div className="space-y-3 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <Layers className="h-4.5 w-4.5" />
@@ -197,9 +181,7 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 4: Databases Panel Shortcut */}
-          <div className={`pure-card p-4 border space-y-3 transition-all hover:border-blue-500/50 ${
-            isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
-          }`}>
+          <div className="space-y-3 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <Database className="h-4.5 w-4.5" />
@@ -250,7 +232,7 @@ export default function HomeDashboard({
             <motion.div 
               initial={{ scale: 0.97, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="text-center py-20 pure-card space-y-4"
+              className="text-center py-16 space-y-4"
             >
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto border ${
                 isDark ? 'bg-blue-950/60 border-blue-800 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
@@ -320,17 +302,15 @@ export default function HomeDashboard({
                               <span>Abrir Tablas</span>
                             </motion.button>
 
-                            {item.id !== 'sqlite' && onRemoveDatabase ? (
+                            {onRemoveDatabase ? (
                               <button
                                 onClick={() => onRemoveDatabase(item.id)}
-                                className="p-2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 transition-colors"
+                                className="p-2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 transition-colors shrink-0"
                                 title="Eliminar"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
-                            ) : (
-                              <div className="w-8 h-8 shrink-0" />
-                            )}
+                            ) : null}
                           </div>
 
                         </div>
@@ -525,15 +505,21 @@ export default function HomeDashboard({
         onClose={() => setShowCreateDbModal(false)}
         onCreate={(newDb) => {
           setShowCreateDbModal(false);
-          if (onSelectDatabaseDetail) {
-            onSelectDatabaseDetail({
-              id: 'db-' + Date.now(),
-              name: newDb.name,
-              port: newDb.engine === 'mysql' ? 3306 : 5432,
-              status: 'READY',
-              tech: `Esquema ${newDb.engine.toUpperCase()}`,
-              isDb: true
-            });
+          const createdItem = {
+            id: 'db-' + Date.now(),
+            name: newDb.name,
+            engine: newDb.engine || 'sqlite',
+            type: newDb.engine || 'sqlite',
+            port: newDb.engine === 'mysql' ? 3306 : newDb.engine === 'postgres' ? 5432 : null,
+            status: 'READY',
+            tech: `Esquema ${(newDb.engine || 'sqlite').toUpperCase()}`,
+            installed: true,
+            isDb: true
+          };
+          if (onAddCustomDatabase) {
+            onAddCustomDatabase(createdItem);
+          } else if (onSelectDatabaseDetail) {
+            onSelectDatabaseDetail(createdItem);
           }
         }}
       />

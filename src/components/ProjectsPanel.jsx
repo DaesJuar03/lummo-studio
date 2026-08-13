@@ -81,7 +81,7 @@ export default function ProjectsPanel({
 
   return (
     <div className={`py-6 px-8 max-w-7xl w-full mx-auto space-y-8 flex-1 ${
-      isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-transparent text-[#f4f4f5]' : 'bg-transparent text-slate-900'
     }`}>
       
       {/* Header Bar */}

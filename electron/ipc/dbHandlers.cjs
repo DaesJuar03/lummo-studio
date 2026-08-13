@@ -154,6 +154,50 @@ function registerDbHandlers(getMainWindow) {
       return { success: false, error: err.message };
     }
   });
+
+  safeHandle('db-get-default-path', (event, name) => {
+    try {
+      const filePath = dbManager.resolveSqlitePath({ name });
+      return { success: true, filePath };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
+
+  safeHandle('db-migrate-database-file', async (event, config) => {
+    try {
+      const win = getMainWindow();
+      const sourcePath = dbManager.resolveSqlitePath(config);
+      const defaultName = path.basename(sourcePath);
+
+      const result = await dialog.showSaveDialog(win, {
+        title: 'Migrar / Exportar Archivo de Base de Datos SQLite (.sqlite)',
+        defaultPath: defaultName,
+        filters: [
+          { name: 'Base de Datos SQLite (*.sqlite)', extensions: ['sqlite', 'db'] },
+          { name: 'Todos los archivos', extensions: ['*'] }
+        ]
+      });
+
+      if (result.canceled || !result.filePath) {
+        return { success: false, canceled: true };
+      }
+
+      if (fs.existsSync(sourcePath)) {
+        fs.copyFileSync(sourcePath, result.filePath);
+      } else {
+        const SQL = await dbManager.getSqlJs();
+        const db = new SQL.Database();
+        const exported = db.export();
+        fs.writeFileSync(result.filePath, Buffer.from(exported));
+        db.close();
+      }
+
+      return { success: true, filePath: result.filePath };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  });
 }
 
 module.exports = { registerDbHandlers };

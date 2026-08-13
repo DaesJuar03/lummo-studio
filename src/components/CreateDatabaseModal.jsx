@@ -73,7 +73,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate }) {
                 onChange={(e) => setEngine(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-800 focus:outline-none focus:border-blue-600"
               >
-                <option value="sqlite">SQLite (Embebido - archivo local .sqlite)</option>
+                <option value="sqlite">SQLite (archivo local .sqlite en Documentos)</option>
                 <option value="mysql">MySQL / MariaDB (Puerto :3306)</option>
                 <option value="postgres">PostgreSQL (Puerto :5432)</option>
               </select>

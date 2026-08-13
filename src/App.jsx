@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import HomeDashboard from './components/HomeDashboard';
 import ProjectsPanel from './components/ProjectsPanel';
 import DatabasesPanel from './components/DatabasesPanel';
 import LogsConsole from './components/LogsConsole';
-import SettingsModal from './components/SettingsModal';
-import CommandPaletteModal from './components/CommandPaletteModal';
-import NewTabActionModal from './components/NewTabActionModal';
-import ImportProjectModal from './components/ImportProjectModal';
-import OnboardingWizard from './components/OnboardingWizard';
-import StandaloneLogWindow from './components/StandaloneLogWindow';
-import ProjectDetailPage from './components/ProjectDetailPage';
-import DatabaseDetailPage from './components/DatabaseDetailPage';
 import ErrorBoundary from './components/ErrorBoundary';
-import { getTranslations } from './locales';
+import { getTranslations, detectSystemLanguage } from './locales';
+
+// Code Splitting with React.lazy for heavy modals and detail pages
+const SettingsModal = lazy(() => import('./components/SettingsModal'));
+const CommandPaletteModal = lazy(() => import('./components/CommandPaletteModal'));
+const NewTabActionModal = lazy(() => import('./components/NewTabActionModal'));
+const ImportProjectModal = lazy(() => import('./components/ImportProjectModal'));
+const OnboardingWizard = lazy(() => import('./components/OnboardingWizard'));
+const StandaloneLogWindow = lazy(() => import('./components/StandaloneLogWindow'));
+const ProjectDetailPage = lazy(() => import('./components/ProjectDetailPage'));
+const DatabaseDetailPage = lazy(() => import('./components/DatabaseDetailPage'));
 
 export default function App() {
   const [projects, setProjects] = useState([]);
@@ -22,14 +24,17 @@ export default function App() {
   const [logs, setLogs] = useState({});
   const [activeLogsProject, setActiveLogsProject] = useState(null);
 
+  // Auto-detect user system language on first run
+  const [langDetection] = useState(() => detectSystemLanguage());
+
   // First-Time User Onboarding State (Only true on the very first startup)
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return localStorage.getItem('lummo-onboarded') !== 'true';
   });
 
-  // Language State ('es' vs 'en') persisted in localStorage
+  // Language State ('es' vs 'en') persisted in localStorage or auto-detected
   const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('lummo-language') || 'es';
+    return langDetection.language;
   });
 
   // Custom User Databases State (Persisted in localStorage)
@@ -214,9 +219,21 @@ export default function App() {
     }
   };
 
-  const handleAddCustomDatabase = (newDbObj) => {
-    setCustomDatabases(prev => [newDbObj, ...prev]);
-    openTab({ id: `db-${newDbObj.id}`, title: `Base de Datos / ${newDbObj.name}`, type: 'database-detail', db: newDbObj });
+  const handleAddCustomDatabase = async (newDbObj) => {
+    let filePath = newDbObj.filePath || null;
+    if ((!filePath || !newDbObj.filePath) && window.electronAPI?.db?.getDefaultDbPath) {
+      const res = await window.electronAPI.db.getDefaultDbPath(newDbObj.name);
+      if (res?.filePath) filePath = res.filePath;
+    }
+    const fullDbObj = {
+      ...newDbObj,
+      filePath,
+      installed: true,
+      isDb: true,
+      tech: newDbObj.engine === 'sqlite' ? 'SQLite (.sqlite en Documentos)' : `Esquema ${(newDbObj.engine || 'sqlite').toUpperCase()}`
+    };
+    setCustomDatabases(prev => [fullDbObj, ...prev]);
+    openTab({ id: `db-${fullDbObj.id}`, title: `Base de Datos / ${fullDbObj.name}`, type: 'database-detail', db: fullDbObj });
   };
 
   const handleRemoveDatabase = (dbId) => {
@@ -444,14 +461,12 @@ export default function App() {
   const runningCount = projects.filter(p => p.status === 'RUNNING').length;
   const activeTabObj = openTabs.find(t => t.id === activeTabId) || openTabs[0];
 
-  const defaultSQLite = {
-    id: 'sqlite',
-    name: 'SQLite (Embebido)',
+  const cleanSQLite = {
+    id: 'sqlite-custom',
+    name: 'Nueva Base de Datos SQLite',
+    type: 'sqlite',
     port: null,
-    status: 'READY',
-    size: '2.1 MB',
-    tables: 12,
-    connections: 1
+    status: 'READY'
   };
 
   // IF FIRST TIME USER ONBOARDING: Render standalone full-page setup view BEFORE main app
@@ -467,13 +482,15 @@ export default function App() {
         onToggleTheme={toggleTheme}
         language={language}
         onSelectLanguage={(lang) => setLanguage(lang)}
+        detectedLang={langDetection.detectedLang}
+        isLangSupported={langDetection.isSupported}
       />
     );
   }
 
   return (
     <div className={`h-screen w-screen flex flex-col font-sans overflow-hidden transition-colors duration-200 ${
-      theme === 'dark' ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
+      theme === 'dark' ? 'bg-[#09090b] text-[#f4f4f5]' : 'bg-slate-50 text-slate-900'
     }`}>
       {/* Header */}
       <Header
@@ -513,6 +530,7 @@ export default function App() {
               onRemoveProject={handleRemoveProject}
               onSelectProjectDetail={(project) => openTab({ id: project.id, title: `Proyecto / ${project.name}`, type: 'project-detail', project })}
               onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `Base de Datos / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+              onAddCustomDatabase={handleAddCustomDatabase}
               onRemoveDatabase={handleRemoveDatabase}
               theme={theme}
               language={language}
@@ -548,6 +566,11 @@ export default function App() {
             />
           )}
 
+        <Suspense fallback={
+          <div className="flex items-center justify-center p-12 text-xs font-mono text-slate-500">
+            <span className="animate-pulse">Cargando módulo de Lummo Studio...</span>
+          </div>
+        }>
           {activeTabObj?.type === 'project-detail' && activeTabObj.project && (
             <ProjectDetailPage
               project={projects.find(p => p.id === activeTabObj.project.id || p.path === activeTabObj.project.path) || activeTabObj.project}
@@ -569,72 +592,75 @@ export default function App() {
               theme={theme}
             />
           )}
+        </Suspense>
         </ErrorBoundary>
       </main>
 
-      {/* Real-time Console Logs Drawer (Fallback) */}
-      {activeLogsProject && (
-        <LogsConsole
-          logs={logs}
-          activeProjectId={activeLogsProject}
-          projects={projects}
-          onClose={() => setActiveLogsProject(null)}
-          onClearLogs={handleClearProjectLogs}
-        />
-      )}
+      <Suspense fallback={null}>
+        {/* Real-time Console Logs Drawer (Fallback) */}
+        {activeLogsProject && (
+          <LogsConsole
+            logs={logs}
+            activeProjectId={activeLogsProject}
+            projects={projects}
+            onClose={() => setActiveLogsProject(null)}
+            onClearLogs={handleClearProjectLogs}
+          />
+        )}
 
-      {/* Settings Modal */}
-      {showSettings && (
-        <SettingsModal
-          onClose={() => setShowSettings(false)}
-          envStatus={envStatus}
-          onScanEnv={handleScanEnv}
-          isScanning={isScanning}
+        {/* Settings Modal */}
+        {showSettings && (
+          <SettingsModal
+            onClose={() => setShowSettings(false)}
+            envStatus={envStatus}
+            onScanEnv={handleScanEnv}
+            isScanning={isScanning}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            language={language}
+            onSelectLanguage={(lang) => setLanguage(lang)}
+            onOpenOnboarding={() => setShowOnboarding(true)}
+            onClearAllLogs={handleClearAllLogs}
+          />
+        )}
+
+        {/* New Tab Action Picker Modal */}
+        <NewTabActionModal
+          isOpen={showNewTabModal}
+          onClose={() => setShowNewTabModal(false)}
+          onOpenProjects={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
+          onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
+          onAddProject={() => setShowImportModal(true)}
+          onOpenSQLiteWorkbench={() => openTab({ id: 'db-sqlite', title: 'Base de Datos / SQLite', type: 'database-detail', db: cleanSQLite })}
           theme={theme}
-          onToggleTheme={toggleTheme}
-          language={language}
-          onSelectLanguage={(lang) => setLanguage(lang)}
-          onOpenOnboarding={() => setShowOnboarding(true)}
-          onClearAllLogs={handleClearAllLogs}
         />
-      )}
 
-      {/* New Tab Action Picker Modal */}
-      <NewTabActionModal
-        isOpen={showNewTabModal}
-        onClose={() => setShowNewTabModal(false)}
-        onOpenProjects={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
-        onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
-        onAddProject={() => setShowImportModal(true)}
-        onOpenSQLiteWorkbench={() => openTab({ id: 'db-sqlite', title: 'Base de Datos / SQLite (Embebido)', type: 'database-detail', db: defaultSQLite })}
-        theme={theme}
-      />
+        {/* Import Project Modal with Drag and Drop Zone */}
+        <ImportProjectModal
+          isOpen={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onImportFolder={handleImportFolderPath}
+          projects={projects}
+          theme={theme}
+          language={language}
+        />
 
-      {/* Import Project Modal with Drag and Drop Zone */}
-      <ImportProjectModal
-        isOpen={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        onImportFolder={handleImportFolderPath}
-        projects={projects}
-        theme={theme}
-        language={language}
-      />
-
-      {/* Quick Command Omnibox (Ctrl + K) */}
-      <CommandPaletteModal
-        isOpen={showCommandPalette}
-        onClose={() => setShowCommandPalette(false)}
-        projects={projects}
-        customDatabases={customDatabases}
-        onAddProject={() => setShowImportModal(true)}
-        onOpenProjects={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
-        onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
-        onOpenSettings={() => setShowSettings(true)}
-        onToggleProject={handleToggleProject}
-        onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `Base de Datos / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
-        onOpenOnboarding={() => setShowOnboarding(true)}
-        theme={theme}
-      />
+        {/* Quick Command Omnibox (Ctrl + K) */}
+        <CommandPaletteModal
+          isOpen={showCommandPalette}
+          onClose={() => setShowCommandPalette(false)}
+          projects={projects}
+          customDatabases={customDatabases}
+          onAddProject={() => setShowImportModal(true)}
+          onOpenProjects={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
+          onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
+          onOpenSettings={() => setShowSettings(true)}
+          onToggleProject={handleToggleProject}
+          onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `Base de Datos / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+          onOpenOnboarding={() => setShowOnboarding(true)}
+          theme={theme}
+        />
+      </Suspense>
     </div>
   );
 }

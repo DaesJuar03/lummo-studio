@@ -22,60 +22,8 @@ export default function DatabasesPanel({
   onSelectDatabaseDetail, 
   theme 
 }) {
-  const defaultDatabases = [
-    {
-      id: 'sqlite',
-      name: 'SQLite (Embebido)',
-      port: null,
-      status: 'READY',
-      tech: 'Motor Nativo en Lummo Studio',
-      installed: true,
-      size: '2.1 MB',
-      tables: 12,
-      connections: 1
-    },
-    {
-      id: 'mysql',
-      name: 'MySQL / MariaDB',
-      port: 3306,
-      status: 'STOPPED',
-      tech: 'Servidor Local MySQL',
-      installed: envStatus?.mysql?.installed ?? true,
-      size: '14.2 MB',
-      tables: 8,
-      connections: 2
-    },
-    {
-      id: 'postgres',
-      name: 'PostgreSQL',
-      port: 5432,
-      status: 'STOPPED',
-      tech: 'Servidor Local PostgreSQL',
-      installed: envStatus?.postgres?.installed ?? false,
-      size: '6.8 MB',
-      tables: 4,
-      connections: 1
-    },
-    {
-      id: 'mongodb',
-      name: 'MongoDB',
-      port: 27017,
-      status: 'STOPPED',
-      tech: 'Ejecución CLI / Docker',
-      installed: envStatus?.docker?.installed ?? false,
-      size: '0.0 MB',
-      tables: 0,
-      connections: 0
-    }
-  ];
-
   // Dynamic database status state map
-  const [dbStatuses, setDbStatuses] = useState({
-    sqlite: 'READY',
-    mysql: 'STOPPED',
-    postgres: 'STOPPED',
-    mongodb: 'STOPPED'
-  });
+  const [dbStatuses, setDbStatuses] = useState({});
 
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState(null);
@@ -84,9 +32,9 @@ export default function DatabasesPanel({
 
   const isDark = theme === 'dark';
 
-  const databases = [...customDatabases, ...defaultDatabases].map(db => ({
+  const databases = customDatabases.map(db => ({
     ...db,
-    status: dbStatuses[db.id] !== undefined ? dbStatuses[db.id] : (db.status || 'STOPPED')
+    status: dbStatuses[db.id] !== undefined ? dbStatuses[db.id] : (db.status || 'READY')
   }));
 
   const toggleDatabaseStatus = (dbItem) => {
@@ -133,12 +81,12 @@ export default function DatabasesPanel({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const installedDatabases = databases.filter(db => db.installed && db.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const installedDatabases = databases.filter(db => db.installed !== false && db.name.toLowerCase().includes(searchTerm.toLowerCase()));
   const notDetectedEngines = databases.filter(db => !db.installed);
 
   return (
     <div className={`py-6 px-8 max-w-7xl w-full mx-auto space-y-8 flex-1 ${
-      isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-transparent text-[#f4f4f5]' : 'bg-transparent text-slate-900'
     }`}>
       
       {/* Header Navigation */}
@@ -185,136 +133,115 @@ export default function DatabasesPanel({
         <span className="text-xs font-bold font-mono text-slate-500 uppercase tracking-wider">
           Instancias Activas y Disponibles ({installedDatabases.length})
         </span>
-
-        {installedDatabases.map((db) => {
-          const isRunning = db.status === 'RUNNING' || db.status === 'READY';
-
-          return (
-            <motion.div
-              key={db.id}
-              whileHover={{ y: -1 }}
-              onClick={() => onSelectDatabaseDetail && onSelectDatabaseDetail(db)}
-              className={`pure-card p-5 cursor-pointer transition-all space-y-4 ${
-                isRunning 
-                  ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm' 
-                  : isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
-              }`}
+        {installedDatabases.length === 0 ? (
+          <div className={`p-12 text-center rounded-2xl border space-y-4 ${
+            isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-white border-slate-200'
+          }`}>
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 mx-auto flex items-center justify-center">
+              <Database className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Sin bases de datos configuradas
+              </h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-sans">
+                El panel está limpio. Puedes conectar o crear tu primera instancia local de SQLite, MySQL o PostgreSQL para comenzar.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl inline-flex items-center gap-2 shadow-sm transition-all"
             >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                
-                {/* Info Block */}
-                <div className="flex items-center space-x-3.5 min-w-0">
-                  <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center font-bold shrink-0 ${
-                    isDark ? 'bg-blue-950/60 border-blue-800 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
-                  }`}>
-                    <Database className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center space-x-2.5">
-                      <h3 className={`font-extrabold text-lg tracking-tight truncate hover:text-blue-500 transition-colors ${
-                        isDark ? 'text-white' : 'text-slate-900'
-                      }`}>
-                        {db.name}
-                      </h3>
-                      <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-md border flex items-center gap-1.5 ${
-                        isRunning ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : isDark ? 'bg-[#181818] text-slate-400 border-[#2e2e2e]' : 'bg-slate-100 text-slate-600 border-slate-200'
-                      }`}>
-                        <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
-                        {isRunning ? 'EJECUTANDO (ACTIVO)' : 'APAGADO (STOPPED)'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 font-mono mt-0.5">{db.tech}</p>
-                  </div>
-                </div>
+              <Plus className="w-4 h-4" />
+              <span>Conectar / Crear Primera BD</span>
+            </button>
+          </div>
+        ) : (
+          installedDatabases.map((db) => {
+            const isRunning = db.status === 'RUNNING' || db.status === 'READY';
 
-                {/* Metrics & Start/Stop Controls */}
-                <div className="flex items-center space-x-3 shrink-0">
-                  <div className={`hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl border text-xs font-mono ${
-                    isDark ? 'bg-[#181818] border-[#2e2e2e] text-[#a1a1aa]' : 'bg-slate-100 border-slate-200 text-slate-700'
-                  }`}>
-                    <span className="font-semibold">{db.size || '0.0 MB'}</span>
-                    <span className="text-slate-400">|</span>
-                    <span className="font-semibold">{db.tables || 0} tablas</span>
-                  </div>
-
-                  {db.port && (
-                    <div className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border font-mono text-xs ${
-                      isDark ? 'bg-[#181818] border-[#2e2e2e]' : 'bg-slate-100 border-slate-200'
+            return (
+              <motion.div
+                key={db.id}
+                whileHover={{ y: -1 }}
+                onClick={() => onSelectDatabaseDetail && onSelectDatabaseDetail(db)}
+                className={`pure-card p-5 cursor-pointer transition-all space-y-4 ${
+                  isRunning 
+                    ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm' 
+                    : isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
+                }`}
+              >
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  {/* Info Block */}
+                  <div className="flex items-center space-x-3.5 min-w-0">
+                    <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center font-bold shrink-0 ${
+                      isDark ? 'bg-blue-950/60 border-blue-800 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
                     }`}>
-                      <span className="text-slate-500">Puerto:</span>
-                      <span className="font-bold text-blue-500">{db.port}</span>
+                      <Database className="h-5 w-5" />
                     </div>
-                  )}
+                    <div className="min-w-0">
+                      <div className="flex items-center space-x-2.5">
+                        <h3 className={`font-extrabold text-lg tracking-tight truncate hover:text-blue-500 transition-colors ${
+                          isDark ? 'text-white' : 'text-slate-900'
+                        }`}>
+                          {db.name}
+                        </h3>
+                        <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-md border flex items-center gap-1.5 ${
+                          isRunning ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : isDark ? 'bg-[#181818] text-slate-400 border-[#2e2e2e]' : 'bg-slate-100 text-slate-600 border-slate-200'
+                        }`}>
+                          <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
+                          {isRunning ? 'EJECUTANDO (ACTIVO)' : 'APAGADO (STOPPED)'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 font-mono mt-0.5">{db.tech || db.type || 'SQLite'}</p>
+                    </div>
+                  </div>
 
-                  {/* Working Start / Stop Toggle Button */}
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleDatabaseStatus(db);
-                    }}
-                    className={`w-32 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all shadow-xs text-white ${
-                      isRunning
-                        ? 'bg-rose-600 hover:bg-rose-700'
-                        : 'bg-blue-600 hover:bg-blue-700'
-                    }`}
-                  >
-                    {isRunning ? <Square className="h-3.5 w-3.5 fill-white" /> : <Play className="h-3.5 w-3.5 fill-white" />}
-                    <span>{isRunning ? 'Apagar' : 'Ejecutar'}</span>
-                  </motion.button>
+                  {/* Actions & Start/Stop Controls */}
+                  <div className="flex items-center space-x-3 shrink-0">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyConnectionString(db);
+                      }}
+                      className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors ${
+                        isDark ? 'bg-[#181818] border-[#2e2e2e] text-[#a1a1aa] hover:bg-[#282828] hover:text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      {copiedId === db.id ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
+                      <span>{copiedId === db.id ? '¡Copiado!' : 'Copiar URL'}</span>
+                    </button>
 
-                  <ChevronRight className="h-5 w-5 text-slate-400" />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setImportExportDb(db);
+                      }}
+                      className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors ${
+                        isDark ? 'bg-[#181818] border-[#2e2e2e] text-[#a1a1aa] hover:bg-[#282828] hover:text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      }`}
+                      title="Importar o Exportar respaldos SQL"
+                    >
+                      <Upload className="h-3.5 w-3.5 text-blue-500" />
+                      <span>Dump SQL</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onSelectDatabaseDetail) onSelectDatabaseDetail(db);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-3.5 rounded-xl transition-all shadow-xs flex items-center space-x-1.5"
+                    >
+                      <Table className="h-3.5 w-3.5" />
+                      <span>Abrir Tablas & Consultas</span>
+                    </button>
+                  </div>
                 </div>
-
-              </div>
-
-              {/* Bottom Actions Row */}
-              <div className={`pt-3 border-t flex flex-wrap items-center justify-between gap-3 ${
-                isDark ? 'border-[#282828]' : 'border-slate-100'
-              }`}>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      copyConnectionString(db);
-                    }}
-                    className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors ${
-                      isDark ? 'bg-[#181818] border-[#2e2e2e] text-[#a1a1aa] hover:bg-[#282828] hover:text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    {copiedId === db.id ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
-                    <span>{copiedId === db.id ? '¡Copiado!' : 'Copiar URL'}</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setImportExportDb(db);
-                    }}
-                    className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors ${
-                      isDark ? 'bg-[#181818] border-[#2e2e2e] text-[#a1a1aa] hover:bg-[#282828] hover:text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
-                    title="Importar o Exportar respaldos SQL"
-                  >
-                    <Upload className="h-3.5 w-3.5 text-blue-500" />
-                    <span>Dump SQL</span>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onSelectDatabaseDetail) onSelectDatabaseDetail(db);
-                    }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-3.5 rounded-xl transition-all shadow-xs flex items-center space-x-1.5"
-                  >
-                    <Table className="h-3.5 w-3.5" />
-                    <span>Abrir Tablas & Consultas</span>
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
+              </motion.div>
+            );
+          })
+        )}
       </div>
 
       {/* NOT DETECTED ENGINES */}

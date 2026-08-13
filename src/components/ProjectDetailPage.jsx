@@ -277,7 +277,7 @@ export default function ProjectDetailPage({
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.2 }}
       className={`p-6 max-w-7xl w-full mx-auto space-y-6 flex-1 ${
-        isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
+        isDark ? 'bg-transparent text-[#f4f4f5]' : 'bg-transparent text-slate-900'
       }`}
     >
       
@@ -373,7 +373,7 @@ export default function ProjectDetailPage({
           >
             <Share2 className="h-4 w-4" />
             {tunnelUrl && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse border-2 border-[#161616]"></span>
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse border-2 border-[#09090b]"></span>
             )}
           </button>
 

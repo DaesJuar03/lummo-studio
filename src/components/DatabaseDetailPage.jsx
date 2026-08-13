@@ -24,6 +24,7 @@ import {
 import ImportExportSqlModal from './ImportExportSqlModal';
 import ErDiagramModal from './ErDiagramModal';
 import DataExportModal from './DataExportModal';
+import VirtualizedTable from './VirtualizedTable';
 
 
 export default function DatabaseDetailPage({
@@ -196,36 +197,82 @@ export default function DatabaseDetailPage({
     setShowNewTableForm(false);
   };
 
-  const handleExportJSON = () => {
+  const handleExportJSON = async () => {
     if (!selectedTable || !dbData[selectedTable]) return;
-    const jsonStr = JSON.stringify(dbData[selectedTable], null, 2);
-    navigator.clipboard.writeText(jsonStr);
-    setExportNotice('¡Tabla copiada en formato JSON!');
-    setTimeout(() => setExportNotice(''), 3000);
+    if (window.electronAPI?.db?.exportDataFile) {
+      const res = await window.electronAPI.db.exportDataFile({
+        format: 'json',
+        tableName: selectedTable,
+        rows: dbData[selectedTable]
+      });
+      if (res.success) {
+        setExportNotice(`¡Archivo guardado en: ${res.filePath}!`);
+        setTimeout(() => setExportNotice(''), 4000);
+      }
+    } else {
+      const jsonStr = JSON.stringify(dbData[selectedTable], null, 2);
+      navigator.clipboard.writeText(jsonStr);
+      setExportNotice('¡Tabla copiada en formato JSON!');
+      setTimeout(() => setExportNotice(''), 3000);
+    }
   };
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
     if (!selectedTable || !dbData[selectedTable] || dbData[selectedTable].length === 0) return;
-    const rows = dbData[selectedTable];
-    const headers = Object.keys(rows[0]).join(',');
-    const csvLines = rows.map(r => Object.values(r).join(','));
-    const csvContent = [headers, ...csvLines].join('\n');
-    navigator.clipboard.writeText(csvContent);
-    setExportNotice('¡Tabla copiada en formato CSV!');
-    setTimeout(() => setExportNotice(''), 3000);
+    if (window.electronAPI?.db?.exportDataFile) {
+      const res = await window.electronAPI.db.exportDataFile({
+        format: 'csv',
+        tableName: selectedTable,
+        rows: dbData[selectedTable]
+      });
+      if (res.success) {
+        setExportNotice(`¡Archivo guardado en: ${res.filePath}!`);
+        setTimeout(() => setExportNotice(''), 4000);
+      }
+    } else {
+      const rows = dbData[selectedTable];
+      const headers = Object.keys(rows[0]).join(',');
+      const csvLines = rows.map(r => Object.values(r).join(','));
+      const csvContent = [headers, ...csvLines].join('\n');
+      navigator.clipboard.writeText(csvContent);
+      setExportNotice('¡Tabla copiada en formato CSV!');
+      setTimeout(() => setExportNotice(''), 3000);
+    }
   };
 
-  const handleExportSQL = () => {
+  const handleExportSQL = async () => {
     if (!selectedTable || !dbData[selectedTable] || dbData[selectedTable].length === 0) return;
-    const rows = dbData[selectedTable];
-    const sqlStatements = rows.map(r => {
-      const keys = Object.keys(r).join(', ');
-      const vals = Object.values(r).map(v => typeof v === 'string' ? `'${v}'` : v).join(', ');
-      return `INSERT INTO ${selectedTable} (${keys}) VALUES (${vals});`;
-    }).join('\n');
-    navigator.clipboard.writeText(sqlStatements);
-    setExportNotice('¡Dump de consultas SQL copiado!');
-    setTimeout(() => setExportNotice(''), 3000);
+    if (window.electronAPI?.db?.exportDataFile) {
+      const res = await window.electronAPI.db.exportDataFile({
+        format: 'sql',
+        tableName: selectedTable,
+        rows: dbData[selectedTable]
+      });
+      if (res.success) {
+        setExportNotice(`¡Archivo guardado en: ${res.filePath}!`);
+        setTimeout(() => setExportNotice(''), 4000);
+      }
+    } else {
+      const rows = dbData[selectedTable];
+      const sqlStatements = rows.map(r => {
+        const keys = Object.keys(r).join(', ');
+        const vals = Object.values(r).map(v => typeof v === 'string' ? `'${v}'` : v).join(', ');
+        return `INSERT INTO ${selectedTable} (${keys}) VALUES (${vals});`;
+      }).join('\n');
+      navigator.clipboard.writeText(sqlStatements);
+      setExportNotice('¡Dump de consultas SQL copiado!');
+      setTimeout(() => setExportNotice(''), 3000);
+    }
+  };
+
+  const handleMigrateFile = async () => {
+    if (window.electronAPI?.db?.migrateDatabaseFile) {
+      const res = await window.electronAPI.db.migrateDatabaseFile(db);
+      if (res.success) {
+        setExportNotice(`¡Base de Datos exportada exitosamente a: ${res.filePath}!`);
+        setTimeout(() => setExportNotice(''), 5000);
+      }
+    }
   };
 
   const handleInsertRow = async (e) => {
@@ -316,7 +363,7 @@ export default function DatabaseDetailPage({
       exit={{ opacity: 0, x: -10 }}
       transition={{ duration: 0.2 }}
       className={`p-6 max-w-7xl w-full mx-auto space-y-6 flex-1 ${
-        isDark ? 'bg-[#161616] text-[#e4e4e7]' : 'bg-slate-50 text-slate-900'
+        isDark ? 'bg-transparent text-[#f4f4f5]' : 'bg-transparent text-slate-900'
       }`}
     >
       {/* Top Header Navigation */}
@@ -754,6 +801,17 @@ export default function DatabaseDetailPage({
                   </button>
 
                   <button
+                    onClick={handleMigrateFile}
+                    className={`text-xs px-2.5 py-1.5 rounded-xl border font-bold flex items-center gap-1 transition-colors ${
+                      isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-700'
+                    }`}
+                    title="Migrar / Exportar archivo de Base de Datos completo (.sqlite) a cualquier carpeta"
+                  >
+                    <HardDrive className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Migrar BD...</span>
+                  </button>
+
+                  <button
                     onClick={() => setShowInsertRowForm(!showInsertRowForm)}
                     className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center space-x-1 shadow-2xs"
                   >
@@ -813,32 +871,7 @@ export default function DatabaseDetailPage({
                 )}
               </div>
             ) : (
-              <div className={`overflow-x-auto rounded-2xl border ${
-                isDark ? 'border-[#2a2a2a] bg-[#161616]' : 'border-slate-200 bg-slate-50/50'
-              }`}>
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className={`border-b text-[11px] uppercase ${
-                    isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
-                  }`}>
-                    <tr>
-                      {activeRows.length > 0 && Object.keys(activeRows[0]).map((key) => (
-                        <th key={key} className="px-4 py-3 font-bold">{key}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className={`divide-y ${isDark ? 'divide-[#2a2a2a] text-slate-300' : 'divide-slate-200 text-slate-800'}`}>
-                    {activeRows.map((row, idx) => (
-                      <tr key={idx} className={isDark ? 'hover:bg-[#202020]' : 'hover:bg-white'}>
-                        {Object.values(row).map((val, cellIdx) => (
-                          <td key={cellIdx} className="px-4 py-3 whitespace-nowrap">
-                            {String(val)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <VirtualizedTable rows={activeRows} isDark={isDark} containerHeight={460} />
             )}
           </div>
 
@@ -879,7 +912,7 @@ export default function DatabaseDetailPage({
               rows={5}
               placeholder="CREATE TABLE usuarios (id INT, nombre TEXT);"
               className={`w-full border rounded-2xl p-4 text-xs font-mono font-bold focus:outline-none ${
-                isDark ? 'bg-[#161616] border-[#2a2a2a] text-blue-400 focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-blue-600 focus:border-blue-600'
+                isDark ? 'bg-[#121215] border-[#27272a] text-blue-400 focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-blue-600 focus:border-blue-600'
               }`}
             />
 
@@ -907,32 +940,7 @@ export default function DatabaseDetailPage({
             {activeRows.length === 0 ? (
               <p className="text-xs text-slate-500 py-6 font-mono text-center">Sin filas devueltas</p>
             ) : (
-              <div className={`overflow-x-auto rounded-2xl border ${
-                isDark ? 'border-[#2a2a2a] bg-[#161616]' : 'border-slate-200 bg-slate-50/50'
-              }`}>
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className={`border-b text-[11px] uppercase ${
-                    isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
-                  }`}>
-                    <tr>
-                      {activeRows.length > 0 && Object.keys(activeRows[0]).map((key) => (
-                        <th key={key} className="px-4 py-2.5 font-bold">{key}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className={`divide-y ${isDark ? 'divide-[#2a2a2a] text-slate-300' : 'divide-slate-200 text-slate-800'}`}>
-                    {activeRows.map((row, idx) => (
-                      <tr key={idx} className={isDark ? 'hover:bg-[#202020]' : 'hover:bg-white'}>
-                        {Object.values(row).map((val, cellIdx) => (
-                          <td key={cellIdx} className="px-4 py-2.5 whitespace-nowrap">
-                            {String(val)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <VirtualizedTable rows={activeRows} isDark={isDark} containerHeight={400} />
             )}
           </div>
         </motion.div>

@@ -94,12 +94,12 @@ export default function Header({
 
   return (
     <header className={`relative z-40 border-b select-none w-full transition-colors duration-200 ${
-      isDark ? 'border-[#242424]' : 'border-slate-200'
+      isDark ? 'border-[#27272a]' : 'border-slate-200'
     }`} onClick={closeContextMenu}>
       {/* Top Titlebar Row */}
       <div 
         className={`h-11 px-3 flex items-center justify-between border-b ${
-          isDark ? 'bg-[#181818] border-[#242424] text-[#e4e4e7]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
+          isDark ? 'bg-[#121215] border-[#27272a] text-[#f4f4f5]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
       >
@@ -111,7 +111,7 @@ export default function Header({
               disabled={!canGoBack}
               className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-2xs disabled:opacity-25 disabled:pointer-events-none ${
                 isDark
-                  ? 'bg-[#262626] border border-[#3a3a3c] text-white hover:bg-blue-600 hover:border-blue-500'
+                  ? 'bg-[#18181b] border border-[#27272a] text-white hover:bg-blue-600 hover:border-blue-500'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
               title="Retroceder"
@@ -124,7 +124,7 @@ export default function Header({
               disabled={!canGoForward}
               className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-2xs disabled:opacity-25 disabled:pointer-events-none ${
                 isDark
-                  ? 'bg-[#262626] border border-[#3a3a3c] text-white hover:bg-blue-600 hover:border-blue-500'
+                  ? 'bg-[#18181b] border border-[#27272a] text-white hover:bg-blue-600 hover:border-blue-500'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
               title="Avanzar"
@@ -141,9 +141,6 @@ export default function Header({
               className="w-5 h-5 object-contain" 
             />
             <span className="font-extrabold text-xs tracking-tight">Lummo Studio</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
-              isDark ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-blue-50 text-blue-600 border border-blue-200'
-            }`}>v2.0.0</span>
           </div>
         </div>
 
@@ -153,7 +150,7 @@ export default function Header({
             onClick={onOpenCommandPalette}
             className={`w-60 sm:w-72 md:w-80 flex items-center justify-between px-3 py-1 rounded-xl border text-xs transition-all shadow-2xs ${
               isDark
-                ? 'bg-[#222222] border-[#333333] text-[#d4d4d8] hover:bg-[#2a2a2a] hover:border-slate-600'
+                ? 'bg-[#18181b] border-[#27272a] text-[#f4f4f5] hover:bg-[#202025] hover:border-[#3f3f46]'
                 : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400'
             }`}
           >
@@ -169,10 +166,10 @@ export default function Header({
         <div className="flex items-center space-x-2 shrink-0" style={{ WebkitAppRegion: 'no-drag' }}>
           <button
             onClick={onOpenSettings}
-            className={`px-2.5 py-1 rounded-lg border transition-all flex items-center space-x-1.5 text-xs font-bold shadow-2xs ${
+            className={`px-2.5 py-1 rounded-lg border border-transparent transition-all flex items-center space-x-1.5 text-xs font-bold ${
               isDark 
-                ? 'border-transparent text-slate-300 hover:bg-[#282828] hover:border-[#3a3a3c] hover:text-white' 
-                : 'border-transparent text-slate-700 hover:bg-slate-300/50 hover:border-slate-300/80 hover:text-slate-900'
+                ? 'text-slate-300 hover:bg-[#18181b] hover:border-[#27272a] hover:text-white hover:shadow-2xs' 
+                : 'text-slate-700 hover:bg-slate-200/70 hover:border-slate-300 hover:text-slate-900 hover:shadow-2xs'
             }`}
             title={t.settings}
           >
@@ -180,11 +177,11 @@ export default function Header({
             <span>{t.settings}</span>
           </button>
 
-          <div className={`flex items-center pl-2 border-l h-11 ${isDark ? 'border-[#242424]' : 'border-slate-300/70'}`}>
+          <div className={`flex items-center pl-2 border-l h-11 ${isDark ? 'border-[#27272a]' : 'border-slate-300/70'}`}>
             <button
               onClick={handleMinimize}
               className={`w-10 h-11 flex items-center justify-center transition-all ${
-                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#18181b]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Minimizar"
             >
@@ -193,7 +190,7 @@ export default function Header({
             <button
               onClick={handleMaximize}
               className={`w-10 h-11 flex items-center justify-center transition-all ${
-                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#18181b]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Maximizar"
             >
@@ -213,7 +210,7 @@ export default function Header({
       {/* Bottom Row: Dedicated Open Tabs Bar with Drag & Drop and Pin Tabs */}
       <div 
         className={`h-9 px-3 flex items-center space-x-1 overflow-x-auto no-scrollbar scroll-smooth w-full ${
-          isDark ? 'bg-[#141414] border-t border-[#222222]' : 'bg-slate-100/80 border-t border-slate-200/80'
+          isDark ? 'bg-[#09090b] border-t border-[#1f1f23]' : 'bg-slate-100/80 border-t border-slate-200/80'
         }`}
         style={{ WebkitAppRegion: 'no-drag' }}
       >
@@ -241,10 +238,10 @@ export default function Header({
                 } ${
                   isActive
                     ? isDark 
-                      ? 'bg-[#282828] border-[#3f3f46] text-white shadow-2xs font-extrabold' 
+                      ? 'bg-[#1f1f24] border-[#3f3f46] text-white shadow-2xs font-extrabold' 
                       : 'bg-white border-slate-300/90 text-blue-600 shadow-2xs font-extrabold'
                     : isDark
-                      ? 'bg-[#1a1a1a] border-transparent text-[#a1a1aa] hover:text-white hover:bg-[#222222]'
+                      ? 'bg-[#121215] border-transparent text-[#a1a1aa] hover:text-white hover:bg-[#18181b]'
                       : 'bg-slate-200/50 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
                 }`}
                 title={tab.title}
@@ -275,7 +272,7 @@ export default function Header({
           whileTap={{ scale: 0.9 }}
           onClick={onPlusClick}
           className={`p-1 rounded-md transition-all h-7 w-7 flex items-center justify-center shrink-0 ${
-            isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+            isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#18181b]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
           }`}
           title="Nueva pestaña"
         >

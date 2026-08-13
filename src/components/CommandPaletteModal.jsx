@@ -77,13 +77,7 @@ export default function CommandPaletteModal({
 
   if (!isOpen) return null;
 
-  const defaultDatabases = [
-    { id: 'sqlite', name: 'SQLite (Embebido)', tech: 'Motor Nativo en Lummo', isDb: true },
-    { id: 'mysql', name: 'MySQL / MariaDB', tech: 'Servidor Local MySQL', isDb: true },
-    { id: 'postgres', name: 'PostgreSQL', tech: 'Servidor Local PostgreSQL', isDb: true }
-  ];
-
-  const allDatabases = [...customDatabases.map(d => ({ ...d, isDb: true })), ...defaultDatabases];
+  const allDatabases = customDatabases.map(d => ({ ...d, isDb: true }));
 
   const actions = [
     {

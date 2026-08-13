@@ -13,17 +13,25 @@ const { registerDbHandlers } = require('./ipc/dbHandlers.cjs');
 const { registerTunnelProxyHandlers } = require('./ipc/tunnelProxyHandlers.cjs');
 const { registerProjectHandlers } = require('./ipc/projectHandlers.cjs');
 
+function sanitizeShellCommand(cmd) {
+  if (typeof cmd !== 'string') return '';
+  // Remover caracteres de control nulos o no imprimibles
+  let clean = cmd.replace(/[\x00-\x08\x0E-\x1F\x7F]/g, '').trim();
+  return clean;
+}
+
 function runProjectScript(projectId, folderPath, scriptCommand, emitLog) {
-  if (!folderPath || !scriptCommand) {
-    if (emitLog) emitLog(projectId, '[Lummo Script Error] Ruta de carpeta o comando inválidos.');
-    return Promise.resolve({ success: false, error: 'Comando o carpeta vacíos' });
+  const cleanCmd = sanitizeShellCommand(scriptCommand);
+  if (!folderPath || !cleanCmd || !fs.existsSync(folderPath)) {
+    if (emitLog) emitLog(projectId, '[Lummo Script Error] Ruta de carpeta inexistente o comando inválido.');
+    return Promise.resolve({ success: false, error: 'Comando o carpeta vacíos o inexistentes' });
   }
 
   return new Promise((resolve) => {
-    emitLog(projectId, `\n[Lummo Script] === Ejecutando: "${scriptCommand}" ===`);
+    emitLog(projectId, `\n[Lummo Script] === Ejecutando: "${cleanCmd}" ===`);
     emitLog(projectId, `[Lummo Script] Carpeta: ${folderPath}`);
 
-    const child = spawn(scriptCommand, [], {
+    const child = spawn(cleanCmd, [], {
       cwd: folderPath,
       shell: true,
       env: { ...process.env }
@@ -44,8 +52,8 @@ function runProjectScript(projectId, folderPath, scriptCommand, emitLog) {
 
     child.on('close', (code) => {
       const msg = code === 0 
-        ? `[Lummo Script] Comando "${scriptCommand}" completado exitosamente.`
-        : `[Lummo Script] Comando "${scriptCommand}" finalizó con código de salida ${code}.`;
+        ? `[Lummo Script] Comando "${cleanCmd}" completado exitosamente.`
+        : `[Lummo Script] Comando "${cleanCmd}" finalizó con código de salida ${code}.`;
       if (emitLog) emitLog(projectId, msg);
       resolve({ success: code === 0, code });
     });
@@ -120,17 +128,30 @@ function createWindow() {
 
 let updateTrayContextMenu = () => {};
 
+function killProcessTree(child) {
+  if (!child) return;
+  const pid = typeof child === 'number' ? child : child.pid;
+  if (!pid) return;
+
+  try {
+    if (process.platform === 'win32') {
+      exec(`taskkill /pid ${pid} /T /F`, () => {});
+    } else {
+      if (child.kill) {
+        try { child.kill('SIGTERM'); } catch (e) {}
+      }
+      try { process.kill(-pid, 'SIGKILL'); } catch (e) {}
+    }
+  } catch (e) {
+    console.error(`[Lummo Cleanup Error] No se pudo finalizar proceso ${pid}:`, e);
+  }
+}
+
 function stopProjectById(projectId) {
   const item = runningProcesses.get(projectId);
   if (item) {
     const child = item.child || item;
-    try {
-      if (process.platform === 'win32') {
-        exec(`taskkill /pid ${child.pid} /T /F`);
-      } else {
-        child.kill('SIGTERM');
-      }
-    } catch (e) {}
+    killProcessTree(child);
     runningProcesses.delete(projectId);
     updateTrayContextMenu();
     if (mainWindow && !mainWindow.isDestroyed()) {
@@ -142,13 +163,7 @@ function stopProjectById(projectId) {
 function stopAllProjects() {
   runningProcesses.forEach((item, projectId) => {
     const child = item.child || item;
-    try {
-      if (process.platform === 'win32') {
-        exec(`taskkill /pid ${child.pid} /T /F`);
-      } else {
-        child.kill('SIGTERM');
-      }
-    } catch (e) {}
+    killProcessTree(child);
   });
   runningProcesses.clear();
   updateTrayContextMenu();
@@ -318,6 +333,11 @@ app.whenReady().then(() => {
 
 app.on('before-quit', () => {
   isQuitting = true;
+  stopAllProjects();
+});
+
+app.on('will-quit', () => {
+  stopAllProjects();
 });
 
 app.on('window-all-closed', () => {

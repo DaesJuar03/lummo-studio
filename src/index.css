@@ -30,10 +30,10 @@
     color: #0f172a;
   }
 
-  /* Antigravity Matte Dark Theme */
+  /* Matte Dark Theme */
   body.dark-theme {
-    background-color: #161616;
-    color: #e4e4e7;
+    background-color: #09090b;
+    color: #f4f4f5;
   }
 
   code, kbd, .font-mono {
@@ -54,7 +54,7 @@
 }
 
 body.dark-theme .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -83,17 +83,18 @@ body.light-theme .pure-card:hover {
   box-shadow: 0 10px 30px -4px rgba(37, 99, 235, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
 }
 
-/* Antigravity Matte Dark Cards */
+/* Matte Dark Cards */
 body.dark-theme .pure-card {
-  background-color: #1e1e1e;
-  border: 1px solid #2a2a2a;
+  background-color: #121215;
+  border: 1px solid #27272a;
   border-radius: 16px;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
 }
 
 body.dark-theme .pure-card:hover {
   transform: translateY(-2px);
+  background-color: #18181b;
   border-color: #3f3f46;
   box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.7);
 }
@@ -116,8 +117,8 @@ body.dark-theme .hotkey-badge {
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 6px;
-  background: #282828;
-  border: 1px solid #383838;
+  background: #18181b;
+  border: 1px solid #27272a;
   color: #a1a1aa;
 }
 

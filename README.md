@@ -75,10 +75,13 @@
 - **Edición en Tiempo Real**: Edita variables de entorno sin salir de la app.
 - **Auto-Reinicie en Cambio de Puerto**: Sincronización inmediata al modificar variables o puertos asignados.
 
-### 🗄️ 5. Workbench SQL & Diagrama Entidad-Relación (ER) Nativo
-- **Soporte Multi-Motor**: Administra motores **SQLite** (embebido nativo en Lummo), **MySQL / MariaDB** y **PostgreSQL**.
+### 🗄️ 5. Workbench SQL, Tabla Virtualizada & Persistencia en Documentos
+- **Persistencia en Documentos**: Todas las bases de datos SQLite se guardan de forma física y permanente en `Documents/LummoStudio/Databases/`.
+- **Migración a Cualquier Carpeta**: Exporta o migra archivos de base de datos `.sqlite` a cualquier directorio deseado mediante diálogos nativos.
+- **Tabla Virtualizada**: Rendimiento ultrarrápido al explorar miles de filas de datos SQL mediante virtualización en pantalla (`VirtualizedTable.jsx`).
+- **Soporte Multi-Motor**: Administra motores **SQLite**, **MySQL / MariaDB** y **PostgreSQL**.
 - **Diagrama Entidad-Relación (ER)**: Generación automática de diagramas relacionales interactivos con soporte de Zoom y conectores Bezier.
-- **Snapshots & Dump SQL**: Exportación e importación de datos en formato `.sql`, `.csv`, `.json` y `.xlsx`.
+- **Snapshots & Dump SQL**: Exportación e importación nativa de datos en formato `.sql`, `.csv` y `.json`.
 
 ### 🌐 6. Motor Multilingüe (Español / Inglés) & Sistema para Contribuidores
 
@@ -158,6 +161,11 @@ Lummo Studio cuenta con un motor de internacionalización ligero e hiper-extensi
    npm run electron:dev
    ```
 
+4. **Ejecutar Suite de Pruebas Unitarias (Vitest)**:
+   ```bash
+   npm test
+   ```
+
 ---
 
 ## 📦 Compilación y Generación del Ejecutable (`.exe`)
@@ -201,6 +209,7 @@ xamp_2.0/
 │   ├── main.cjs         # Proceso principal de Electron (IPC, Tray, Window)
 │   ├── processManager.js# Gestor de procesos Node/Express/Vite/PHP/Python
 │   ├── scanner.js       # Escáner de ejecutables y entorno local
+│   ├── dbManager.cjs    # Gestor SQL y resolución de persistencia en Documentos
 │   └── detector.js      # Detector automático de stack de proyectos
 ├── public/
 │   ├── screenshots/     # Capturas de pantalla oficiales
@@ -208,20 +217,19 @@ xamp_2.0/
 │   └── Lummo.png        # Logotipo principal de la aplicación
 ├── src/
 │   ├── assets/          # Recursos estáticos importados por Vite
-│   ├── components/      # Componentes de React
-│   │   ├── DatabaseDetailPage.jsx
-│   │   ├── DatabasesPanel.jsx
-│   │   ├── ErDiagramModal.jsx (Nativo ER View)
-│   │   ├── ExecutionConfigModal.jsx
-│   │   ├── Header.jsx
-│   │   ├── HomeDashboard.jsx
-│   │   ├── ProjectDetailPage.jsx
-│   │   ├── ScriptLauncherModal.jsx
-│   │   └── SettingsModal.jsx
+│   ├── components/      # Componentes de React (VirtualizedTable, DatabaseDetailPage, etc.)
+│   ├── context/         # Custom Hooks & Estado global (useLummoState.js)
 │   ├── locales/         # i18n Engine & Diccionarios (es.json, en.json, index.js)
+│   ├── types/           # Declaraciones de tipos TypeScript (lummo.d.ts)
 │   ├── App.jsx          # Componente raíz y enrutador de pestañas
 │   ├── index.css        # Sistema de diseño Tailwind CSS y scrollbars
 │   └── main.jsx         # Punto de entrada de React
+├── tests/               # Suite de pruebas automáticas Vitest (12 tests)
+│   ├── dbManager.test.js
+│   ├── detector.test.js
+│   ├── locales.test.js
+│   └── sanitizer.test.js
+├── vitest.config.js     # Configuración del test runner Vitest
 ├── package.json         # Configuración v2.0.0 y Electron Builder
 └── README.md            # Documentación oficial
 ```

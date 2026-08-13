@@ -22,6 +22,34 @@ function resolveDbType(config) {
   return 'sqlite';
 }
 
+function getLummoDatabasesDir() {
+  const os = require('os');
+  let docsPath;
+  try {
+    const { app } = require('electron');
+    if (app && app.getPath) {
+      docsPath = app.getPath('documents');
+    }
+  } catch (e) {}
+  if (!docsPath) {
+    docsPath = path.join(os.homedir(), 'Documents');
+  }
+  const dbDir = path.join(docsPath, 'LummoStudio', 'Databases');
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+  return dbDir;
+}
+
+function resolveSqlitePath(config) {
+  if (config && config.filePath && fs.existsSync(path.dirname(config.filePath))) {
+    return config.filePath;
+  }
+  const dbDir = getLummoDatabasesDir();
+  const dbName = (config && config.name) ? config.name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'lummo_database';
+  return path.join(dbDir, `${dbName}.sqlite`);
+}
+
 // --------------------------------------------------------------------------
 // Helper: Helper Connection Testers
 // --------------------------------------------------------------------------
@@ -30,7 +58,7 @@ async function testConnection(config) {
 
   try {
     if (type.includes('sqlite')) {
-      const dbPath = config.filePath || path.join(process.cwd(), 'lummo_local.db');
+      const dbPath = resolveSqlitePath(config);
       return { success: true, message: `Conectado a SQLite (${path.basename(dbPath)})` };
     }
 
@@ -77,7 +105,7 @@ async function getSchema(config) {
   try {
     if (type.includes('sqlite')) {
       const SQL = await getSqlJs();
-      const dbPath = config.filePath || path.join(process.cwd(), 'lummo_local.db');
+      const dbPath = resolveSqlitePath(config);
       let fileData = null;
       if (fs.existsSync(dbPath)) {
         fileData = fs.readFileSync(dbPath);
@@ -174,7 +202,7 @@ async function executeQuery(config, sqlQuery) {
   try {
     if (type.includes('sqlite')) {
       const SQL = await getSqlJs();
-      const dbPath = config.filePath || path.join(process.cwd(), 'lummo_local.db');
+      const dbPath = resolveSqlitePath(config);
       let fileData = null;
       if (fs.existsSync(dbPath)) {
         fileData = fs.readFileSync(dbPath);
@@ -379,11 +407,14 @@ async function createDatabaseSnapshot(config, targetFolder) {
 }
 
 module.exports = {
+  getSqlJs,
+  resolveDbType,
   testConnection,
   getSchema,
   executeQuery,
   importSqlDump,
   exportSqlDump,
-  createDatabaseSnapshot
+  createDatabaseSnapshot,
+  getLummoDatabasesDir,
+  resolveSqlitePath
 };
-

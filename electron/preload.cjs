@@ -36,7 +36,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     importSql: (config, filePath) => ipcRenderer.invoke('db-import-sql', { config, filePath }),
     exportSql: (config, destinationPath) => ipcRenderer.invoke('db-export-sql', { config, destinationPath }),
     exportDataFile: (payload) => ipcRenderer.invoke('db-export-data-file', payload),
-    createSnapshot: (config, targetFolder) => ipcRenderer.invoke('db-create-snapshot', { config, targetFolder })
+    createSnapshot: (config, targetFolder) => ipcRenderer.invoke('db-create-snapshot', { config, targetFolder }),
+    getDefaultDbPath: (name) => ipcRenderer.invoke('db-get-default-path', name),
+    migrateDatabaseFile: (config) => ipcRenderer.invoke('db-migrate-database-file', config)
   },
 
   // Project Dependency Manager & HTTPS

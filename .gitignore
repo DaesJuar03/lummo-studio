@@ -22,6 +22,7 @@ lummo_local.db
 *.db
 *.sqlite
 *.sqlite3
+*.sql
 lummo_projects.json
 
 # Editor directories and files

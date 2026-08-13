@@ -179,6 +179,10 @@ export function runProjectScript(projectId, folderPath, scriptCommand, emitLog) 
       resolve({ success: false, error: err.message });
     });
 
+    child.on('close', (code) => {
+      const msg = code === 0 
+        ? `[Lummo Script] Comando "${scriptCommand}" completado exitosamente.`
+        : `[Lummo Script] Comando "${scriptCommand}" finalizó con código de salida ${code}.`;
       if (emitLog) emitLog(projectId, msg);
       resolve({ success: code === 0, code });
     });

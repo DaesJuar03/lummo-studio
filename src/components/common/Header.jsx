@@ -94,12 +94,12 @@ export default function Header({
 
   return (
     <header className={`relative z-40 border-b select-none w-full transition-colors duration-200 ${
-      isDark ? 'border-[#27272a]' : 'border-slate-200'
+      isDark ? 'border-[#2b2b2b]' : 'border-slate-200'
     }`} onClick={closeContextMenu}>
       {/* Top Titlebar Row */}
       <div 
         className={`h-11 px-3 flex items-center justify-between border-b ${
-          isDark ? 'bg-[#121215] border-[#27272a] text-[#f4f4f5]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
+          isDark ? 'bg-[#181818] border-[#2b2b2b] text-[#cccccc]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
       >
@@ -150,7 +150,7 @@ export default function Header({
             onClick={onOpenCommandPalette}
             className={`w-60 sm:w-72 md:w-80 flex items-center justify-between px-3 py-1 rounded-xl border text-xs transition-all shadow-2xs ${
               isDark
-                ? 'bg-[#18181b] border-[#27272a] text-[#f4f4f5] hover:bg-[#202025] hover:border-[#3f3f46]'
+                ? 'bg-[#1e1e1e] border-[#3c3c3c] text-[#cccccc] hover:bg-[#252526] hover:border-[#007acc]'
                 : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400'
             }`}
           >
@@ -210,7 +210,7 @@ export default function Header({
       {/* Bottom Row: Dedicated Open Tabs Bar with Drag & Drop and Pin Tabs */}
       <div 
         className={`h-9 px-3 flex items-center space-x-1 overflow-x-auto no-scrollbar scroll-smooth w-full ${
-          isDark ? 'bg-[#09090b] border-t border-[#1f1f23]' : 'bg-slate-100/80 border-t border-slate-200/80'
+          isDark ? 'bg-[#252526] border-t border-[#2b2b2b]' : 'bg-slate-100/80 border-t border-slate-200/80'
         }`}
         style={{ WebkitAppRegion: 'no-drag' }}
       >
@@ -238,10 +238,10 @@ export default function Header({
                 } ${
                   isActive
                     ? isDark 
-                      ? 'bg-[#1f1f24] border-[#3f3f46] text-white shadow-2xs font-extrabold' 
+                      ? 'bg-[#1e1e1e] border-[#007acc] text-white shadow-2xs font-extrabold' 
                       : 'bg-white border-slate-300/90 text-blue-600 shadow-2xs font-extrabold'
                     : isDark
-                      ? 'bg-[#121215] border-transparent text-[#a1a1aa] hover:text-white hover:bg-[#18181b]'
+                      ? 'bg-[#2d2d2d] border-transparent text-[#969696] hover:text-white hover:bg-[#2a2d2e]'
                       : 'bg-slate-200/50 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
                 }`}
                 title={tab.title}

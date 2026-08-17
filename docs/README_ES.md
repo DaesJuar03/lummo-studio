@@ -2,82 +2,49 @@
   <img src="../public/Lummo.png" alt="Lummo Studio Logo" width="160" />
 </p>
 
-<h1 align="center">Lummo Studio v2.1.0 — Documentación Oficial (Español)</h1>
+<h1 align="center">Lummo Studio v2.1.0 — Manual Consolidado (Español)</h1>
 
 <p align="center">
   <strong>Panel de Control para Entornos de Desarrollo Locales y Gestor de Bases de Datos Relacionales</strong>
 </p>
 
 <p align="center">
-  <a href="../README.md">Inicio / Main</a> | 
-  <a href="README_EN.md">English Documentation</a>
+  <a href="../README.md">Inicio / Landing Page</a> &nbsp;|&nbsp; 
+  <a href="INDEX_ES.md"><strong>[Índice de la Documentación]</strong></a> &nbsp;|&nbsp; 
+  <a href="README_EN.md">English Version</a>
 </p>
 
 ---
 
 ## 1. Descripción General
 
-**Lummo Studio** es una aplicación de escritorio diseñada para centralizar el control de servidores web locales y la gestión de bases de datos relacionales en entornos de desarrollo modernos. Ofrece una alternativa ligera, modular y extensible a herramientas tradicionales como XAMPP, WampServer o MAMP.
-
-La plataforma permite la administración simultánea de múltiples proyectos (Vite, React, Next.js, Express, PHP/Laravel, Python) e incluye herramientas integradas para exploraciones SQL, visualización de diagramas Entidad-Relación (ER), monitoreo de telemetría y túneles de red.
+**Lummo Studio** es una aplicación de escritorio avanzada para la administración centralizada de servidores web locales y bases de datos relacionales en entornos de desarrollo modernos. Diseñado como una solución modular, rápida y extensible que reemplaza a herramientas tradicionales como XAMPP, WampServer o MAMP, centraliza telemetría, gestión de dependencias, túneles de red y exploración SQL en una sola interfaz.
 
 ---
 
-## 2. Características Principales
+## 2. Guía Navegable de Módulos Técnicos
 
-### 2.1 Gestión de Proyectos Multi-Stack
-- **Detección Automática de Entornos**: Identificación del stack tecnológico (`Vite + React`, `Next.js`, `Express`, `PHP / Laravel`, `Python`) al seleccionar el directorio raíz.
-- **Asignación Dinámica de Puertos**: Resolución automática de conflictos verificando disponibilidad de puertos en el sistema.
-- **Lanzador de Scripts Integrado**: Ejecución directa de comandos personalizados (`npm run build`, migraciones de base de datos, etc.) con salida de logs en tiempo real.
+Para acceder a la documentación detallada por área de especialidad, consulte los siguientes submódulos:
 
-### 2.2 Integración Git y Gestor de Dependencias
-- **Clonación de Repositorios**: Soporte nativo para clonar repositorios Git remotos mediante interfaz gráfica.
-- **Gestión Multi-Package Manager**: Instalación automatizada de paquetes utilizando `npm`, `yarn`, `pnpm`, `bun`, `composer` o `pip`.
-
-### 2.3 Administración de Bases de Datos Relacionales
-- **Soporte Multi-Motor**: Conectividad y consulta nativa para **SQLite**, **MySQL / MariaDB** y **PostgreSQL**.
-- **Persistencia Física de SQLite**: Almacenamiento directo y estructurado de archivos de base de datos en la carpeta del usuario.
-- **Diagramas Entidad-Relación (ER)**: Generación automática de diagramas interactivos relacionales con zoom y cálculo de conectores.
-- **Explorador de Datos Virtualizado**: Renderizado de alto rendimiento para tablas extensas mediante virtualización de filas.
-- **Exportación e Importación**: Soporte para volcados SQL y exportación de datos en formatos JSON y CSV.
-
-### 2.4 Servicios de Red y Sistema
-- **Bandeja del Sistema (System Tray)**: Ejecución continua en segundo plano permitiendo mantener servidores activos al cerrar la ventana principal.
-- **Túneles Públicos y Certificados SSL**: Generación de certificados locales e integración con túneles para pruebas de webhooks e interfaces móviles.
-- **Editor `.env` Integrado**: Modificación segura de variables de entorno con sincronización en tiempo real.
+| Módulo Técnico | Descripción del Contenido |
+| :--- | :--- |
+| 📄 **[Índice General](INDEX_ES.md)** | Visión general y mapa completo de la documentación. |
+| 🏗️ **[01. Arquitectura y Sistema](es/01_arquitectura_y_sistema.md)** | Proceso Main de Electron, IPC Handlers, React 19 Shell y persistencia SQLite. |
+| 🚀 **[02. Gestión de Proyectos](es/02_gestion_de_proyectos_y_stacks.md)** | Autodetección de stacks (Vite, Next.js, Express, Laravel, Python), terminal e integración Git. |
+| 🗄️ **[03. Workbench de Bases de Datos](es/03_workbench_bases_de_datos_y_diagramas.md)** | Motores SQLite, MySQL, PostgreSQL, Diagramas ER, Diseñador de Esquemas y Mock Data. |
+| 🌐 **[04. Servicios de Red y Tray](es/04_redes_tuneles_y_tray.md)** | Proxy local, túneles HTTPS públicos, certificados SSL, System Tray y Omnibox (`Ctrl+K`). |
+| 🛠️ **[05. Guía para Desarrolladores](es/05_guia_desarrollador_compilacion_y_tests.md)** | Setup de desarrollo, pruebas con Vitest, compilación `.exe` con Electron Builder e i18n. |
 
 ---
 
-## 3. Arquitectura del Sistema
+## 3. Resumen de Características Principales
 
-Lummo Studio sigue la arquitectura estándar de aplicaciones Electron separando las responsabilidades del proceso principal y el proceso de renderizado:
-
-```text
-Lummo Studio
-├── Proceso Principal (Electron Main)
-│   ├── main.cjs               # Orquestador del ciclo de vida de la app
-│   ├── managers/              # Gestores de ventanas y tray de sistema
-│   │   ├── windowManager.cjs  # Configuración y eventos de BrowserWindow
-│   │   └── trayManager.cjs    # Gestión del menú contextual en bandeja
-│   ├── ipc/                   # Controladores modulares IPC
-│   │   ├── systemHandlers.cjs # Escaneo de entorno y operaciones de SO
-│   │   ├── projectHandlers.cjs# Ejecución de scripts y detección
-│   │   ├── dbHandlers.cjs     # Conexiones SQL y consultas
-│   │   └── tunnelProxyHandlers.cjs # Proxy local y túneles
-│   ├── dbManager.cjs          # Driver y persistencia SQL
-│   ├── processManager.js      # Control de procesos hijo y subprocesos
-│   └── detector.js            # Análisis estático de stacks tecnológicos
-└── Proceso de Renderizado (React UI)
-    ├── src/main.jsx           # Punto de entrada de React
-    ├── src/App.jsx            # Orquestador principal de UI
-    ├── src/hooks/             # Hooks personalizados (useTabNavigation.js)
-    ├── src/components/        # Componentes organizados por dominio
-    │   ├── views/             # Vistas de dashboard y paneles principales
-    │   ├── modals/            # Diálogos y ventanas modulares
-    │   └── common/            # Componentes reutilizables de UI
-    ├── src/locales/           # Motor de internacionalización (i18n)
-    └── src/types/             # Definiciones de tipos (lummo.d.ts)
-```
+- **Detección Automática Multi-Stack**: Identificación inmediata de proyectos Node.js, React, Next.js, Express, PHP/Laravel y Python al seleccionar una carpeta raíz.
+- **Administrador de Bases de Datos Relacionales**: Conexión nativa e interactiva a **SQLite**, **MySQL / MariaDB** y **PostgreSQL**.
+- **Visualizador de Diagramas Entidad-Relación (ER)**: Mapeo visual interactivo en HTML5 Canvas con exportación a PNG/SVG.
+- **Integración Git & Gestores de Paquetes**: Clonación GUI de repositorios e instalación con `npm`, `yarn`, `pnpm`, `bun`, `composer` y `pip`.
+- **Túneles HTTPS Públicos y Certificados Local SSL**: Inspección de webhooks y pruebas móviles con generación de certificados localmente.
+- **Ejecución en Segundo Plano (System Tray)**: Mantiene los servidores web activos al cerrar la ventana de la aplicación.
 
 ---
 
@@ -85,77 +52,60 @@ Lummo Studio
 
 - **Sistema Operativo**: Windows 10 / Windows 11 (64-bit).
 - **Entorno de Ejecución**: Node.js v18.0.0 o superior.
-- **Control de Versiones**: Git instalado y registrado en la variable de entorno `PATH`.
+- **Herramientas**: Git CLI instalado y registrado en la variable de entorno `PATH`.
 
 ---
 
 ## 5. Instalación y Entorno de Desarrollo
 
-### 5.1 Clonar el Repositorio
 ```bash
+# 1. Clonar el repositorio
 git clone https://github.com/tu-usuario/lummo-studio.git
 cd lummo-studio
-```
 
-### 5.2 Instalación de Dependencias
-```bash
+# 2. Instalar dependencias
 npm install
-```
 
-### 5.3 Ejecución en Modo Desarrollo
-```bash
+# 3. Ejecutar en modo desarrollo
 npm run electron:dev
-```
 
-### 5.4 Ejecución de Pruebas Unitarias
-```bash
+# 4. Ejecutar pruebas automatizadas
 npm test
 ```
 
 ---
 
-## 6. Compilación y Distribución
+## 6. Compilación de Producción
 
-Para generar la distribución ejecutable de producción para Windows:
+Para compilar y empaquetar el ejecutable ejecutable nativo para Windows:
 
-1. **Compilar el paquete Web con Vite**:
-   ```bash
-   npm run build
-   ```
+```bash
+# Paso 1: Compilar bundle web
+npm run build
 
-2. **Generar el ejecutable ejecutable nativo (.exe)**:
-   ```bash
-   npx electron-builder
-   ```
+# Paso 2: Generar instaladores nativos en release/
+npx electron-builder
+```
 
-Los instaladores resultantes se generarán en la carpeta `release/`:
-- `release/Lummo Studio Setup 2.1.0.exe` (Instalador ejecutable NSIS)
-- `release/Lummo Studio 2.1.0.exe` (Versión ejecutable portable)
+Los instaladores resultantes estarán en la carpeta `release/`:
+- `Lummo Studio Setup 2.1.0.exe` (Instalador NSIS)
+- `Lummo Studio 2.1.0.exe` (Ejecutable portable)
 
 ---
 
-## 7. Guía de Internacionalización (i18n)
+## 7. Atajos de Teclado Globales
 
-Para añadir soporte a un nuevo idioma en Lummo Studio sin modificar la lógica interna:
-
-1. Crear un archivo JSON de idioma en `src/locales/{codigo_idioma}.json` respetando el esquema oficial.
-2. Registrar el idioma en `src/locales/index.js` mediante la función `registerLocale()`.
-
----
-
-## 8. Atajos de Teclado
-
-| Atajo | Descripción |
+| Atajo | Acción |
 | :--- | :--- |
 | `Ctrl + K` / `Cmd + K` | Abrir / Cerrar el Buscador Omnibox |
 | `Alt + N` | Abrir diálogo de Importación de Proyectos |
 | `Alt + P` | Ir al Panel General de Proyectos |
 | `Alt + D` | Ir al Panel de Bases de Datos |
-| `Alt + S` | Abrir la Configuración del Sistema |
-| `Escape` | Cerrar el modal o diálogo activo |
+| `Alt + S` | Abrir Configuración del Sistema |
+| `Escape` | Cerrar modal activo |
 
 ---
 
-## 9. Licencia
+## 8. Licencia
 
-Este proyecto está distribuido bajo la Licencia MIT. Consulta el archivo `LICENSE` para más información.
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más información.

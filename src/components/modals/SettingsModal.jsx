@@ -75,13 +75,13 @@ export default function SettingsModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-4xl h-[680px] max-h-[90vh] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
-            isDark ? 'bg-[#121215] border-[#27272a] text-[#f4f4f5]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#252526] border-[#2b2b2b] text-[#cccccc]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'bg-[#09090b] border-[#27272a]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#181818] border-[#2b2b2b]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">

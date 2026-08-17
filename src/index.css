@@ -1,4 +1,20 @@
+@import "@fontsource/plus-jakarta-sans/400.css";
+@import "@fontsource/plus-jakarta-sans/500.css";
+@import "@fontsource/plus-jakarta-sans/600.css";
+@import "@fontsource/plus-jakarta-sans/700.css";
+@import "@fontsource/plus-jakarta-sans/800.css";
+
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "@fontsource/jetbrains-mono/700.css";
+
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
 
 @layer base {
   html, body {
@@ -9,7 +25,7 @@
     max-height: 100vh !important;
     max-width: 100vw !important;
     overflow: hidden !important;
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
     user-select: none;
     transition: background-color 0.25s ease, color 0.25s ease;
   }
@@ -30,10 +46,10 @@
     color: #0f172a;
   }
 
-  /* Matte Dark Theme */
+  /* VS Code Dark Modern / Antigravity Theme */
   body.dark-theme {
-    background-color: #09090b;
-    color: #f4f4f5;
+    background-color: #1e1e1e;
+    color: #cccccc;
   }
 
   code, kbd, .font-mono {
@@ -64,8 +80,16 @@ body.dark-theme .custom-scrollbar::-webkit-scrollbar-track {
   background-clip: padding-box;
 }
 
+body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #007acc;
+}
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #2563eb;
+}
+
+body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #1177bb;
 }
 
 /* Light Theme Cards */
@@ -83,20 +107,20 @@ body.light-theme .pure-card:hover {
   box-shadow: 0 10px 30px -4px rgba(37, 99, 235, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
 }
 
-/* Matte Dark Cards */
+/* VS Code Dark Modern / Antigravity Cards */
 body.dark-theme .pure-card {
-  background-color: #121215;
-  border: 1px solid #27272a;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  background-color: #252526;
+  border: 1px solid #2b2b2b;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
 }
 
 body.dark-theme .pure-card:hover {
   transform: translateY(-2px);
-  background-color: #18181b;
-  border-color: #3f3f46;
-  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.7);
+  background-color: #2a2d2e;
+  border-color: #007acc;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
 }
 
 /* Hotkey Badges */
@@ -117,9 +141,9 @@ body.dark-theme .hotkey-badge {
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 6px;
-  background: #18181b;
-  border: 1px solid #27272a;
-  color: #a1a1aa;
+  background: #181818;
+  border: 1px solid #3c3c3c;
+  color: #9cdcfe;
 }
 
 /* Keyframe Animations */

@@ -61,7 +61,7 @@ export default function HomeDashboard({
 
       {/* Page Header Title with Simple Telemetry Text */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4 ${
-        isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
+        isDark ? 'border-[#2b2b2b]' : 'border-slate-200'
       }`}>
         <div>
           <h2 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -145,7 +145,7 @@ export default function HomeDashboard({
             <button
               onClick={() => setShowCloneRepoModal(true)}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
-                isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-200 hover:bg-[#252525]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-[#252526] border-[#2b2b2b] text-slate-200 hover:bg-[#2a2d2e] hover:border-[#007acc]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <Download className="h-4 w-4 text-blue-500" />
@@ -172,7 +172,7 @@ export default function HomeDashboard({
             <button
               onClick={onOpenProjectsTab}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
-                isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-200 hover:bg-[#252525]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-[#252526] border-[#2b2b2b] text-slate-200 hover:bg-[#2a2d2e] hover:border-[#007acc]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <span>Explorar Proyectos</span>
@@ -199,7 +199,7 @@ export default function HomeDashboard({
             <button
               onClick={onOpenDatabasesTab}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
-                isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-200 hover:bg-[#252525]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-[#252526] border-[#2b2b2b] text-slate-200 hover:bg-[#2a2d2e] hover:border-[#007acc]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <span>Explorar Bases de Datos</span>

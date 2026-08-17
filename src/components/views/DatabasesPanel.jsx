@@ -91,7 +91,7 @@ export default function DatabasesPanel({
       
       {/* Header Navigation */}
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6 ${
-        isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
+        isDark ? 'border-[#2b2b2b]' : 'border-slate-200'
       }`}>
         <div>
           <h2 className={`text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>

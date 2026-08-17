@@ -86,7 +86,7 @@ export default function ProjectsPanel({
       
       {/* Header Bar */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6 ${
-        isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
+        isDark ? 'border-[#2b2b2b]' : 'border-slate-200'
       }`}>
         <div>
           <h1 className={`text-3xl font-extrabold tracking-tight ${

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Settings as SettingsIcon, Cpu, Hash, Code, Sliders, RefreshCw, Sun, Moon, Languages, Check } from 'lucide-react';
+import { X, Settings as SettingsIcon, Cpu, Hash, Code, Sliders, RefreshCw, Sun, Moon, Languages, Check, Download, CheckSquare, Loader2 } from 'lucide-react';
 import { availableLocales, getTranslations } from '../../locales';
 
 export default function SettingsModal({ 
@@ -19,6 +19,56 @@ export default function SettingsModal({
     return localStorage.getItem('lummo-notifications') !== 'false';
   });
   const [clearedLogsNotice, setClearedLogsNotice] = useState(false);
+
+  const [selectedTechs, setSelectedTechs] = useState(new Set());
+  const [isInstallingTechs, setIsInstallingTechs] = useState(false);
+  const [installProgressMap, setInstallProgressMap] = useState({});
+
+  React.useEffect(() => {
+    if (envStatus) {
+      const missingKeys = ['node', 'php', 'mysql', 'postgres', 'python', 'git'].filter(
+        k => !envStatus[k]?.installed
+      );
+      setSelectedTechs(new Set(missingKeys));
+    }
+  }, [envStatus]);
+
+  React.useEffect(() => {
+    if (window.electronAPI?.onTechInstallProgress) {
+      const unsubscribe = window.electronAPI.onTechInstallProgress((data) => {
+        setInstallProgressMap(prev => ({
+          ...prev,
+          [data.techKey]: data
+        }));
+      });
+      return () => unsubscribe();
+    }
+  }, []);
+
+  const handleToggleTechSelect = (key) => {
+    setSelectedTechs(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const handleStartInstallation = async () => {
+    if (selectedTechs.size === 0 || !window.electronAPI?.downloadAndInstallTech) return;
+    setIsInstallingTechs(true);
+
+    const keysToInstall = Array.from(selectedTechs);
+    try {
+      await window.electronAPI.downloadAndInstallTech(keysToInstall);
+      if (onScanEnv) await onScanEnv();
+    } catch (err) {
+      console.error('Error al instalar desde Settings:', err);
+    } finally {
+      setIsInstallingTechs(false);
+      if (onScanEnv) onScanEnv();
+    }
+  };
 
   const [detectedEditors, setDetectedEditors] = useState([]);
   const [isScanningEditors, setIsScanningEditors] = useState(false);
@@ -75,13 +125,13 @@ export default function SettingsModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-4xl h-[680px] max-h-[90vh] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
-            isDark ? 'bg-[#252526] border-[#2b2b2b] text-[#cccccc]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#14161c] border-[#232631] text-[#e6e8ec]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'bg-[#181818] border-[#2b2b2b]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#181a20] border-[#232631]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
@@ -96,7 +146,7 @@ export default function SettingsModal({
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
               className={`p-2 rounded-xl transition-colors ${
-                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#18181b]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1d202a]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-5 w-5" />
@@ -108,7 +158,7 @@ export default function SettingsModal({
             
             {/* Left Sidebar Categories */}
             <div className={`w-64 border-r p-4 space-y-1 shrink-0 ${
-              isDark ? 'bg-[#09090b] border-[#27272a]' : 'bg-slate-50/80 border-slate-200'
+              isDark ? 'bg-[#0d0e11] border-[#232631]' : 'bg-slate-50/80 border-slate-200'
             }`}>
               {categories.map((cat) => {
                 const Icon = cat.icon;
@@ -120,10 +170,10 @@ export default function SettingsModal({
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${
                       isActive
                         ? isDark 
-                          ? 'bg-[#1f1f24] border border-[#3f3f46] text-white shadow-xs' 
+                          ? 'bg-[#1f222e] border border-[#2c3040] text-white shadow-xs' 
                           : 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                         : isDark
-                          ? 'text-[#a1a1aa] hover:bg-[#18181b] hover:text-white'
+                          ? 'text-[#8a8f9e] hover:bg-[#1a1c24] hover:text-white'
                           : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
                     }`}
                   >
@@ -135,30 +185,104 @@ export default function SettingsModal({
             </div>
 
             {/* Right Category Details View */}
-            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#121215]' : 'bg-white'}`}>
+            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#14161c]' : 'bg-white'}`}>
               
               {/* Category 1: Servicios del Sistema */}
               {activeCategory === 'services' && (
                 <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-6">
-                  <div className={`flex items-center justify-between border-b pb-4 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 gap-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
                     <div>
                       <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.systemServices}</h4>
                       <p className="text-xs text-slate-500">Diagnóstico de ejecutables y motores locales detectados en tu equipo</p>
                     </div>
-                    {onScanEnv && (
-                      <motion.button
-                        whileTap={{ scale: 0.94 }}
-                        onClick={onScanEnv}
-                        disabled={isScanning}
-                        className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50 ${
-                          isDark ? 'bg-[#222] border-[#333] text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-700'
-                        }`}
-                      >
-                        <RefreshCw className={`h-3.5 w-3.5 ${isScanning ? 'animate-spin' : ''}`} />
-                        <span>{isScanning ? 'Escaneando...' : 'Re-Escanear'}</span>
-                      </motion.button>
-                    )}
+
+                    <div className="flex items-center space-x-2 shrink-0">
+                      {onScanEnv && (
+                        <motion.button
+                          whileTap={{ scale: 0.94 }}
+                          onClick={onScanEnv}
+                          disabled={isScanning || isInstallingTechs}
+                          className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 whitespace-nowrap shrink-0 transition-all disabled:opacity-50 ${
+                            isDark ? 'bg-[#222] border-[#333] text-slate-200 hover:bg-[#2c2c2c]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          <RefreshCw className={`h-4 w-4 shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
+                          <span className="whitespace-nowrap">{isScanning ? 'Escaneando...' : 'Re-Escanear'}</span>
+                        </motion.button>
+                      )}
+
+                      {selectedTechs.size > 0 && (
+                        <button
+                          onClick={handleStartInstallation}
+                          disabled={isInstallingTechs}
+                          className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 whitespace-nowrap shrink-0 shadow-md shadow-blue-600/20 transition-all disabled:opacity-50 cursor-pointer"
+                        >
+                          {isInstallingTechs ? (
+                            <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                          ) : (
+                            <Download className="h-4 w-4 shrink-0" />
+                          )}
+                          <span className="whitespace-nowrap">
+                            {isInstallingTechs 
+                              ? 'Instalando...' 
+                              : `Descargar e Instalar (${selectedTechs.size})`}
+                          </span>
+                        </button>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Installation Progress Bar Monitor */}
+                  {(isInstallingTechs || Object.keys(installProgressMap).length > 0) && (
+                    <div className={`p-4 rounded-2xl border space-y-3 ${
+                      isDark ? 'bg-[#151518] border-blue-500/30' : 'bg-slate-50 border-blue-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Loader2 className={`h-4 w-4 text-blue-500 ${isInstallingTechs ? 'animate-spin' : ''}`} />
+                          <h4 className={`font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            Progreso de Instalación en el Sistema
+                          </h4>
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-blue-400">
+                          {isInstallingTechs ? 'Instalando...' : 'Completado'}
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        {Array.from(selectedTechs).map((techKey) => {
+                          const progressData = installProgressMap[techKey] || {};
+                          const stage = progressData.stage || 'waiting';
+                          const percent = progressData.percent || 0;
+
+                          return (
+                            <div key={techKey} className="space-y-1">
+                              <div className="flex items-center justify-between text-[11px] font-mono">
+                                <span className={`font-bold uppercase ${isDark ? 'text-white' : 'text-slate-800'}`}>
+                                  {progressData.name || techKey}
+                                </span>
+                                <span className="text-slate-400">
+                                  {progressData.message || (stage === 'waiting' ? 'En cola...' : `${percent}%`)}
+                                </span>
+                              </div>
+                              <div className="w-full bg-slate-700/30 h-2 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full transition-all duration-300 ${
+                                    stage === 'completed' 
+                                      ? 'bg-emerald-500' 
+                                      : stage === 'error' 
+                                        ? 'bg-rose-500' 
+                                        : 'bg-blue-500'
+                                  }`}
+                                  style={{ width: `${percent}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 gap-4">
                     {[
@@ -167,18 +291,41 @@ export default function SettingsModal({
                       { name: 'MySQL', key: 'mysql' },
                       { name: 'PostgreSQL', key: 'postgres' },
                       { name: 'Python', key: 'python' },
+                      { name: 'Git for Windows', key: 'git' },
                       { name: 'Docker', key: 'docker' },
-                      { name: 'SQLite', key: 'sqlite' }
+                      { name: 'SQLite Nativo', key: 'sqlite' }
                     ].map((srv) => {
                       const status = envStatus ? envStatus[srv.key] : null;
                       const isInstalled = status?.installed;
+                      const isChecked = selectedTechs.has(srv.key);
+                      const isInternal = srv.key === 'sqlite' || srv.key === 'docker';
+
                       return (
-                        <div key={srv.key} className={`p-4 rounded-2xl border flex items-center justify-between ${
-                          isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-slate-50 border-slate-200'
-                        }`}>
-                          <div>
-                            <span className={`block font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>{srv.name}</span>
-                            <span className="block text-[11px] font-mono text-slate-500">{status?.version || (isInstalled ? 'Instalado' : 'No instalado')}</span>
+                        <div 
+                          key={srv.key} 
+                          onClick={() => !isInstalled && !isInternal && handleToggleTechSelect(srv.key)}
+                          className={`p-4 rounded-2xl border flex items-center justify-between transition-all ${
+                            !isInstalled && !isInternal ? 'cursor-pointer hover:border-blue-500/50' : ''
+                          } ${
+                            isChecked && !isInstalled
+                              ? isDark ? 'bg-blue-500/10 border-blue-500/50' : 'bg-blue-50 border-blue-200'
+                              : isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-slate-50 border-slate-200'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            {!isInstalled && !isInternal && (
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => handleToggleTechSelect(srv.key)}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-4 h-4 rounded border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                              />
+                            )}
+                            <div>
+                              <span className={`block font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>{srv.name}</span>
+                              <span className="block text-[11px] font-mono text-slate-500">{status?.version || (isInstalled ? 'Instalado' : 'No instalado')}</span>
+                            </div>
                           </div>
                           <span className={`w-2.5 h-2.5 rounded-full ${isInstalled ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
                         </div>
@@ -475,9 +622,27 @@ export default function SettingsModal({
                       <button
                         type="button"
                         onClick={handleClearLogsAction}
-                        className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition-all shadow-xs flex items-center gap-1.5 shrink-0 ml-3"
+                        className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all shadow-xs"
                       >
-                        {clearedLogsNotice ? '¡Memoria Limpiada!' : 'Limpiar Todos los Logs'}
+                        {clearedLogsNotice ? '¡Logs Limpiados!' : 'Limpiar Todo los Logs'}
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-2xl border bg-blue-500/5 border-blue-500/20">
+                      <div>
+                        <span className="block text-xs font-bold text-blue-500">Asistente de Configuración Inicial (First-Time Setup)</span>
+                        <span className="block text-[11px] text-slate-500">Borra la marca de primera vez y reabre la ventana de diagnóstico de motores y preferencias.</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.removeItem('lummo-onboarded');
+                          if (onOpenOnboarding) onOpenOnboarding();
+                          if (onClose) onClose();
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-xs cursor-pointer"
+                      >
+                        Reabrir Asistente
                       </button>
                     </div>
                   </div>

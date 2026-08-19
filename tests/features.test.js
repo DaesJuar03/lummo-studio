@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-describe('Lummo Studio v2.1.0 Major Features Unit Tests', () => {
+describe('Lummo Studio v2.2.0 Major Features Unit Tests', () => {
   it('should generate valid mock data row for tables', () => {
     const mockColumns = [
       { name: 'id', pk: true, type: 'INTEGER' },
@@ -55,5 +55,21 @@ describe('Lummo Studio v2.1.0 Major Features Unit Tests', () => {
 
     expect(filtered.length).toBe(1);
     expect(filtered[0].name).toBe('Proyecto Alpha');
+  });
+
+  it('should categorize technical errors into friendly user messages', async () => {
+    const { parseLummoError } = await import('../src/utils/errorParser.js');
+    
+    const portError = parseLummoError('Error: listen EADDRINUSE: address already in use :::5173');
+    expect(portError.category).toBe('PORT_IN_USE');
+    expect(portError.userMessage).toContain('puerto seleccionado está siendo utilizado');
+
+    const dbError = parseLummoError('Connection refusal: ECONNREFUSED 127.0.0.1:3306');
+    expect(dbError.category).toBe('DB_CONNECTION_FAILED');
+    expect(dbError.userMessage).toContain('base de datos');
+
+    const missingTech = parseLummoError('php is not recognized as an internal command');
+    expect(missingTech.category).toBe('MISSING_RUNTIME');
+    expect(missingTech.userMessage).toContain('Node.js, PHP, Python o Git');
   });
 });

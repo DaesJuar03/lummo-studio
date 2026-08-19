@@ -94,12 +94,12 @@ export default function Header({
 
   return (
     <header className={`relative z-40 border-b select-none w-full transition-colors duration-200 ${
-      isDark ? 'border-[#2b2b2b]' : 'border-slate-200'
+      isDark ? 'border-[#232631]' : 'border-slate-200'
     }`} onClick={closeContextMenu}>
       {/* Top Titlebar Row */}
       <div 
         className={`h-11 px-3 flex items-center justify-between border-b ${
-          isDark ? 'bg-[#181818] border-[#2b2b2b] text-[#cccccc]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
+          isDark ? 'bg-[#121318] border-[#232631] text-[#e6e8ec]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
       >
@@ -111,7 +111,7 @@ export default function Header({
               disabled={!canGoBack}
               className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-2xs disabled:opacity-25 disabled:pointer-events-none ${
                 isDark
-                  ? 'bg-[#18181b] border border-[#27272a] text-white hover:bg-blue-600 hover:border-blue-500'
+                  ? 'bg-[#181a20] border border-[#232631] text-white hover:bg-blue-600 hover:border-blue-500'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
               title="Retroceder"
@@ -124,7 +124,7 @@ export default function Header({
               disabled={!canGoForward}
               className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-2xs disabled:opacity-25 disabled:pointer-events-none ${
                 isDark
-                  ? 'bg-[#18181b] border border-[#27272a] text-white hover:bg-blue-600 hover:border-blue-500'
+                  ? 'bg-[#181a20] border border-[#232631] text-white hover:bg-blue-600 hover:border-blue-500'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
               title="Avanzar"
@@ -150,7 +150,7 @@ export default function Header({
             onClick={onOpenCommandPalette}
             className={`w-60 sm:w-72 md:w-80 flex items-center justify-between px-3 py-1 rounded-xl border text-xs transition-all shadow-2xs ${
               isDark
-                ? 'bg-[#1e1e1e] border-[#3c3c3c] text-[#cccccc] hover:bg-[#252526] hover:border-[#007acc]'
+                ? 'bg-[#181a20] border-[#232631] text-[#e6e8ec] hover:bg-[#1f222b] hover:border-[#3b82f6]'
                 : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400'
             }`}
           >
@@ -168,7 +168,7 @@ export default function Header({
             onClick={onOpenSettings}
             className={`px-2.5 py-1 rounded-lg border border-transparent transition-all flex items-center space-x-1.5 text-xs font-bold ${
               isDark 
-                ? 'text-slate-300 hover:bg-[#18181b] hover:border-[#27272a] hover:text-white hover:shadow-2xs' 
+                ? 'text-[#8a8f9e] hover:bg-[#1a1c24] hover:border-[#232631] hover:text-white hover:shadow-2xs' 
                 : 'text-slate-700 hover:bg-slate-200/70 hover:border-slate-300 hover:text-slate-900 hover:shadow-2xs'
             }`}
             title={t.settings}
@@ -177,11 +177,11 @@ export default function Header({
             <span>{t.settings}</span>
           </button>
 
-          <div className={`flex items-center pl-2 border-l h-11 ${isDark ? 'border-[#27272a]' : 'border-slate-300/70'}`}>
+          <div className={`flex items-center pl-2 border-l h-11 ${isDark ? 'border-[#232631]' : 'border-slate-300/70'}`}>
             <button
               onClick={handleMinimize}
               className={`w-10 h-11 flex items-center justify-center transition-all ${
-                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#18181b]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1a1c24]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Minimizar"
             >
@@ -190,7 +190,7 @@ export default function Header({
             <button
               onClick={handleMaximize}
               className={`w-10 h-11 flex items-center justify-center transition-all ${
-                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#18181b]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1a1c24]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Maximizar"
             >
@@ -210,7 +210,7 @@ export default function Header({
       {/* Bottom Row: Dedicated Open Tabs Bar with Drag & Drop and Pin Tabs */}
       <div 
         className={`h-9 px-3 flex items-center space-x-1 overflow-x-auto no-scrollbar scroll-smooth w-full ${
-          isDark ? 'bg-[#252526] border-t border-[#2b2b2b]' : 'bg-slate-100/80 border-t border-slate-200/80'
+          isDark ? 'bg-[#181a20] border-t border-[#232631]' : 'bg-slate-100/80 border-t border-slate-200/80'
         }`}
         style={{ WebkitAppRegion: 'no-drag' }}
       >
@@ -238,10 +238,10 @@ export default function Header({
                 } ${
                   isActive
                     ? isDark 
-                      ? 'bg-[#1e1e1e] border-[#007acc] text-white shadow-2xs font-extrabold' 
+                      ? 'bg-[#121318] border-[#3b82f6] text-white shadow-2xs font-extrabold' 
                       : 'bg-white border-slate-300/90 text-blue-600 shadow-2xs font-extrabold'
                     : isDark
-                      ? 'bg-[#2d2d2d] border-transparent text-[#969696] hover:text-white hover:bg-[#2a2d2e]'
+                      ? 'bg-[#1a1c24] border-[#232631] text-[#8a8f9e] hover:text-white hover:bg-[#212430]'
                       : 'bg-slate-200/50 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
                 }`}
                 title={tab.title}

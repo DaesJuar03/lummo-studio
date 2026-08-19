@@ -71,6 +71,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Native System Notifications
   sendNotification: (title, body, silent) => ipcRenderer.invoke('send-notification', { title, body, silent }),
 
+  // System Tech Downloader & Installer
+  downloadAndInstallTech: (techKeys) => ipcRenderer.invoke('system-install-tech', techKeys),
+  onTechInstallProgress: (callback) => {
+    const subscription = (event, value) => callback(value);
+    ipcRenderer.on('tech-install-progress', subscription);
+    return () => ipcRenderer.removeListener('tech-install-progress', subscription);
+  },
+
   // Custom Window Controls
   windowMinimize: () => ipcRenderer.invoke('window-minimize'),
   windowMaximize: () => ipcRenderer.invoke('window-maximize'),

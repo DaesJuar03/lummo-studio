@@ -14,6 +14,7 @@ const CommandPaletteModal = lazy(() => import('./components/modals/CommandPalett
 const NewTabActionModal = lazy(() => import('./components/modals/NewTabActionModal'));
 const ImportProjectModal = lazy(() => import('./components/modals/ImportProjectModal'));
 const OnboardingWizard = lazy(() => import('./components/views/OnboardingWizard'));
+import UserErrorModal from './components/modals/UserErrorModal';
 const StandaloneLogWindow = lazy(() => import('./components/views/StandaloneLogWindow'));
 const ProjectDetailPage = lazy(() => import('./components/views/ProjectDetailPage'));
 const DatabaseDetailPage = lazy(() => import('./components/views/DatabaseDetailPage'));
@@ -24,6 +25,26 @@ export default function App() {
   const [isScanning, setIsScanning] = useState(false);
   const [logs, setLogs] = useState({});
   const [activeLogsProject, setActiveLogsProject] = useState(null);
+  const [userError, setUserError] = useState(null);
+
+  useEffect(() => {
+    const handleGlobalError = (event) => {
+      const detail = event.detail || {};
+      setUserError({
+        error: detail.error || event.error || event.reason || 'Ocurrió una interrupción inesperada.',
+        title: detail.title || 'Atención'
+      });
+    };
+
+    window.addEventListener('lummo:error', handleGlobalError);
+    window.showLummoError = (error, title) => {
+      window.dispatchEvent(new CustomEvent('lummo:error', { detail: { error, title } }));
+    };
+
+    return () => {
+      window.removeEventListener('lummo:error', handleGlobalError);
+    };
+  }, []);
 
   // Auto-detect user system language on first run
   const [langDetection] = useState(() => detectSystemLanguage());
@@ -400,7 +421,7 @@ export default function App() {
 
   return (
     <div className={`h-screen w-screen flex flex-col font-sans overflow-hidden transition-colors duration-200 ${
-      theme === 'dark' ? 'bg-[#09090b] text-[#f4f4f5]' : 'bg-slate-50 text-slate-900'
+      theme === 'dark' ? 'bg-[#0d0e11] text-[#e6e8ec]' : 'bg-slate-50 text-slate-900'
     }`}>
       {/* Header */}
       <Header
@@ -570,6 +591,17 @@ export default function App() {
           onOpenOnboarding={() => setShowOnboarding(true)}
           theme={theme}
         />
+
+        {/* Simplified User-Friendly Error Modal */}
+        {userError && (
+          <UserErrorModal
+            error={userError.error}
+            title={userError.title}
+            onClose={() => setUserError(null)}
+            onOpenInstaller={() => setShowSettings(true)}
+            theme={theme}
+          />
+        )}
       </Suspense>
     </div>
   );

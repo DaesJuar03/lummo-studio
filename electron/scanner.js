@@ -34,6 +34,7 @@ export async function scanSystemEnvironment() {
     postgres: { installed: false, version: null, path: null },
     python: { installed: false, version: null, path: null },
     docker: { installed: false, version: null, path: null },
+    git: { installed: false, version: null, path: null },
     sqlite: { installed: true, version: 'Built-in Lummo Engine', path: 'Internal' }
   };
 
@@ -118,6 +119,23 @@ export async function scanSystemEnvironment() {
   if (dockerVer) {
     results.docker.installed = true;
     results.docker.version = dockerVer;
+  }
+
+  // 7. Git
+  let gitVer = await execPromise('git --version');
+  if (gitVer) {
+    results.git.installed = true;
+    results.git.version = gitVer;
+  } else {
+    const gitPath = checkPathExists([
+      'C:\\Program Files\\Git\\cmd\\git.exe',
+      'C:\\Program Files\\Git\\bin\\git.exe'
+    ]);
+    if (gitPath) {
+      results.git.installed = true;
+      results.git.version = 'Git for Windows';
+      results.git.path = gitPath;
+    }
   }
 
   return results;

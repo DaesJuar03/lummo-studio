@@ -93,6 +93,23 @@ function registerSystemHandlers(getMainWindow, appIconPath) {
       });
     }
   });
+
+  safeHandle('system-install-tech', async (event, techKeys) => {
+    if (!Array.isArray(techKeys) || techKeys.length === 0) {
+      return { success: false, error: 'No se especificaron tecnologías para instalar.' };
+    }
+
+    const { processTechInstallations } = require('./techInstaller.cjs');
+    const win = getMainWindow();
+
+    const results = await processTechInstallations(techKeys, (progressData) => {
+      if (win && !win.isDestroyed()) {
+        win.webContents.send('tech-install-progress', progressData);
+      }
+    });
+
+    return { success: true, results };
+  });
 }
 
 module.exports = { registerSystemHandlers };

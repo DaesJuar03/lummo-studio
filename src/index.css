@@ -46,10 +46,10 @@
     color: #0f172a;
   }
 
-  /* VS Code Dark Modern / Antigravity Theme */
+  /* VS Code Dark Modern / Antigravity IDE Theme */
   body.dark-theme {
-    background-color: #1e1e1e;
-    color: #cccccc;
+    background-color: #0d0e11;
+    color: #e6e8ec;
   }
 
   code, kbd, .font-mono {
@@ -70,7 +70,7 @@
 }
 
 body.dark-theme .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -81,7 +81,7 @@ body.dark-theme .custom-scrollbar::-webkit-scrollbar-track {
 }
 
 body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #007acc;
+  background-color: #2b2e3d;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -89,7 +89,7 @@ body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb {
 }
 
 body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #1177bb;
+  background-color: #3b82f6;
 }
 
 /* Light Theme Cards */
@@ -109,18 +109,18 @@ body.light-theme .pure-card:hover {
 
 /* VS Code Dark Modern / Antigravity Cards */
 body.dark-theme .pure-card {
-  background-color: #252526;
-  border: 1px solid #2b2b2b;
+  background-color: #1a1c24;
+  border: 1px solid #232631;
   border-radius: 14px;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
 }
 
 body.dark-theme .pure-card:hover {
   transform: translateY(-2px);
-  background-color: #2a2d2e;
-  border-color: #007acc;
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+  background-color: #212430;
+  border-color: #3b82f6;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.7);
 }
 
 /* Hotkey Badges */
@@ -141,9 +141,9 @@ body.dark-theme .hotkey-badge {
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 6px;
-  background: #181818;
-  border: 1px solid #3c3c3c;
-  color: #9cdcfe;
+  background: #14161c;
+  border: 1px solid #232631;
+  color: #60a5fa;
 }
 
 /* Keyframe Animations */

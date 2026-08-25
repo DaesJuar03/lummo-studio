@@ -145,7 +145,7 @@ export default function HomeDashboard({
             <button
               onClick={() => setShowCloneRepoModal(true)}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
-                isDark ? 'bg-[#1a1c24] border-[#232631] text-[#e2e8ec] hover:bg-[#212430] hover:border-[#3b82f6]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-[#252526] border-[#2b2b2b] text-slate-200 hover:bg-[#2a2d2e] hover:border-[#007acc]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <Download className="h-4 w-4 text-blue-500" />
@@ -172,7 +172,7 @@ export default function HomeDashboard({
             <button
               onClick={onOpenProjectsTab}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
-                isDark ? 'bg-[#1a1c24] border-[#232631] text-[#e2e8ec] hover:bg-[#212430] hover:border-[#3b82f6]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-[#252526] border-[#2b2b2b] text-slate-200 hover:bg-[#2a2d2e] hover:border-[#007acc]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <span>Explorar Proyectos</span>
@@ -199,7 +199,7 @@ export default function HomeDashboard({
             <button
               onClick={onOpenDatabasesTab}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 ${
-                isDark ? 'bg-[#1a1c24] border-[#232631] text-[#e2e8ec] hover:bg-[#212430] hover:border-[#3b82f6]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-[#252526] border-[#2b2b2b] text-slate-200 hover:bg-[#2a2d2e] hover:border-[#007acc]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <span>Explorar Bases de Datos</span>
@@ -218,7 +218,7 @@ export default function HomeDashboard({
         >
           {/* Header Title with Clean Proyectos Recientes... */}
           <div className={`flex items-center justify-between border-b pb-3 ${
-            isDark ? 'border-[#232631]' : 'border-slate-200'
+            isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
           }`}>
             <div>
               <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -262,14 +262,14 @@ export default function HomeDashboard({
                         transition={{ duration: 0.2, delay: index * 0.04 }}
                         onClick={() => onSelectDatabaseDetail && onSelectDatabaseDetail(item)}
                         className={`pure-card p-4 cursor-pointer transition-all hover:border-blue-500 border ${
-                          isDark ? 'border-[#232631]' : 'border-slate-200'
+                          isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-4">
                           
                           <div className="flex items-center space-x-3.5 min-w-0 flex-1">
                             <div className={`p-2.5 rounded-xl border shrink-0 ${
-                              isDark ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
+                              isDark ? 'bg-blue-950/60 border-blue-800 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
                             }`}>
                               <Database className="h-5 w-5" />
                             </div>
@@ -280,9 +280,7 @@ export default function HomeDashboard({
                                 }`}>
                                   {item.name}
                                 </h4>
-                                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border shrink-0 ${
-                                  isDark ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-blue-50 text-blue-700 border-blue-200'
-                                }`}>
+                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-200 shrink-0">
                                   Base de Datos
                                 </span>
                               </div>
@@ -291,9 +289,7 @@ export default function HomeDashboard({
                           </div>
 
                           <div className="flex items-center space-x-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-                            <span className={`w-28 py-2 text-center text-xs font-mono font-bold px-2.5 rounded-xl border ${
-                              isDark ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            }`}>
+                            <span className="w-28 py-2 text-center text-xs font-mono font-bold px-2.5 rounded-xl border bg-emerald-50 text-emerald-700 border-emerald-200">
                               Activo
                             </span>
 
@@ -333,7 +329,7 @@ export default function HomeDashboard({
                       transition={{ duration: 0.2, delay: index * 0.04 }}
                       onClick={() => onSelectProjectDetail(item)}
                       className={`pure-card p-4 cursor-pointer transition-all hover:border-blue-500 border ${
-                        isRunning ? 'border-blue-500 ring-2 ring-blue-500/20' : isDark ? 'border-[#232631]' : 'border-slate-200'
+                        isRunning ? 'border-blue-500 ring-2 ring-blue-500/20' : isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4">
@@ -341,8 +337,8 @@ export default function HomeDashboard({
                         <div className="flex items-center space-x-3.5 min-w-0 flex-1">
                           <div className={`p-2.5 rounded-xl border shrink-0 ${
                             isRunning 
-                              ? isDark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                              : isDark ? 'bg-[#14161c] border-[#232631] text-[#94a3b8]' : 'bg-slate-100 border-slate-200 text-slate-600'
+                              ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+                              : isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
                           }`}>
                             <Layers className="h-5 w-5" />
                           </div>

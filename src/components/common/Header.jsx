@@ -234,19 +234,21 @@ export default function Header({
                 transition={{ type: "spring", stiffness: 450, damping: 30 }}
                 onClick={() => onSelectTab(tab.id)}
                 className={`group relative flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer h-7 shrink-0 border ${
-                  isPinned ? 'px-2 border-cyan-500/50 bg-cyan-950/30' : ''
+                  isPinned 
+                    ? isDark ? 'px-2 border-blue-500/30 bg-blue-500/10' : 'px-2 border-blue-200 bg-blue-50' 
+                    : ''
                 } ${
                   isActive
                     ? isDark 
                       ? 'bg-[#121318] border-[#3b82f6] text-white shadow-2xs font-extrabold' 
                       : 'bg-white border-slate-300/90 text-blue-600 shadow-2xs font-extrabold'
                     : isDark
-                      ? 'bg-[#1a1c24] border-[#232631] text-[#8a8f9e] hover:text-white hover:bg-[#212430]'
+                      ? 'bg-[#1a1c24] border-[#232631] text-[#94a3b8] hover:text-white hover:bg-[#212430]'
                       : 'bg-slate-200/50 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
                 }`}
                 title={tab.title}
               >
-                {isPinned && <Pin className="w-3 h-3 text-cyan-400 shrink-0 rotate-45" />}
+                {isPinned && <Pin className={`w-3 h-3 shrink-0 rotate-45 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />}
                 {!isPinned && <span className="max-w-[150px] truncate">{tab.title}</span>}
 
                 {tab.closable && !isPinned && (

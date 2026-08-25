@@ -118,7 +118,7 @@ export default function ProjectsPanel({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-blue-600 font-sans ${
-              isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-[#e4e4e7] placeholder-slate-500' : 'bg-white border-slate-200 text-slate-800'
+              isDark ? 'bg-[#14161c] border-[#232631] text-[#e2e8ec] placeholder-slate-500' : 'bg-white border-slate-200 text-slate-800'
             }`}
           />
         </div>
@@ -127,7 +127,7 @@ export default function ProjectsPanel({
       {/* Projects List */}
       {filteredProjects.length === 0 ? (
         <div className={`text-center py-20 rounded-3xl border space-y-4 ${
-          isDark ? 'bg-[#1e1e1e] border-[#2a2a2a]' : 'bg-white border-slate-200'
+          isDark ? 'bg-[#14161c] border-[#232631]' : 'bg-white border-slate-200'
         }`}>
           <div className="w-16 h-16 rounded-2xl bg-blue-600/10 text-blue-500 flex items-center justify-center mx-auto">
             <FolderPlus className="h-8 w-8" />
@@ -158,7 +158,7 @@ export default function ProjectsPanel({
                 className={`pure-card p-5 cursor-pointer transition-all space-y-4 ${
                   isRunning 
                     ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm' 
-                    : isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
+                    : isDark ? 'border-[#232631]' : 'border-slate-200'
                 }`}
               >
                 {/* Top Info Row */}
@@ -166,8 +166,8 @@ export default function ProjectsPanel({
                   <div className="flex items-center space-x-3 min-w-0">
                     <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-medium shrink-0 ${
                       isRunning 
-                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' 
-                        : isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+                        ? isDark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+                        : isDark ? 'bg-[#14161c] border-[#232631] text-[#94a3b8]' : 'bg-slate-100 border-slate-200 text-slate-600'
                     }`}>
                       <Code className="h-4 w-4" />
                     </div>

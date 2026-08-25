@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Settings as SettingsIcon, Cpu, Hash, Code, Sliders, RefreshCw, Sun, Moon, Languages, Check, Download, CheckSquare, Loader2 } from 'lucide-react';
+import { X, Settings as SettingsIcon, Cpu, Hash, Code, Sliders, RefreshCw, Sun, Moon, Languages, Check, Download, CheckSquare, Loader2, ChevronDown, Trash2 } from 'lucide-react';
 import { availableLocales, getTranslations } from '../../locales';
 
 export default function SettingsModal({ 
@@ -501,94 +501,71 @@ export default function SettingsModal({
                     <p className="text-xs text-slate-500">Ajustes globales de idioma y apariencia visual</p>
                   </div>
 
-                  {/* Dynamic Language Switcher from src/locales/ *.json */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider block flex items-center gap-1.5">
-                      <Languages className="h-4 w-4 text-blue-500" />
-                      {t.languageSection}
-                    </label>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      {availableLocales.map((loc) => {
-                        const isSelected = language === loc.code;
-                        return (
-                          <button
-                            key={loc.code}
-                            type="button"
-                            onClick={() => onSelectLanguage && onSelectLanguage(loc.code)}
-                            className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all ${
-                              isSelected 
-                                ? isDark
-                                  ? 'bg-[#2b2b2b] border-[#3f3f46] text-white ring-1 ring-blue-500 font-bold'
-                                  : 'bg-blue-50 border-blue-600 text-blue-900 ring-2 ring-blue-100 font-bold'
-                                : isDark
-                                  ? 'bg-[#181818] border-[#2e2e2e] text-slate-400 hover:text-white'
-                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
-                            }`}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <span className="text-lg font-bold font-mono">{loc.badge}</span>
-                              <div>
-                                <span className="block text-xs font-bold">{loc.name}</span>
-                                <span className="block text-[11px] text-slate-500 font-normal">{loc.description}</span>
-                              </div>
-                            </div>
-                            {isSelected && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
-                          </button>
-                        );
-                      })}
+                  {/* Language and Theme Selectors sharing the SAME ROW */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Column 1: Language Select */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                        <Languages className="h-4 w-4 text-blue-500" />
+                        <span>{t.languageSection}</span>
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={language}
+                          onChange={(e) => onSelectLanguage && onSelectLanguage(e.target.value)}
+                          className={`w-full px-3.5 py-2.5 rounded-2xl border text-xs font-bold outline-none cursor-pointer appearance-none transition-all ${
+                            isDark 
+                              ? 'bg-[#181a22] border-[#2a2f40] text-white hover:border-blue-500/50 focus:border-blue-500' 
+                              : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-slate-300 focus:border-blue-500'
+                          }`}
+                        >
+                          {availableLocales.map((loc) => (
+                            <option key={loc.code} value={loc.code} className={isDark ? 'bg-[#181a22] text-white' : 'bg-white text-slate-900'}>
+                              {loc.name} ({loc.badge})
+                            </option>
+                          ))}
+                        </select>
+                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <ChevronDown className="h-4 w-4" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Theme Switcher Setting */}
-                  <div className="space-y-2 pt-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider block">
-                      {t.themeSection}
-                    </label>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => theme !== 'light' && onToggleTheme()}
-                        className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all ${
-                          !isDark 
-                            ? 'bg-blue-50 border-blue-600 text-blue-900 ring-2 ring-blue-100 font-bold' 
-                            : 'bg-[#18181b] border-[#27272a] text-slate-300 hover:text-white hover:border-[#3f3f46]'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Sun className={`h-5 w-5 ${!isDark ? 'text-blue-600' : 'text-slate-400'}`} />
-                          <div>
-                            <span className="block text-xs font-bold">{t.lightMode}</span>
-                            <span className="block text-[11px] text-slate-500 font-normal">{t.lightModeDesc}</span>
-                          </div>
+                    {/* Column 2: Theme Select */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                        {isDark ? <Moon className="h-4 w-4 text-blue-400" /> : <Sun className="h-4 w-4 text-amber-500" />}
+                        <span>{t.themeSection}</span>
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={theme}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val !== theme) onToggleTheme();
+                          }}
+                          className={`w-full px-3.5 py-2.5 rounded-2xl border text-xs font-bold outline-none cursor-pointer appearance-none transition-all ${
+                            isDark 
+                              ? 'bg-[#181a22] border-[#2a2f40] text-white hover:border-blue-500/50 focus:border-blue-500' 
+                              : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-slate-300 focus:border-blue-500'
+                          }`}
+                        >
+                          <option value="light" className={isDark ? 'bg-[#181a22] text-white' : 'bg-white text-slate-900'}>
+                            ☀️ {t.lightMode}
+                          </option>
+                          <option value="dark" className={isDark ? 'bg-[#181a22] text-white' : 'bg-white text-slate-900'}>
+                            🌙 {t.darkMode}
+                          </option>
+                        </select>
+                        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <ChevronDown className="h-4 w-4" />
                         </div>
-                        {!isDark && <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-xs"></span>}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => theme !== 'dark' && onToggleTheme()}
-                        className={`p-4 rounded-2xl border flex items-center justify-between text-left transition-all ${
-                          isDark 
-                            ? 'bg-[#1f1f24] border-blue-500/80 text-white ring-2 ring-blue-500/20 font-bold' 
-                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Moon className={`h-5 w-5 ${isDark ? 'text-blue-400' : 'text-slate-400'}`} />
-                          <div>
-                            <span className="block text-xs font-bold">{t.darkMode}</span>
-                            <span className="block text-[11px] text-slate-400 font-normal">{t.darkModeDesc}</span>
-                          </div>
-                        </div>
-                        {isDark && <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-xs shadow-blue-500/50"></span>}
-                      </button>
+                      </div>
                     </div>
                   </div>
 
                   {/* System Notifications & Logs Memory Management */}
-                  <div className="space-y-2.5 pt-2 border-t border-slate-200/40">
+                  <div className="space-y-2.5 pt-4 border-t border-slate-200/40">
                     <div className="flex items-center justify-between p-3 rounded-2xl border bg-slate-500/5 border-slate-200/50">
                       <div>
                         <span className="block text-xs font-bold">Notificaciones Nativas de Windows</span>
@@ -604,7 +581,7 @@ export default function SettingsModal({
                             window.electronAPI.sendNotification('Lummo Studio', 'Notificaciones del sistema activadas correctamente 🔔');
                           }
                         }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer ${
                           notificationsEnabled
                             ? 'bg-emerald-600 text-white shadow-xs'
                             : 'bg-slate-300 text-slate-700'
@@ -622,27 +599,14 @@ export default function SettingsModal({
                       <button
                         type="button"
                         onClick={handleClearLogsAction}
-                        className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-all shadow-xs"
+                        className={`p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer shadow-xs ${
+                          clearedLogsNotice
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/20'
+                        }`}
+                        title={clearedLogsNotice ? '¡Logs Limpiados!' : 'Limpiar Todo los Logs'}
                       >
-                        {clearedLogsNotice ? '¡Logs Limpiados!' : 'Limpiar Todo los Logs'}
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 rounded-2xl border bg-blue-500/5 border-blue-500/20">
-                      <div>
-                        <span className="block text-xs font-bold text-blue-500">Asistente de Configuración Inicial (First-Time Setup)</span>
-                        <span className="block text-[11px] text-slate-500">Borra la marca de primera vez y reabre la ventana de diagnóstico de motores y preferencias.</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          localStorage.removeItem('lummo-onboarded');
-                          if (onOpenOnboarding) onOpenOnboarding();
-                          if (onClose) onClose();
-                        }}
-                        className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-xs cursor-pointer"
-                      >
-                        Reabrir Asistente
+                        {clearedLogsNotice ? <Check className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>

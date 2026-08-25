@@ -61,6 +61,27 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Project Script Launcher
   runProjectScript: (projectId, folderPath, scriptCommand) => ipcRenderer.invoke('run-project-script', { projectId, folderPath, scriptCommand }),
 
+  // API Client & REST/GraphQL Runner
+  apiClient: {
+    sendRequest: (requestData) => ipcRenderer.invoke('api-send-request', requestData),
+    getCollections: (folderPath) => ipcRenderer.invoke('api-get-collections', folderPath),
+    saveCollections: (folderPath, collections) => ipcRenderer.invoke('api-save-collections', { folderPath, collections })
+  },
+
+  // Webhook Inspector & Replay Hub
+  webhookInspector: {
+    getEvents: (projectId) => ipcRenderer.invoke('webhook-get-events', projectId),
+    clearEvents: (projectId) => ipcRenderer.invoke('webhook-clear-events', projectId),
+    replayEvent: (projectId, eventData, targetPort) => ipcRenderer.invoke('webhook-replay-event', { projectId, eventData, targetPort }),
+    getMockTemplates: () => ipcRenderer.invoke('webhook-get-mock-templates'),
+    sendMock: (payload) => ipcRenderer.invoke('webhook-send-mock', payload),
+    onTrafficEvent: (callback) => {
+      const subscription = (event, value) => callback(value);
+      ipcRenderer.on('webhook-traffic-event', subscription);
+      return () => ipcRenderer.removeListener('webhook-traffic-event', subscription);
+    }
+  },
+
   // Dedicated Log Windows & Retention
   openLogWindow: (projectId, projectName) => ipcRenderer.invoke('open-log-window', { projectId, projectName }),
   getProjectLogs: (projectId) => ipcRenderer.invoke('get-project-logs', projectId),

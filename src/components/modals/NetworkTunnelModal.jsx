@@ -111,14 +111,14 @@ export default function NetworkTunnelModal({
                     <span className="truncate flex-1 font-bold">{tunnelUrl}</span>
                     <button
                       onClick={onCopyTunnelUrl}
-                      className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-300 transition-colors"
+                      className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-300 transition-colors cursor-pointer"
                       title="Copiar URL"
                     >
                       {tunnelCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </button>
                     <button
                       onClick={() => onOpenBrowser(tunnelUrl)}
-                      className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-300 transition-colors"
+                      className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-300 transition-colors cursor-pointer"
                       title="Abrir en navegador"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -126,6 +126,12 @@ export default function NetworkTunnelModal({
                   </div>
                 )}
               </div>
+
+              {tunnelUrl && (
+                <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[11px] flex items-center justify-between">
+                  <span>🪝 <strong>Live Webhook Inspector activo:</strong> Capturando peticiones y payloads entrantes.</span>
+                </div>
+              )}
             </div>
 
             {/* Divider */}

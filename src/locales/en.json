@@ -90,6 +90,11 @@
     "executionConfig": "Execution Settings",
     "installDeps": "Install Dependencies",
     "setupHttps": "Setup HTTPS / SSL",
-    "cloneRepo": "Clone Git Repository"
+    "cloneRepo": "Clone Git Repository",
+    "apiAndWebhooks": "API & Webhooks",
+    "apiClient": "API Client (REST)",
+    "webhookInspector": "Live Webhook Inspector",
+    "sendRequest": "Send Request",
+    "simulateMock": "Simulate Mock Webhook"
   }
 }

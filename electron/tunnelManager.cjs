@@ -1,15 +1,17 @@
 const { spawn, exec } = require('child_process');
+const webhookProxyManager = require('./webhookProxyManager.cjs');
 
 const activeTunnels = new Map();
 
 /**
- * Inicia un túnel público para un puerto local mediante `npx localtunnel`
+ * Inicia un túnel público para un puerto local mediante `npx localtunnel` y lo conecta al proxy interceptor
  * @param {string} projectId 
  * @param {number} port 
  * @param {function} emitLog 
  * @param {function} emitUrl 
+ * @param {function} emitWebhookEvent 
  */
-function startTunnel(projectId, port, emitLog, emitUrl) {
+async function startTunnel(projectId, port, emitLog, emitUrl, emitWebhookEvent) {
   const log = (id, msg) => {
     if (typeof emitLog === 'function') emitLog(id, msg);
   };
@@ -22,9 +24,22 @@ function startTunnel(projectId, port, emitLog, emitUrl) {
     return;
   }
 
-  log(projectId, `[Lummo Tunnel] Creando túnel público en el puerto ${port}...`);
+  log(projectId, `[Lummo Tunnel] Configurando interceptor de tráfico para puerto ${port}...`);
 
-  const cmd = `npx -y localtunnel --port ${port}`;
+  let tunnelPort = port;
+  try {
+    const interceptor = await webhookProxyManager.ensureInterceptor(projectId, port, emitWebhookEvent);
+    if (interceptor && interceptor.port) {
+      tunnelPort = interceptor.port;
+      log(projectId, `[Lummo Webhook Inspector] Interceptor activo en puerto local :${tunnelPort}`);
+    }
+  } catch (err) {
+    log(projectId, `[Lummo Webhook Warning] No se pudo iniciar interceptor: ${err.message}. Conectando directo.`);
+  }
+
+  log(projectId, `[Lummo Tunnel] Creando túnel público en el puerto ${tunnelPort}...`);
+
+  const cmd = `npx -y localtunnel --port ${tunnelPort}`;
   const child = spawn(cmd, [], { shell: true });
 
   activeTunnels.set(projectId, child);
@@ -37,7 +52,7 @@ function startTunnel(projectId, port, emitLog, emitUrl) {
     const match = output.match(/your url is:\s*(https:\/\/[^\s]+)/i) || output.match(/(https:\/\/[a-zA-Z0-9-]+\.loca\.lt)/i);
     if (match && match[1]) {
       const tunnelUrl = match[1].trim();
-      log(projectId, `[Lummo Tunnel] ¡Túnel listo! URL Pública: ${tunnelUrl}`);
+      log(projectId, `[Lummo Tunnel] ¡Túnel listo con Live Webhook Inspector! URL Pública: ${tunnelUrl}`);
       urlCB(projectId, tunnelUrl);
     }
   });
@@ -55,12 +70,14 @@ function startTunnel(projectId, port, emitLog, emitUrl) {
   child.on('error', (err) => {
     log(projectId, `[Lummo Tunnel Error] ${err.message}`);
     activeTunnels.delete(projectId);
+    webhookProxyManager.stopInterceptor(projectId);
     urlCB(projectId, null);
   });
 
   child.on('close', (code) => {
     log(projectId, `[Lummo Tunnel] Túnel cerrado (Código: ${code})`);
     activeTunnels.delete(projectId);
+    webhookProxyManager.stopInterceptor(projectId);
     urlCB(projectId, null);
   });
 }
@@ -77,15 +94,19 @@ function stopTunnel(projectId, emitLog, emitUrl) {
     if (process.platform === 'win32') {
       exec(`taskkill /pid ${child.pid} /T /F`, () => {
         activeTunnels.delete(projectId);
+        webhookProxyManager.stopInterceptor(projectId);
         if (emitLog) emitLog(projectId, '[Lummo Tunnel] Túnel público detenido.');
         if (emitUrl) emitUrl(projectId, null);
       });
     } else {
       child.kill('SIGTERM');
       activeTunnels.delete(projectId);
+      webhookProxyManager.stopInterceptor(projectId);
       if (emitLog) emitLog(projectId, '[Lummo Tunnel] Túnel público detenido.');
       if (emitUrl) emitUrl(projectId, null);
     }
+  } else {
+    webhookProxyManager.stopInterceptor(projectId);
   }
 }
 

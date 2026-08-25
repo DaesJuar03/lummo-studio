@@ -21,11 +21,13 @@ import {
   Server,
   Share2,
   Zap,
-  Boxes
+  Boxes,
+  Radio
 } from 'lucide-react';
 import NetworkTunnelModal from '../modals/NetworkTunnelModal';
 import ScriptLauncherModal from '../modals/ScriptLauncherModal';
 import ExecutionConfigModal from '../modals/ExecutionConfigModal';
+import ApiAndWebhookModal from '../modals/ApiAndWebhookModal';
 
 export default function ProjectDetailPage({
   project,
@@ -47,6 +49,7 @@ export default function ProjectDetailPage({
   const [showNetworkModal, setShowNetworkModal] = useState(false);
   const [showScriptModal, setShowScriptModal] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showApiWebhookModal, setShowApiWebhookModal] = useState(false);
 
   // Tunnel & Local Domain State
   const [tunnelUrl, setTunnelUrl] = useState('');
@@ -349,8 +352,9 @@ export default function ProjectDetailPage({
           </div>
         </div>
 
-        {/* Header Action Controls */}
-        <div className="flex items-center space-x-2 shrink-0">
+        {/* Header Action Controls (Organized & Harmonized) */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          {/* Main Server Toggle Button */}
           <button
             onClick={() => onToggleProject(project)}
             disabled={isRestarting}
@@ -368,85 +372,115 @@ export default function ProjectDetailPage({
             <span>{isRestarting ? 'Reiniciando...' : isRunning ? 'Detener Servidor' : 'Arrancar Servidor'}</span>
           </button>
 
-          <button
-            onClick={() => onOpenBrowser(projectUrl)}
-            className={`p-2.5 rounded-xl border transition-all ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-            title="Abrir en Navegador Web"
-          >
-            <Globe className="h-4 w-4" />
-          </button>
+          {/* Group 1: Core Target Explorers (Browser, Code, Logs) */}
+          <div className={`flex items-center gap-0.5 p-1 rounded-2xl border ${
+            isDark ? 'bg-[#12141c] border-[#222634]' : 'bg-slate-100 border-slate-200'
+          }`}>
+            <button
+              onClick={() => onOpenBrowser(projectUrl)}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                isDark ? 'text-slate-300 hover:bg-[#1f2330] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+              }`}
+              title="Abrir en Navegador Web"
+            >
+              <Globe className="h-4 w-4" />
+            </button>
 
-          <button
-            onClick={() => onOpenEditor(project.path)}
-            className={`p-2.5 rounded-xl border transition-all ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-            title="Abrir Carpeta en VS Code / Explorador"
-          >
-            <FolderOpen className="h-4 w-4" />
-          </button>
+            <button
+              onClick={() => onOpenEditor(project.path)}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                isDark ? 'text-slate-300 hover:bg-[#1f2330] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+              }`}
+              title="Abrir Carpeta en VS Code / Explorador"
+            >
+              <FolderOpen className="h-4 w-4" />
+            </button>
 
-          <button
-            onClick={() => onOpenLogs(project)}
-            className={`p-2.5 rounded-xl border transition-all ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-            title="Abrir Consola de Logs Independiente"
-          >
-            <Terminal className="h-4 w-4" />
-          </button>
+            <button
+              onClick={() => onOpenLogs(project)}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                isDark ? 'text-slate-300 hover:bg-[#1f2330] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+              }`}
+              title="Abrir Consola de Logs Independiente"
+            >
+              <Terminal className="h-4 w-4" />
+            </button>
+          </div>
 
-          <button
-            onClick={() => {
-              if (window.electronAPI?.runProjectScript) {
-                window.electronAPI.runProjectScript(project.id, project.path, 'docker compose up -d');
-              }
-            }}
-            className={`p-2.5 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer ${
-              isDark ? 'bg-cyan-950/30 border-cyan-500/30 text-cyan-400 hover:bg-cyan-900/50' : 'bg-cyan-50 border-cyan-200 text-cyan-700 hover:bg-cyan-100'
-            }`}
-            title="Ejecutar docker compose up"
-          >
-            <Boxes className="h-4 w-4" />
-            <span>Docker Up</span>
-          </button>
+          {/* Group 2: Dev Tools & Services (API Client, Network Tunnel, Docker) */}
+          <div className={`flex items-center gap-1.5 p-1 rounded-2xl border ${
+            isDark ? 'bg-[#12141c] border-[#222634]' : 'bg-slate-100 border-slate-200'
+          }`}>
+            <button
+              onClick={() => setShowApiWebhookModal(true)}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer relative ${
+                isDark 
+                  ? 'bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 border border-purple-500/30' 
+                  : 'bg-purple-100 text-purple-800 hover:bg-purple-200 border border-purple-200'
+              }`}
+              title="API Client (REST/GraphQL) & Live Webhook Inspector"
+            >
+              <Radio className="h-3.5 w-3.5 text-purple-400" />
+              <span>API & Webhooks</span>
+              {tunnelUrl && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              )}
+            </button>
 
-          <button
-            onClick={() => setShowNetworkModal(true)}
-            className={`p-2.5 rounded-xl border transition-all relative cursor-pointer ${
-              tunnelUrl 
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20' 
-                : isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-            }`}
-            title="Red & Acceso Externo (Túnel Público y Dominio Local)"
-          >
-            <Share2 className="h-4 w-4" />
-            {tunnelUrl && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse border-2 border-[#09090b]"></span>
-            )}
-          </button>
+            <button
+              onClick={() => setShowNetworkModal(true)}
+              className={`p-2 rounded-xl transition-all relative cursor-pointer ${
+                tunnelUrl 
+                  ? 'bg-emerald-500/20 text-emerald-400' 
+                  : isDark ? 'text-slate-300 hover:bg-[#1f2330]' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+              }`}
+              title="Red & Acceso Externo (Túnel Público y Dominio Local)"
+            >
+              <Share2 className="h-4 w-4" />
+              {tunnelUrl && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              )}
+            </button>
 
-          <button
-            onClick={() => setShowConfigModal(true)}
-            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-blue-400 hover:bg-[#252525]' : 'bg-white border-slate-200 text-blue-600 hover:bg-slate-100'
-            }`}
-            title="Configuración de Ejecución (Puerto y Comando de Inicio)"
-          >
-            <Settings2 className="h-4 w-4" />
-          </button>
+            <button
+              onClick={() => {
+                if (window.electronAPI?.runProjectScript) {
+                  window.electronAPI.runProjectScript(project.id, project.path, 'docker compose up -d');
+                }
+              }}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                isDark ? 'text-cyan-400 hover:bg-[#1f2330]' : 'text-cyan-700 hover:bg-white hover:shadow-xs'
+              }`}
+              title="Ejecutar docker compose up"
+            >
+              <Boxes className="h-4 w-4" />
+            </button>
+          </div>
 
-          <button
-            onClick={() => setShowScriptModal(true)}
-            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-amber-400 hover:bg-[#252525]' : 'bg-white border-slate-200 text-amber-600 hover:bg-slate-100'
-            }`}
-            title="Lanzador de Scripts & Comandos CLI"
-          >
-            <Zap className="h-4 w-4" />
-          </button>
+          {/* Group 3: Automation & Configuration (Scripts, Settings) */}
+          <div className={`flex items-center gap-0.5 p-1 rounded-2xl border ${
+            isDark ? 'bg-[#12141c] border-[#222634]' : 'bg-slate-100 border-slate-200'
+          }`}>
+            <button
+              onClick={() => setShowScriptModal(true)}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                isDark ? 'text-amber-400 hover:bg-[#1f2330]' : 'text-amber-600 hover:bg-white hover:shadow-xs'
+              }`}
+              title="Lanzador de Scripts & Comandos CLI"
+            >
+              <Zap className="h-4 w-4" />
+            </button>
+
+            <button
+              onClick={() => setShowConfigModal(true)}
+              className={`p-2 rounded-xl transition-all cursor-pointer ${
+                isDark ? 'text-blue-400 hover:bg-[#1f2330]' : 'text-blue-600 hover:bg-white hover:shadow-xs'
+              }`}
+              title="Configuración de Ejecución (Puerto y Comando de Inicio)"
+            >
+              <Settings2 className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -752,6 +786,16 @@ export default function ProjectDetailPage({
         onSaveConfig={handleSaveConfig}
         isRestarting={isRestarting}
         savedMessage={savedMessage}
+        theme={theme}
+      />
+
+      {/* API Client & Webhook Inspector Modal */}
+      <ApiAndWebhookModal
+        isOpen={showApiWebhookModal}
+        onClose={() => setShowApiWebhookModal(false)}
+        project={project}
+        tunnelUrl={tunnelUrl}
+        onStartTunnel={handleToggleTunnel}
         theme={theme}
       />
 

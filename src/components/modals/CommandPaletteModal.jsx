@@ -9,7 +9,8 @@ import {
   Play, 
   Square, 
   X,
-  Table
+  Table,
+  Radio
 } from 'lucide-react';
 
 export default function CommandPaletteModal({
@@ -121,6 +122,16 @@ export default function CommandPaletteModal({
       hotkey: 'S',
       action: () => {
         if (onOpenSettings) onOpenSettings();
+        onClose();
+      }
+    },
+    {
+      id: 'open-api-webhooks-tool',
+      label: 'Probar APIs & Inspeccionar Webhooks (v3.0)',
+      category: 'Herramientas y Utilidades',
+      icon: Radio,
+      action: () => {
+        if (onOpenProjects) onOpenProjects();
         onClose();
       }
     }

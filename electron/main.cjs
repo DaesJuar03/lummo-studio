@@ -12,6 +12,7 @@ const { registerSystemHandlers } = require('./ipc/systemHandlers.cjs');
 const { registerDbHandlers } = require('./ipc/dbHandlers.cjs');
 const { registerTunnelProxyHandlers } = require('./ipc/tunnelProxyHandlers.cjs');
 const { registerProjectHandlers } = require('./ipc/projectHandlers.cjs');
+const { registerApiWebhookHandlers } = require('./ipc/apiWebhookHandlers.cjs');
 
 // Modular Window and Tray Managers
 const { createMainWindow } = require('./managers/windowManager.cjs');
@@ -234,6 +235,18 @@ app.whenReady().then(() => {
   // Register Modular IPC Handlers
   registerSystemHandlers(() => mainWindow, appIconPath);
   registerDbHandlers(() => mainWindow);
+  registerApiWebhookHandlers(
+    () => mainWindow,
+    (projectId, msg) => {
+      let existing = projectLogsStore.get(projectId) || [];
+      existing.push(msg);
+      if (existing.length > MAX_LOG_LINES) existing = existing.slice(-MAX_LOG_LINES);
+      projectLogsStore.set(projectId, existing);
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('process-log', { projectId, message: msg });
+      }
+    }
+  );
   registerTunnelProxyHandlers(
     (projectId, msg) => {
       let existing = projectLogsStore.get(projectId) || [];
@@ -253,6 +266,11 @@ app.whenReady().then(() => {
           title: 'Túnel Público Activo 🌐',
           body: `URL Pública lista: ${url}`
         });
+      }
+    },
+    (projectId, eventObj) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('webhook-traffic-event', { projectId, event: eventObj });
       }
     }
   );

@@ -248,13 +248,13 @@ export default function OnboardingWizard({
 
   return (
     <div className={`min-h-screen w-full flex flex-col font-sans select-none overflow-x-hidden transition-colors duration-200 ${
-      isDark ? 'bg-[#0d0e11] text-[#e6e8ec]' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-[#090A0F] text-[#F3F4F6]' : 'bg-slate-50 text-slate-900'
     }`}>
       
       {/* Electron Custom Title Drag Bar */}
       <div 
         className={`h-11 border-b px-6 flex items-center justify-between shrink-0 ${
-          isDark ? 'bg-[#121318] border-[#232631]' : 'bg-white border-slate-200'
+          isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
       >
@@ -269,23 +269,23 @@ export default function OnboardingWizard({
         <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' }}>
           <button
             onClick={handleMinimize}
-            className={`p-1.5 rounded-lg transition-colors ${
-              isDark ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1a1c24]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
             }`}
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={handleMaximize}
-            className={`p-1.5 rounded-lg transition-colors ${
-              isDark ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1a1c24]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
             }`}
           >
             <Square className="h-3 w-3" />
           </button>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-rose-600 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-rose-600 transition-colors cursor-pointer"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -297,13 +297,13 @@ export default function OnboardingWizard({
         
         {/* Wizard Header Progress Indicator */}
         <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-6 ${
-          isDark ? 'border-[#232631]' : 'border-slate-200/40'
+          isDark ? 'border-white/[0.08]' : 'border-slate-200/40'
         }`}>
           <div>
             <h1 className={`text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Bienvenido a Lummo Studio
             </h1>
-            <p className="text-slate-500 text-sm mt-1">
+            <p className="text-slate-400 text-sm mt-1">
               Configuración inicial de entorno, diagnóstico de motores y preferencias del sistema
             </p>
           </div>
@@ -319,12 +319,12 @@ export default function OnboardingWizard({
               <button
                 key={s.id}
                 onClick={() => setStep(s.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   step === s.id
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                     : step > s.id
-                      ? isDark ? 'bg-[#1f222e] text-emerald-400 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                      : isDark ? 'bg-[#181a20] text-[#8a8f9e] border border-[#232631]' : 'bg-slate-100 text-slate-400'
+                      ? isDark ? 'bg-[#181B28] text-emerald-400 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                      : isDark ? 'bg-[#12141F] text-slate-400 border border-white/[0.08]' : 'bg-slate-100 text-slate-400'
                 }`}
               >
                 {s.label}
@@ -345,7 +345,7 @@ export default function OnboardingWizard({
               <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 1. Idioma de la Aplicación & Apariencia Visual
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Selecciona tu idioma preferido y el tema con el que deseas trabajar en Lummo Studio.
               </p>
             </div>
@@ -359,8 +359,8 @@ export default function OnboardingWizard({
                 {detectedLang && (
                   <span className={`text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-md flex items-center shrink-0 ${
                     isLangSupported 
-                      ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
-                      : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.3)]' 
+                      : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
                   }`}>
                     <Globe className="h-3 w-3 inline mr-1.5" />
                     <span>OS ({detectedLang.toUpperCase()}): {isLangSupported ? 'Detectado & Soportado' : 'Sin soporte (Inglés asignado)'}</span>
@@ -376,22 +376,22 @@ export default function OnboardingWizard({
                       onClick={() => onSelectLanguage && onSelectLanguage(loc.code)}
                       className={`pure-card p-5 cursor-pointer border flex items-center justify-between transition-all ${
                         isSelected
-                          ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/5'
-                          : isDark ? 'border-[#232631] bg-[#1a1c24]' : 'border-slate-200 bg-white'
+                          ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/10'
+                          : isDark ? 'border-white/[0.08] bg-[#12141F] hover:bg-[#181B28]' : 'border-slate-200 bg-white'
                       }`}
                     >
                       <div className="flex items-center space-x-3.5">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs ${
-                          isSelected ? 'bg-blue-600 text-white' : isDark ? 'bg-[#282828] text-slate-400' : 'bg-slate-100 text-slate-600'
+                          isSelected ? 'bg-blue-600 text-white' : isDark ? 'bg-[#181B28] text-slate-400' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {loc.code.toUpperCase()}
                         </div>
                         <div>
                           <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{loc.name}</h4>
-                          <p className="text-xs text-slate-500">{loc.label}</p>
+                          <p className="text-xs text-slate-400">{loc.label}</p>
                         </div>
                       </div>
-                      {isSelected && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
+                      {isSelected && <CheckCircle2 className="h-5 w-5 text-blue-400" />}
                     </div>
                   );
                 })}
@@ -409,17 +409,17 @@ export default function OnboardingWizard({
                   onClick={() => theme !== 'light' && onToggleTheme()}
                   className={`pure-card p-5 cursor-pointer border flex items-center justify-between transition-all ${
                     !isDark
-                      ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/5'
-                      : 'border-[#27272a] bg-[#121215]'
+                      ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/10'
+                      : 'border-white/[0.08] bg-[#12141F] hover:bg-[#181B28]'
                   }`}
                 >
                   <div className="flex items-center space-x-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
                       <Sun className="h-5 w-5" />
                     </div>
                     <div>
                       <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Modo Claro (Light)</h4>
-                      <p className="text-xs text-slate-500">Limpio, brillante y blanco minimalista</p>
+                      <p className="text-xs text-slate-400">Limpio, brillante y blanco minimalista</p>
                     </div>
                   </div>
                   {!isDark && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
@@ -430,7 +430,7 @@ export default function OnboardingWizard({
                   onClick={() => theme !== 'dark' && onToggleTheme()}
                   className={`pure-card p-5 cursor-pointer border flex items-center justify-between transition-all ${
                     isDark
-                      ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/5'
+                      ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/10'
                       : 'border-slate-200 bg-white'
                   }`}
                 >
@@ -440,10 +440,10 @@ export default function OnboardingWizard({
                     </div>
                     <div>
                       <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>Modo Oscuro (Dark)</h4>
-                      <p className="text-xs text-slate-500">Diseño mate carbón elegante y contrastado</p>
+                      <p className="text-xs text-slate-400">Diseño Linear / Vercel mate carbón de alto contraste</p>
                     </div>
                   </div>
-                  {isDark && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
+                  {isDark && <CheckCircle2 className="h-5 w-5 text-blue-400" />}
                 </div>
               </div>
             </div>
@@ -463,7 +463,7 @@ export default function OnboardingWizard({
                 <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   2. Diagnóstico & Instalador de Motores de Desarrollo
                 </h2>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Verificamos e instalamos las herramientas en tu sistema operativo. Elige las que necesites descargar.
                 </p>
               </div>
@@ -472,8 +472,8 @@ export default function OnboardingWizard({
                 <button
                   onClick={onScanEnv}
                   disabled={isScanning || isInstallingTechs}
-                  className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 whitespace-nowrap shrink-0 transition-all disabled:opacity-50 ${
-                    isDark ? 'bg-[#222] border-[#333] text-slate-200 hover:bg-[#2c2c2c]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                  className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 whitespace-nowrap shrink-0 transition-all cursor-pointer disabled:opacity-50 ${
+                    isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-200 hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <RefreshCw className={`h-4 w-4 shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
@@ -484,7 +484,7 @@ export default function OnboardingWizard({
                   <button
                     onClick={handleStartInstallation}
                     disabled={isInstallingTechs}
-                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 whitespace-nowrap shrink-0 shadow-md shadow-blue-600/20 transition-all disabled:opacity-50 cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-2 whitespace-nowrap shrink-0 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all disabled:opacity-50 cursor-pointer"
                   >
                     {isInstallingTechs ? (
                       <Loader2 className="h-4 w-4 animate-spin shrink-0" />
@@ -511,10 +511,10 @@ export default function OnboardingWizard({
 
               return (
                 <div className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs ${
-                  isDark ? 'bg-[#18181c] border-[#2a2a30] text-slate-300' : 'bg-blue-50/60 border-blue-100 text-slate-700'
+                  isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-300' : 'bg-blue-50/60 border-blue-100 text-slate-700'
                 }`}>
                   <div className="flex items-center space-x-2">
-                    <CheckSquare className="h-4 w-4 text-blue-500" />
+                    <CheckSquare className="h-4 w-4 text-blue-400" />
                     <span className="font-semibold">
                       Se detectaron <strong>{allMissing.length}</strong> herramientas no instaladas en tu sistema.
                     </span>
@@ -522,13 +522,13 @@ export default function OnboardingWizard({
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setSelectedTechs(new Set(allMissing))}
-                      className="px-2.5 py-1 rounded-lg font-bold text-[11px] bg-blue-600/10 text-blue-500 hover:bg-blue-600/20 transition-all"
+                      className="px-2.5 py-1 rounded-lg font-bold text-[11px] bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 transition-all cursor-pointer"
                     >
                       Seleccionar Todas ({allMissing.length})
                     </button>
                     <button
                       onClick={() => setSelectedTechs(new Set())}
-                      className="px-2 py-1 rounded-lg font-bold text-[11px] text-slate-400 hover:text-slate-200 transition-all"
+                      className="px-2 py-1 rounded-lg font-bold text-[11px] text-slate-400 hover:text-slate-200 transition-all cursor-pointer"
                     >
                       Limpiar
                     </button>
@@ -540,11 +540,11 @@ export default function OnboardingWizard({
             {/* Real-Time Installation Progress Monitor Panel */}
             {(isInstallingTechs || Object.keys(installProgressMap).length > 0) && (
               <div className={`p-5 rounded-2xl border space-y-4 ${
-                isDark ? 'bg-[#151518] border-blue-500/30' : 'bg-slate-50 border-blue-200'
+                isDark ? 'bg-[#12141F] border-blue-500/30' : 'bg-slate-50 border-blue-200'
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2.5">
-                    <Loader2 className={`h-4 w-4 text-blue-500 ${isInstallingTechs ? 'animate-spin' : ''}`} />
+                    <Loader2 className={`h-4 w-4 text-blue-400 ${isInstallingTechs ? 'animate-spin' : ''}`} />
                     <h4 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       Progreso de Descarga e Instalación Oficial
                     </h4>
@@ -613,8 +613,8 @@ export default function OnboardingWizard({
                       !isInstalled && !isInternal ? 'cursor-pointer hover:border-blue-500/50' : ''
                     } ${
                       isChecked && !isInstalled
-                        ? isDark ? 'border-blue-500/60 bg-blue-500/5' : 'border-blue-500 bg-blue-50/50'
-                        : isDark ? 'border-[#2a2a2a] bg-[#1e1e1e]' : 'border-slate-200 bg-white'
+                        ? isDark ? 'border-blue-500/60 bg-blue-500/10' : 'border-blue-500 bg-blue-50/50'
+                        : isDark ? 'border-white/[0.08] bg-[#12141F] hover:bg-[#181B28]' : 'border-slate-200 bg-white'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -634,13 +634,13 @@ export default function OnboardingWizard({
                       </div>
                       <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
                         isInstalled
-                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
-                          : 'bg-amber-500/10 text-amber-500 border-amber-500/30'
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                          : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
                       }`}>
                         {isInstalled ? 'INSTALADO' : 'NO DETECTADO'}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 font-mono">
+                    <p className="text-xs text-slate-400 font-mono">
                       {info?.version || item.desc}
                     </p>
                   </div>
@@ -662,48 +662,48 @@ export default function OnboardingWizard({
               <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 3. Herramientas Integradas en Lummo Studio
               </h2>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Explora las funcionalidades principales que facilitarán tu flujo de desarrollo.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200 bg-white'}`}>
-                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center">
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Layers className="h-5 w-5" />
                 </div>
                 <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>Gestión Multi-Proyectos</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   Lanza y administra múltiples proyectos de React, Vite, Node, Express y PHP de forma simultánea asignando puertos dinámicos de manera automática.
                 </p>
               </div>
 
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200 bg-white'}`}>
-                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center">
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Database className="h-5 w-5" />
                 </div>
                 <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>Workbench SQL Embebido</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   Conéctate y administra bases de datos SQLite nativas, MySQL y PostgreSQL directamente desde la app con explorador de tablas y consultas SQL.
                 </p>
               </div>
 
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200 bg-white'}`}>
-                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center">
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Terminal className="h-5 w-5" />
                 </div>
                 <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>Ventanas Independientes de Logs</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   Abre consolas de terminal flotantes para cada proyecto con transmisión de registros en tiempo real y limpieza con un solo clic.
                 </p>
               </div>
 
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200 bg-white'}`}>
-                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center">
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+                <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Sliders className="h-5 w-5" />
                 </div>
                 <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>Buscador Omnibox (Ctrl + K)</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   Accede velozmente a tus proyectos, bases de datos o acciones rápidas con el atajo de teclado universal `Ctrl + K`.
                 </p>
               </div>
@@ -718,7 +718,7 @@ export default function OnboardingWizard({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-10 space-y-6"
           >
-            <div className="w-20 h-20 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 flex items-center justify-center mx-auto shadow-xl">
+            <div className="w-20 h-20 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(16,185,129,0.2)]">
               <Rocket className="h-10 w-10 animate-bounce" />
             </div>
 
@@ -726,7 +726,7 @@ export default function OnboardingWizard({
               <h2 className={`text-3xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 ¡Todo Listo para Comenzar!
               </h2>
-              <p className="text-slate-500 text-sm mt-2 max-w-lg mx-auto leading-relaxed">
+              <p className="text-slate-400 text-sm mt-2 max-w-lg mx-auto leading-relaxed">
                 Tu entorno de desarrollo Lummo Studio se encuentra configurado y listo para acelerar tu flujo de trabajo local.
               </p>
             </div>
@@ -734,11 +734,11 @@ export default function OnboardingWizard({
         )}
 
         {/* Stepper Navigation Buttons */}
-        <div className="pt-6 border-t border-slate-200/40 flex items-center justify-between">
+        <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between">
           <button
             onClick={handleBack}
             disabled={step === 1}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all disabled:opacity-30 ${
+            className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all cursor-pointer disabled:opacity-30 ${
               isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -748,7 +748,7 @@ export default function OnboardingWizard({
 
           <button
             onClick={handleNext}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-md shadow-blue-600/20 flex items-center space-x-2 transition-all cursor-pointer"
+            className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2.5 px-6 rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] flex items-center space-x-2 transition-all cursor-pointer"
           >
             <span>{step === 4 ? 'Comenzar a Usar Lummo Studio' : 'Siguiente Paso'}</span>
             <ChevronRight className="h-4 w-4" />

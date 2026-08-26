@@ -167,15 +167,15 @@ export default function ImportProjectModal({
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#181818] border-[#2a2a2a] text-[#e4e4e7]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header */}
           <div className={`px-5 py-3.5 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#141414] border-[#262626]' : 'bg-slate-50/80 border-slate-200/80'
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50/80 border-slate-200/80'
           }`}>
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-500">
+              <div className="w-8 h-8 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
                 {step === 'analyzing' ? (
                   <RefreshCw className="h-4 w-4 animate-spin" />
                 ) : step === 'results' ? (
@@ -204,8 +204,8 @@ export default function ImportProjectModal({
 
             <button
               onClick={onClose}
-              className={`p-1.5 rounded-lg transition-colors ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#262626]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -222,9 +222,9 @@ export default function ImportProjectModal({
                 onDrop={handleDrop}
                 className={`p-7 rounded-xl border border-dashed text-center transition-all cursor-pointer space-y-3.5 ${
                   isDragging
-                    ? 'border-blue-500 bg-blue-500/5 scale-[1.005]'
+                    ? 'border-blue-500 bg-blue-500/10 scale-[1.005]'
                     : isDark
-                    ? 'border-[#333333] bg-[#141414] hover:border-blue-500/50 hover:bg-[#1a1a1a]'
+                    ? 'border-white/[0.12] bg-[#12141F] hover:border-blue-500/50 hover:bg-[#1A1D2D]'
                     : 'border-slate-300 bg-slate-50/50 hover:border-blue-400 hover:bg-blue-50/20'
                 }`}
                 onClick={handleBrowseFolder}
@@ -233,7 +233,7 @@ export default function ImportProjectModal({
                   isDragging 
                     ? 'bg-blue-600 text-white border-blue-400' 
                     : isDark 
-                    ? 'bg-[#222222] border-[#333333] text-blue-400' 
+                    ? 'bg-[#181B28] border-white/[0.08] text-blue-400' 
                     : 'bg-white border-slate-200 text-blue-600 shadow-2xs'
                 }`}>
                   <UploadCloud className="h-6 w-6" />
@@ -243,7 +243,7 @@ export default function ImportProjectModal({
                   <h4 className={`font-semibold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     Arrastra y suelta tu carpeta aquí
                   </h4>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-slate-400">
                     O haz clic para abrir el navegador de archivos
                   </p>
                 </div>
@@ -255,7 +255,7 @@ export default function ImportProjectModal({
                       e.stopPropagation();
                       handleBrowseFolder();
                     }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-2xs inline-flex items-center space-x-1.5 transition-all cursor-pointer"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] inline-flex items-center space-x-1.5 transition-all cursor-pointer"
                   >
                     <Folder className="h-3.5 w-3.5" />
                     <span>Buscar carpeta</span>
@@ -267,11 +267,11 @@ export default function ImportProjectModal({
             {/* STEP 2: ANALYZING */}
             {step === 'analyzing' && (
               <div className={`p-6 rounded-xl border text-center space-y-5 ${
-                isDark ? 'bg-[#141414] border-[#262626]' : 'bg-slate-50/50 border-slate-200/80'
+                isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50/50 border-slate-200/80'
               }`}>
                 <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full border-2 border-blue-500/20 animate-ping"></div>
-                  <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/30 text-blue-500 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/30 text-blue-400 flex items-center justify-center">
                     <Search className="h-5 w-5 animate-pulse" />
                   </div>
                 </div>
@@ -325,7 +325,7 @@ export default function ImportProjectModal({
                 {/* Dual Environment Card */}
                 {detectedFolder.hasBackend ? (
                   <div className={`p-4 rounded-xl border space-y-3 ${
-                    isDark ? 'bg-[#141414] border-purple-500/20' : 'bg-purple-50/40 border-purple-200/80'
+                    isDark ? 'bg-[#12141F] border-purple-500/20' : 'bg-purple-50/40 border-purple-200/80'
                   }`}>
                     <div className="flex items-center justify-between border-b pb-2.5 border-purple-500/15">
                       <div className="flex items-center space-x-2">
@@ -349,7 +349,7 @@ export default function ImportProjectModal({
                     <div className="grid grid-cols-2 gap-2.5 text-xs">
                       {/* Frontend */}
                       <div className={`p-3 rounded-lg border space-y-1 ${
-                        isDark ? 'bg-[#1c1c1c] border-[#282828]' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#181B28] border-white/[0.08]' : 'bg-white border-slate-200'
                       }`}>
                         <div className="flex items-center space-x-1.5 text-blue-400 font-medium text-[11px]">
                           <Layers className="h-3.5 w-3.5" />
@@ -365,7 +365,7 @@ export default function ImportProjectModal({
 
                       {/* Backend */}
                       <div className={`p-3 rounded-lg border space-y-1 ${
-                        isDark ? 'bg-[#1c1c1c] border-[#282828]' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#181B28] border-white/[0.08]' : 'bg-white border-slate-200'
                       }`}>
                         <div className="flex items-center space-x-1.5 text-purple-400 font-medium text-[11px]">
                           <Server className="h-3.5 w-3.5" />
@@ -387,10 +387,10 @@ export default function ImportProjectModal({
                 ) : (
                   /* Single Environment Card */
                   <div className={`p-4 rounded-xl border ${
-                    isDark ? 'bg-[#141414] border-[#262626]' : 'bg-slate-50/50 border-slate-200/80'
+                    isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50/50 border-slate-200/80'
                   }`}>
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-lg bg-emerald-500/15 text-emerald-500 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
                         <CheckCircle className="h-4.5 w-4.5" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -411,7 +411,7 @@ export default function ImportProjectModal({
                 )}
 
                 {/* Bottom Actions */}
-                <div className="flex items-center justify-between pt-1 border-t border-slate-200/40">
+                <div className="flex items-center justify-between pt-1 border-t border-white/[0.08]">
                   <button
                     onClick={handleResetScan}
                     className="text-xs text-slate-400 hover:text-slate-200 font-medium cursor-pointer transition-colors"
@@ -422,7 +422,7 @@ export default function ImportProjectModal({
                   {detectedFolder.isAlreadyImported ? (
                     <button
                       onClick={handleConfirmImport}
-                      className="bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-2xs transition-all cursor-pointer flex items-center space-x-1.5"
+                      className="bg-amber-600 hover:bg-amber-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-md shadow-amber-600/20 transition-all cursor-pointer flex items-center space-x-1.5"
                     >
                       <RefreshCw className="h-3.5 w-3.5" />
                       <span>Reemplazar proyecto</span>
@@ -430,7 +430,7 @@ export default function ImportProjectModal({
                   ) : (
                     <button
                       onClick={handleConfirmImport}
-                      className="bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-2xs transition-all cursor-pointer flex items-center space-x-1.5"
+                      className="bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer flex items-center space-x-1.5"
                     >
                       <span>Confirmar e importar</span>
                       <ArrowRight className="h-3.5 w-3.5" />

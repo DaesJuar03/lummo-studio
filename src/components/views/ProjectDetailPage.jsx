@@ -34,6 +34,7 @@ import NetworkTunnelModal from '../modals/NetworkTunnelModal';
 import ScriptLauncherModal from '../modals/ScriptLauncherModal';
 import ExecutionConfigModal from '../modals/ExecutionConfigModal';
 import ApiAndWebhookModal from '../modals/ApiAndWebhookModal';
+import DockerComposeModal from '../modals/DockerComposeModal';
 
 export default function ProjectDetailPage({
   project,
@@ -56,6 +57,8 @@ export default function ProjectDetailPage({
   const [showScriptModal, setShowScriptModal] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showApiWebhookModal, setShowApiWebhookModal] = useState(false);
+  const [showDockerModal, setShowDockerModal] = useState(false);
+  const [hasDockerCompose, setHasDockerCompose] = useState(false);
 
   // Port Conflict Modal State
   const [portConflict, setPortConflict] = useState(null); // { port, pid, processName }
@@ -159,6 +162,12 @@ export default function ProjectDetailPage({
         } else {
           setHasEnvExample(false);
         }
+      });
+    }
+
+    if (window.electronAPI?.docker?.detectFiles && project?.path) {
+      window.electronAPI.docker.detectFiles(project.path).then((res) => {
+        setHasDockerCompose(Boolean(res && res.hasDocker));
       });
     }
   }, [project?.path]);
@@ -430,13 +439,13 @@ export default function ProjectDetailPage({
       
       {/* Top Header Bar */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 ${
-        isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
+        isDark ? 'border-white/[0.08]' : 'border-slate-200'
       }`}>
         <div className="flex items-center space-x-3.5 min-w-0">
           <button
             onClick={onBack}
-            className={`p-2 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1 ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+            className={`p-2 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer ${
+              isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -450,13 +459,13 @@ export default function ProjectDetailPage({
               </h2>
               <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border ${
                 isRunning 
-                  ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' 
-                  : isDark ? 'bg-[#222] text-slate-400 border-[#333]' : 'bg-slate-200 text-slate-600 border-slate-300'
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]' 
+                  : isDark ? 'bg-[#181B28] text-slate-400 border-white/[0.08]' : 'bg-slate-200 text-slate-600 border-slate-300'
               }`}>
                 :{project.port} ({isRunning ? 'Activo' : 'Detenido'})
               </span>
             </div>
-            <p className="text-xs text-slate-500 font-mono mt-0.5 truncate">{project.path}</p>
+            <p className="text-xs text-slate-400 font-mono mt-0.5 truncate">{project.path}</p>
           </div>
         </div>
 
@@ -467,7 +476,9 @@ export default function ProjectDetailPage({
             onClick={handleSmartToggleProject}
             disabled={isRestarting}
             className={`px-5 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 text-white shadow-md transition-all cursor-pointer disabled:opacity-50 ${
-              isRunning ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/20' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20'
+              isRunning 
+                ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/20' 
+                : 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)]'
             }`}
           >
             {isRestarting ? (
@@ -482,12 +493,12 @@ export default function ProjectDetailPage({
 
           {/* Group 1: Core Target Explorers */}
           <div className={`flex items-center gap-0.5 p-1 rounded-2xl border ${
-            isDark ? 'bg-[#12141c] border-[#222634]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => onOpenBrowser(projectUrl)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-slate-300 hover:bg-[#1f2330] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Abrir en Navegador Web"
             >
@@ -497,7 +508,7 @@ export default function ProjectDetailPage({
             <button
               onClick={() => onOpenEditor(project.path)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-slate-300 hover:bg-[#1f2330] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Abrir Carpeta en VS Code / Explorador"
             >
@@ -507,7 +518,7 @@ export default function ProjectDetailPage({
             <button
               onClick={() => onOpenLogs(project)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-slate-300 hover:bg-[#1f2330] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Abrir Consola de Logs Independiente"
             >
@@ -517,7 +528,7 @@ export default function ProjectDetailPage({
 
           {/* Group 2: Dev Tools & Services */}
           <div className={`flex items-center gap-1.5 p-1 rounded-2xl border ${
-            isDark ? 'bg-[#12141c] border-[#222634]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setShowApiWebhookModal(true)}
@@ -540,7 +551,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all relative cursor-pointer ${
                 tunnelUrl 
                   ? 'bg-emerald-500/20 text-emerald-400' 
-                  : isDark ? 'text-slate-300 hover:bg-[#1f2330]' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                  : isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Red & Acceso Externo (Túneles Cloudflare & Localtunnel)"
             >
@@ -551,28 +562,29 @@ export default function ProjectDetailPage({
             </button>
 
             <button
-              onClick={() => {
-                if (window.electronAPI?.runProjectScript) {
-                  window.electronAPI.runProjectScript(project.id, project.path, 'docker compose up -d');
-                }
-              }}
-              className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-cyan-400 hover:bg-[#1f2330]' : 'text-cyan-700 hover:bg-white hover:shadow-xs'
+              onClick={() => setShowDockerModal(true)}
+              className={`p-2 rounded-xl transition-all cursor-pointer relative ${
+                hasDockerCompose 
+                  ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/25' 
+                  : isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
-              title="Ejecutar docker compose up"
+              title="Gestor Visual de Docker Compose & Contenedores"
             >
               <Boxes className="h-4 w-4" />
+              {hasDockerCompose && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-cyan-400"></span>
+              )}
             </button>
           </div>
 
           {/* Group 3: Automation & Configuration */}
           <div className={`flex items-center gap-0.5 p-1 rounded-2xl border ${
-            isDark ? 'bg-[#12141c] border-[#222634]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setShowScriptModal(true)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-amber-400 hover:bg-[#1f2330]' : 'text-amber-600 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-amber-400 hover:bg-[#1E2235]' : 'text-amber-600 hover:bg-white hover:shadow-xs'
               }`}
               title="Lanzador de Scripts & Comandos CLI"
             >
@@ -582,7 +594,7 @@ export default function ProjectDetailPage({
             <button
               onClick={() => setShowConfigModal(true)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-blue-400 hover:bg-[#1f2330]' : 'text-blue-600 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-blue-400 hover:bg-[#1E2235]' : 'text-blue-600 hover:bg-white hover:shadow-xs'
               }`}
               title="Configuración de Ejecución (Puerto y Comando de Inicio)"
             >
@@ -656,23 +668,23 @@ export default function ProjectDetailPage({
         </div>
 
         {/* Right 3 Columns: Real Telemetry Metrics */}
-        <div className={`lg:col-span-3 lg:border-l pl-0 lg:pl-6 space-y-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-200'}`}>
+        <div className={`lg:col-span-3 lg:border-l pl-0 lg:pl-6 space-y-3 ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
           <div className="space-y-1">
             <div className="flex items-center space-x-1.5 text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider">
-              <Activity className="h-3.5 w-3.5 text-blue-500" />
+              <Activity className="h-3.5 w-3.5 text-blue-400" />
               <span>ESTADO</span>
             </div>
-            <span className={`text-2xl font-black tracking-tight block ${isRunning ? 'text-emerald-500' : 'text-slate-500'}`}>
+            <span className={`text-2xl font-black tracking-tight block ${isRunning ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'text-slate-500'}`}>
               {isRunning ? 'RUNNING' : 'STOPPED'}
             </span>
           </div>
 
-          <div className={`border-t ${isDark ? 'border-[#262626]' : 'border-slate-200/60'}`}></div>
+          <div className={`border-t ${isDark ? 'border-white/[0.08]' : 'border-slate-200/60'}`}></div>
 
           {/* Real RAM Metric */}
           <div className="space-y-1">
             <div className="flex items-center space-x-1.5 text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider">
-              <HardDrive className="h-3.5 w-3.5 text-blue-500" />
+              <HardDrive className="h-3.5 w-3.5 text-blue-400" />
               <span>MEMORIA RAM REAL</span>
             </div>
             <div className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -680,12 +692,12 @@ export default function ProjectDetailPage({
             </div>
           </div>
 
-          <div className={`border-t ${isDark ? 'border-[#262626]' : 'border-slate-200/60'}`}></div>
+          <div className={`border-t ${isDark ? 'border-white/[0.08]' : 'border-slate-200/60'}`}></div>
 
           {/* Real CPU Metric */}
           <div className="space-y-1">
             <div className="flex items-center space-x-1.5 text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider">
-              <Cpu className="h-3.5 w-3.5 text-blue-500" />
+              <Cpu className="h-3.5 w-3.5 text-blue-400" />
               <span>CPU REAL</span>
             </div>
             <div className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -695,7 +707,7 @@ export default function ProjectDetailPage({
         </div>
       </div>
 
-      <div className={`border-t ${isDark ? 'border-[#262626]' : 'border-slate-200/80'}`}></div>
+      <div className={`border-t ${isDark ? 'border-white/[0.08]' : 'border-slate-200/80'}`}></div>
 
       {/* SECTION 2: Middle Grid - Live Preview (Left 6) & Advanced .env Editor (Right 6) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -703,15 +715,17 @@ export default function ProjectDetailPage({
         {/* Left 6: Live Preview */}
         <div className="lg:col-span-6 space-y-3">
           <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
               Live Preview
             </span>
-            <span className="text-xs font-mono text-blue-500 font-bold">
+            <span className="text-xs font-mono text-blue-400 font-bold">
               {projectUrl}
             </span>
           </div>
 
-          <div className="relative w-full h-80 rounded-2xl border overflow-hidden bg-slate-900 border-slate-800 flex flex-col items-center justify-center text-center group shadow-sm">
+          <div className={`relative w-full h-80 rounded-2xl border overflow-hidden flex flex-col items-center justify-center text-center group shadow-sm ${
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-900 border-slate-800'
+          }`}>
             {isRunning ? (
               <>
                 <iframe
@@ -722,7 +736,7 @@ export default function ProjectDetailPage({
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center space-y-2 backdrop-blur-xs select-none">
                   <button
                     onClick={() => onOpenBrowser(projectUrl)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 px-5 rounded-xl shadow-lg flex items-center space-x-2 transition-transform hover:scale-105 cursor-pointer"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2.5 px-5 rounded-xl shadow-lg hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] flex items-center space-x-2 transition-transform hover:scale-105 cursor-pointer"
                   >
                     <ExternalLink className="h-4 w-4" />
                     <span>Abrir ({projectUrl})</span>
@@ -734,11 +748,13 @@ export default function ProjectDetailPage({
               </>
             ) : (
               <div className="p-6 space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto ${
+                  isDark ? 'bg-[#12141F] border border-white/[0.08] text-slate-400' : 'bg-slate-800 text-slate-400'
+                }`}>
                   <Globe className="h-6 w-6" />
                 </div>
                 <h4 className="text-slate-300 font-bold text-sm">Servidor Detenido</h4>
-                <p className="text-slate-500 text-xs max-w-xs mx-auto">
+                <p className="text-slate-400 text-xs max-w-xs mx-auto">
                   Haz clic en "Arrancar Servidor" para activar el entorno y cargar la vista previa.
                 </p>
               </div>
@@ -750,7 +766,7 @@ export default function ProjectDetailPage({
         <div className="lg:col-span-6 space-y-3">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center space-x-2">
-              <FileCode2 className="h-4 w-4 text-blue-500" />
+              <FileCode2 className="h-4 w-4 text-blue-400" />
               <h3 className={`font-bold text-xs tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 Variables de Entorno ({selectedEnvFile})
               </h3>
@@ -760,8 +776,8 @@ export default function ProjectDetailPage({
               <button
                 type="button"
                 onClick={() => setMaskSecrets(!maskSecrets)}
-                className={`p-1.5 rounded-lg border text-xs transition-colors ${
-                  isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600'
+                className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
+                  isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600'
                 }`}
                 title={maskSecrets ? 'Revelar valores secretos' : 'Ocultar valores secretos'}
               >
@@ -770,8 +786,8 @@ export default function ProjectDetailPage({
 
               <button
                 onClick={() => setRawEnvMode(!rawEnvMode)}
-                className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border transition-colors ${
-                  isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300' : 'bg-white border-slate-200 text-slate-700'
+                className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                  isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235]' : 'bg-white border-slate-200 text-slate-700'
                 }`}
               >
                 {rawEnvMode ? 'Formulario' : 'Texto Plano'}
@@ -791,7 +807,7 @@ export default function ProjectDetailPage({
               <button
                 type="button"
                 onClick={handleImportMissingKeys}
-                className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-black font-bold text-[10px] rounded-lg transition-all"
+                className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-black font-bold text-[10px] rounded-lg transition-all cursor-pointer"
               >
                 Importar Claves
               </button>
@@ -809,8 +825,8 @@ export default function ProjectDetailPage({
                       placeholder="CLAVE (ej: PORT)"
                       value={pair.key}
                       onChange={(e) => handleEnvPairChange(idx, 'key', e.target.value)}
-                      className={`w-2/5 border rounded-xl p-2 text-xs font-mono font-bold ${
-                        isDark ? 'bg-[#181818] border-[#2e2e2e] text-white' : 'bg-white border-slate-200'
+                      className={`w-2/5 border rounded-xl p-2 text-xs font-mono font-bold transition-all ${
+                        isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200'
                       }`}
                     />
                     <span className="text-slate-400 font-mono font-bold">=</span>
@@ -819,13 +835,13 @@ export default function ProjectDetailPage({
                       placeholder="VALOR"
                       value={pair.value}
                       onChange={(e) => handleEnvPairChange(idx, 'value', e.target.value)}
-                      className={`flex-1 border rounded-xl p-2 text-xs font-mono ${
-                        isDark ? 'bg-[#181818] border-[#2e2e2e] text-white' : 'bg-white border-slate-200'
+                      className={`flex-1 border rounded-xl p-2 text-xs font-mono transition-all ${
+                        isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200'
                       }`}
                     />
                     <button
                       onClick={() => handleRemoveEnvPair(idx)}
-                      className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                      className="p-2 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
                       title="Eliminar variable"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -836,7 +852,7 @@ export default function ProjectDetailPage({
 
               <button
                 onClick={handleAddEnvPair}
-                className="text-xs text-blue-500 font-bold hover:text-blue-600 flex items-center space-x-1 pt-1"
+                className="text-xs text-blue-400 font-bold hover:text-blue-300 flex items-center space-x-1 pt-1 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>Agregar Variable</span>
@@ -849,8 +865,8 @@ export default function ProjectDetailPage({
                 value={envContent}
                 onChange={(e) => setEnvContent(e.target.value)}
                 placeholder="PORT=3000&#10;NODE_ENV=development"
-                className={`w-full border rounded-2xl p-3 text-xs font-mono font-semibold focus:outline-none ${
-                  isDark ? 'bg-[#181818] border-[#2e2e2e] text-white' : 'bg-white border-slate-200 text-slate-900'
+                className={`w-full border rounded-2xl p-3 text-xs font-mono font-semibold focus:outline-none transition-all ${
+                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200 text-slate-900'
                 }`}
               />
             </div>
@@ -859,14 +875,14 @@ export default function ProjectDetailPage({
           <div className="flex items-center justify-between pt-2">
             <button
               onClick={handleSaveEnv}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-md shadow-blue-600/20 transition-all cursor-pointer"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer"
             >
               <Save className="h-3.5 w-3.5" />
               <span>Guardar {selectedEnvFile}</span>
             </button>
 
             {envSaveStatus && (
-              <span className="text-xs text-emerald-500 font-mono font-bold flex items-center gap-1">
+              <span className="text-xs text-emerald-400 font-mono font-bold flex items-center gap-1">
                 <Check className="h-3.5 w-3.5" /> {envSaveStatus}
               </span>
             )}
@@ -883,7 +899,7 @@ export default function ProjectDetailPage({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               className={`w-full max-w-md rounded-2xl border shadow-2xl overflow-hidden p-6 space-y-4 ${
-                isDark ? 'bg-[#18181b] border-[#27272a] text-white' : 'bg-white border-slate-200 text-slate-900'
+                isDark ? 'bg-[#0D0E15] border-white/[0.08] text-white' : 'bg-white border-slate-200 text-slate-900'
               }`}
             >
               <div className="flex items-center space-x-3 text-amber-400">
@@ -896,7 +912,9 @@ export default function ProjectDetailPage({
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#202024] border border-[#27272a] text-xs font-mono space-y-1">
+              <div className={`p-3.5 rounded-xl border text-xs font-mono space-y-1 ${
+                isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+              }`}>
                 <div>Proceso: <span className="text-indigo-400 font-bold">{portConflict.processName}</span></div>
                 <div>PID: <span className="text-amber-400 font-bold">{portConflict.pid}</span></div>
                 <div>Puerto: <span className="text-slate-300 font-bold">:{portConflict.port}</span></div>
@@ -907,7 +925,7 @@ export default function ProjectDetailPage({
                   type="button"
                   onClick={handleKillConflictAndStart}
                   disabled={isResolvingPort}
-                  className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition-all flex items-center justify-center space-x-2"
+                  className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                 >
                   <Square className="h-3.5 w-3.5 fill-white" />
                   <span>Liberar Puerto (Finalizar PID {portConflict.pid}) y Arrancar</span>
@@ -917,8 +935,8 @@ export default function ProjectDetailPage({
                   type="button"
                   onClick={handleUseFreePortAndStart}
                   disabled={isResolvingPort}
-                  className={`w-full py-2.5 px-4 rounded-xl border font-bold text-xs transition-all flex items-center justify-center space-x-2 ${
-                    isDark ? 'bg-[#202024] border-[#27272a] text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-800'
+                  className={`w-full py-2.5 px-4 rounded-xl border font-bold text-xs transition-all flex items-center justify-center space-x-2 cursor-pointer ${
+                    isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-200 text-slate-800'
                   }`}
                 >
                   <Play className="h-3.5 w-3.5" />
@@ -928,7 +946,7 @@ export default function ProjectDetailPage({
                 <button
                   type="button"
                   onClick={() => setPortConflict(null)}
-                  className="w-full py-1.5 text-xs text-slate-500 hover:text-slate-300 text-center"
+                  className="w-full py-1.5 text-xs text-slate-500 hover:text-slate-300 text-center cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -990,6 +1008,14 @@ export default function ProjectDetailPage({
         project={project}
         tunnelUrl={tunnelUrl}
         onStartTunnel={handleToggleTunnel}
+        theme={theme}
+      />
+
+      {/* Docker Compose & Containers Dashboard Modal */}
+      <DockerComposeModal
+        isOpen={showDockerModal}
+        onClose={() => setShowDockerModal(false)}
+        project={project}
         theme={theme}
       />
 

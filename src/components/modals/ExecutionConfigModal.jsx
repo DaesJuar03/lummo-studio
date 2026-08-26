@@ -35,15 +35,15 @@ export default function ExecutionConfigModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-md rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#181818] border-[#2e2e2e] text-white' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#141414] border-[#262626]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                 <Settings2 className="h-5 w-5" />
               </div>
               <div>
@@ -55,8 +55,8 @@ export default function ExecutionConfigModal({
             </div>
             <button
               onClick={onClose}
-              className={`p-2 rounded-xl transition-colors ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -74,11 +74,11 @@ export default function ExecutionConfigModal({
                 value={portInput}
                 onChange={(e) => setPortInput(e.target.value)}
                 placeholder="ej: 3000"
-                className={`w-full border rounded-xl p-3 font-mono font-bold text-sm focus:outline-none ${
-                  isDark ? 'bg-[#141414] border-[#2e2e2e] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                className={`w-full border rounded-xl p-3 font-mono font-bold text-sm focus:outline-none transition-all ${
+                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               />
-              <span className="text-[11px] text-slate-500 block">
+              <span className="text-[11px] text-slate-400 block">
                 El puerto en el que escuchará el servidor local.
               </span>
             </div>
@@ -92,11 +92,11 @@ export default function ExecutionConfigModal({
                 value={commandInput}
                 onChange={(e) => setCommandInput(e.target.value)}
                 placeholder="ej: npm run dev"
-                className={`w-full border rounded-xl p-3 font-mono font-bold text-sm focus:outline-none ${
-                  isDark ? 'bg-[#141414] border-[#2e2e2e] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                className={`w-full border rounded-xl p-3 font-mono font-bold text-sm focus:outline-none transition-all ${
+                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               />
-              <span className="text-[11px] text-slate-500 block">
+              <span className="text-[11px] text-slate-400 block">
                 Comando ejecutado al hacer clic en "Arrancar Servidor".
               </span>
             </div>
@@ -111,11 +111,13 @@ export default function ExecutionConfigModal({
 
           {/* Modal Footer */}
           <div className={`px-6 py-4 border-t flex items-center justify-between ${
-            isDark ? 'bg-[#141414] border-[#262626]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <button
               onClick={onClose}
-              className="bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:bg-[#1E2235] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+              }`}
             >
               Cancelar
             </button>
@@ -123,7 +125,7 @@ export default function ExecutionConfigModal({
             <button
               onClick={onSaveConfig}
               disabled={isRestarting}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl flex items-center space-x-2 shadow-lg shadow-blue-600/20 transition-all cursor-pointer disabled:opacity-50"
+              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl flex items-center space-x-2 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer disabled:opacity-50"
             >
               {isRestarting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               <span>{isRestarting ? 'Reiniciando...' : 'Guardar y Aplicar'}</span>

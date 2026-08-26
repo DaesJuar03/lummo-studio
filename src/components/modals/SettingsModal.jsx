@@ -125,28 +125,28 @@ export default function SettingsModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-4xl h-[680px] max-h-[90vh] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
-            isDark ? 'bg-[#14161c] border-[#232631] text-[#e6e8ec]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'bg-[#181a20] border-[#232631]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
                 <SettingsIcon className="h-5 w-5" />
               </div>
               <div>
                 <h3 className={`font-extrabold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.settingsTitle}</h3>
-                <p className="text-xs text-slate-500">{t.settingsDesc}</p>
+                <p className="text-xs text-slate-400">{t.settingsDesc}</p>
               </div>
             </div>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className={`p-2 rounded-xl transition-colors ${
-                isDark ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1d202a]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-5 w-5" />
@@ -158,7 +158,7 @@ export default function SettingsModal({
             
             {/* Left Sidebar Categories */}
             <div className={`w-64 border-r p-4 space-y-1 shrink-0 ${
-              isDark ? 'bg-[#0d0e11] border-[#232631]' : 'bg-slate-50/80 border-slate-200'
+              isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50/80 border-slate-200'
             }`}>
               {categories.map((cat) => {
                 const Icon = cat.icon;
@@ -167,13 +167,13 @@ export default function SettingsModal({
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left cursor-pointer ${
                       isActive
                         ? isDark 
-                          ? 'bg-[#1f222e] border border-[#2c3040] text-white shadow-xs' 
+                          ? 'bg-[#181B28] border border-white/[0.08] text-white shadow-[0_0_12px_rgba(59,130,246,0.15)]' 
                           : 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                         : isDark
-                          ? 'text-[#8a8f9e] hover:bg-[#1a1c24] hover:text-white'
+                          ? 'text-slate-400 hover:bg-[#12141F] hover:text-white'
                           : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
                     }`}
                   >
@@ -185,15 +185,15 @@ export default function SettingsModal({
             </div>
 
             {/* Right Category Details View */}
-            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#14161c]' : 'bg-white'}`}>
+            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#0D0E15]' : 'bg-white'}`}>
               
               {/* Category 1: Servicios del Sistema */}
               {activeCategory === 'services' && (
                 <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-6">
-                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 gap-3 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 gap-3 ${isDark ? 'border-white/[0.08]' : 'border-slate-100'}`}>
                     <div>
                       <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.systemServices}</h4>
-                      <p className="text-xs text-slate-500">Diagnóstico de ejecutables y motores locales detectados en tu equipo</p>
+                      <p className="text-xs text-slate-400">Diagnóstico de ejecutables y motores locales detectados en tu equipo</p>
                     </div>
 
                     <div className="flex items-center space-x-2 shrink-0">
@@ -202,8 +202,8 @@ export default function SettingsModal({
                           whileTap={{ scale: 0.94 }}
                           onClick={onScanEnv}
                           disabled={isScanning || isInstallingTechs}
-                          className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 whitespace-nowrap shrink-0 transition-all disabled:opacity-50 ${
-                            isDark ? 'bg-[#222] border-[#333] text-slate-200 hover:bg-[#2c2c2c]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                          className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 whitespace-nowrap shrink-0 transition-all cursor-pointer disabled:opacity-50 ${
+                            isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-200 hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
                           }`}
                         >
                           <RefreshCw className={`h-4 w-4 shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
@@ -215,7 +215,7 @@ export default function SettingsModal({
                         <button
                           onClick={handleStartInstallation}
                           disabled={isInstallingTechs}
-                          className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 whitespace-nowrap shrink-0 shadow-md shadow-blue-600/20 transition-all disabled:opacity-50 cursor-pointer"
+                          className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-2 whitespace-nowrap shrink-0 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all disabled:opacity-50 cursor-pointer"
                         >
                           {isInstallingTechs ? (
                             <Loader2 className="h-4 w-4 animate-spin shrink-0" />
@@ -309,7 +309,7 @@ export default function SettingsModal({
                           } ${
                             isChecked && !isInstalled
                               ? isDark ? 'bg-blue-500/10 border-blue-500/50' : 'bg-blue-50 border-blue-200'
-                              : isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-slate-50 border-slate-200'
+                              : isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
                           }`}
                         >
                           <div className="flex items-center space-x-3">
@@ -324,10 +324,10 @@ export default function SettingsModal({
                             )}
                             <div>
                               <span className={`block font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>{srv.name}</span>
-                              <span className="block text-[11px] font-mono text-slate-500">{status?.version || (isInstalled ? 'Instalado' : 'No instalado')}</span>
+                              <span className="block text-[11px] font-mono text-slate-400">{status?.version || (isInstalled ? 'Instalado' : 'No instalado')}</span>
                             </div>
                           </div>
-                          <span className={`w-2.5 h-2.5 rounded-full ${isInstalled ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
+                          <span className={`w-2.5 h-2.5 rounded-full ${isInstalled ? 'bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-amber-400'}`}></span>
                         </div>
                       );
                     })}
@@ -338,27 +338,35 @@ export default function SettingsModal({
               {/* Category 2: Puertos por Defecto */}
               {activeCategory === 'ports' && (
                 <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-6">
-                  <div className={`border-b pb-4 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
+                  <div className={`border-b pb-4 ${isDark ? 'border-white/[0.08]' : 'border-slate-100'}`}>
                     <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.defaultPorts}</h4>
-                    <p className="text-xs text-slate-500">Mapeo predeterminado de puertos para evitar conflictos en local</p>
+                    <p className="text-xs text-slate-400">Mapeo predeterminado de puertos para evitar conflictos en local</p>
                   </div>
 
                   <div className="space-y-3 font-mono text-xs">
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200/50">
+                    <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
+                      isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+                    }`}>
                       <span>Vite / React Dev Server</span>
-                      <span className="font-bold text-blue-500">:5173</span>
+                      <span className="font-bold text-blue-400">:5173</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200/50">
+                    <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
+                      isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+                    }`}>
                       <span>Next.js App Router</span>
-                      <span className="font-bold text-blue-500">:3000</span>
+                      <span className="font-bold text-blue-400">:3000</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200/50">
+                    <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
+                      isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+                    }`}>
                       <span>Express / Node API</span>
-                      <span className="font-bold text-blue-500">:8080</span>
+                      <span className="font-bold text-blue-400">:8080</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200/50">
+                    <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
+                      isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+                    }`}>
                       <span>PHP Artisan Serve</span>
-                      <span className="font-bold text-blue-500">:8000</span>
+                      <span className="font-bold text-blue-400">:8000</span>
                     </div>
                   </div>
                 </motion.div>
@@ -367,28 +375,28 @@ export default function SettingsModal({
               {/* Category 3: Editor de Código */}
               {activeCategory === 'editor' && (
                 <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-3.5">
-                  <div className={`border-b pb-2 flex items-center justify-between ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
+                  <div className={`border-b pb-2 flex items-center justify-between ${isDark ? 'border-white/[0.08]' : 'border-slate-100'}`}>
                     <div>
                       <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.codeEditorTab}</h4>
-                      <p className="text-xs text-slate-500">Selecciona el editor o IDE para abrir tus proyectos</p>
+                      <p className="text-xs text-slate-400">Selecciona el editor o IDE para abrir tus proyectos</p>
                     </div>
 
                     <button
                       type="button"
                       onClick={handleScanEditors}
                       disabled={isScanningEditors}
-                      className={`px-3 py-1.5 rounded-xl border flex items-center space-x-1.5 text-xs font-bold transition-all shadow-2xs ${
-                        isDark ? 'bg-[#242424] border-[#333333] text-slate-200 hover:bg-[#2c2c2c]' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+                      className={`px-3 py-1.5 rounded-xl border flex items-center space-x-1.5 text-xs font-bold transition-all cursor-pointer ${
+                        isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-200 hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
-                      <RefreshCw className={`h-3.5 w-3.5 ${isScanningEditors ? 'animate-spin text-blue-500' : 'text-slate-400'}`} />
+                      <RefreshCw className={`h-3.5 w-3.5 ${isScanningEditors ? 'animate-spin text-blue-400' : 'text-slate-400'}`} />
                       <span>{isScanningEditors ? 'Escaneando...' : 'Re-escanear'}</span>
                     </button>
                   </div>
 
                   {/* Enterprise Dropdown Selector */}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider block">
+                    <label className="text-xs font-bold text-slate-400 uppercase font-mono tracking-wider block">
                       Editor Predeterminado Seleccionado:
                     </label>
                     <select
@@ -398,9 +406,9 @@ export default function SettingsModal({
                         setSelectedEditorCmd(val);
                         localStorage.setItem('lummo-preferred-editor', val);
                       }}
-                      className={`w-full p-3.5 rounded-2xl border text-xs font-bold font-mono focus:outline-none transition-all cursor-pointer shadow-2xs ${
+                      className={`w-full p-3.5 rounded-2xl border text-xs font-bold font-mono focus:outline-none transition-all cursor-pointer ${
                         isDark 
-                          ? 'bg-[#181818] border-[#2e2e2e] text-white focus:border-blue-500' 
+                          ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' 
                           : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-blue-600'
                       }`}
                     >
@@ -440,11 +448,11 @@ export default function SettingsModal({
 
                   {/* Grid List of Detected System Editors */}
                   <div className="space-y-2 pt-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider block">
+                    <label className="text-xs font-bold text-slate-400 uppercase font-mono tracking-wider block">
                       Catálogo de Editores e IDEs Compatibles:
                     </label>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-56 overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-56 overflow-y-auto custom-scrollbar pr-1">
                       {(detectedEditors || []).map((ed) => {
                         const isSelected = selectedEditorCmd === ed.cmd;
                         return (
@@ -458,10 +466,10 @@ export default function SettingsModal({
                             className={`p-3.5 rounded-2xl border flex items-center justify-between text-left transition-all cursor-pointer ${
                               isSelected
                                 ? isDark
-                                  ? 'bg-[#2b2b2b] border-blue-500/60 ring-1 ring-blue-500 text-white'
+                                  ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.2)]'
                                   : 'bg-blue-50/80 border-blue-500 ring-2 ring-blue-100 text-blue-900 font-bold'
                                 : isDark
-                                  ? 'bg-[#181818] border-[#2e2e2e] text-slate-400 hover:text-white hover:bg-[#222222]'
+                                  ? 'bg-[#12141F] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#1A1D2D]'
                                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                             }`}
                           >
@@ -478,11 +486,11 @@ export default function SettingsModal({
                                   {ed.installed ? 'Disponible' : 'No en PATH'}
                                 </span>
                               </div>
-                              <p className="text-[11px] text-slate-500 font-mono font-semibold">{ed.cmd}</p>
+                              <p className="text-[11px] text-slate-400 font-mono font-semibold">{ed.cmd}</p>
                             </div>
 
                             {isSelected && (
-                              <Check className="h-4 w-4 text-blue-500 shrink-0" />
+                              <Check className="h-4 w-4 text-blue-400 shrink-0" />
                             )}
                           </button>
                         );
@@ -496,17 +504,17 @@ export default function SettingsModal({
               {/* Category 4: General */}
               {activeCategory === 'general' && (
                 <motion.div initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.15 }} className="space-y-6">
-                  <div className={`border-b pb-4 ${isDark ? 'border-[#2a2a2a]' : 'border-slate-100'}`}>
+                  <div className={`border-b pb-4 ${isDark ? 'border-white/[0.08]' : 'border-slate-100'}`}>
                     <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.generalTab}</h4>
-                    <p className="text-xs text-slate-500">Ajustes globales de idioma y apariencia visual</p>
+                    <p className="text-xs text-slate-400">Ajustes globales de idioma y apariencia visual</p>
                   </div>
 
                   {/* Language and Theme Selectors sharing the SAME ROW */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Column 1: Language Select */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider flex items-center gap-1.5">
-                        <Languages className="h-4 w-4 text-blue-500" />
+                      <label className="text-xs font-bold text-slate-400 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                        <Languages className="h-4 w-4 text-blue-400" />
                         <span>{t.languageSection}</span>
                       </label>
                       <div className="relative">
@@ -515,12 +523,12 @@ export default function SettingsModal({
                           onChange={(e) => onSelectLanguage && onSelectLanguage(e.target.value)}
                           className={`w-full px-3.5 py-2.5 rounded-2xl border text-xs font-bold outline-none cursor-pointer appearance-none transition-all ${
                             isDark 
-                              ? 'bg-[#181a22] border-[#2a2f40] text-white hover:border-blue-500/50 focus:border-blue-500' 
+                              ? 'bg-[#12141F] border-white/[0.08] text-white hover:border-white/[0.16] focus:border-blue-500' 
                               : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-slate-300 focus:border-blue-500'
                           }`}
                         >
                           {availableLocales.map((loc) => (
-                            <option key={loc.code} value={loc.code} className={isDark ? 'bg-[#181a22] text-white' : 'bg-white text-slate-900'}>
+                            <option key={loc.code} value={loc.code} className={isDark ? 'bg-[#12141F] text-white' : 'bg-white text-slate-900'}>
                               {loc.name} ({loc.badge})
                             </option>
                           ))}
@@ -533,7 +541,7 @@ export default function SettingsModal({
 
                     {/* Column 2: Theme Select */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                      <label className="text-xs font-bold text-slate-400 uppercase font-mono tracking-wider flex items-center gap-1.5">
                         {isDark ? <Moon className="h-4 w-4 text-blue-400" /> : <Sun className="h-4 w-4 text-amber-500" />}
                         <span>{t.themeSection}</span>
                       </label>
@@ -546,15 +554,15 @@ export default function SettingsModal({
                           }}
                           className={`w-full px-3.5 py-2.5 rounded-2xl border text-xs font-bold outline-none cursor-pointer appearance-none transition-all ${
                             isDark 
-                              ? 'bg-[#181a22] border-[#2a2f40] text-white hover:border-blue-500/50 focus:border-blue-500' 
+                              ? 'bg-[#12141F] border-white/[0.08] text-white hover:border-white/[0.16] focus:border-blue-500' 
                               : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-slate-300 focus:border-blue-500'
                           }`}
                         >
-                          <option value="light" className={isDark ? 'bg-[#181a22] text-white' : 'bg-white text-slate-900'}>
-                            ☀️ {t.lightMode}
+                          <option value="light" className={isDark ? 'bg-[#12141F] text-white' : 'bg-white text-slate-900'}>
+                            {t.lightMode}
                           </option>
-                          <option value="dark" className={isDark ? 'bg-[#181a22] text-white' : 'bg-white text-slate-900'}>
-                            🌙 {t.darkMode}
+                          <option value="dark" className={isDark ? 'bg-[#12141F] text-white' : 'bg-white text-slate-900'}>
+                            {t.darkMode}
                           </option>
                         </select>
                         <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -565,11 +573,13 @@ export default function SettingsModal({
                   </div>
 
                   {/* System Notifications & Logs Memory Management */}
-                  <div className="space-y-2.5 pt-4 border-t border-slate-200/40">
-                    <div className="flex items-center justify-between p-3 rounded-2xl border bg-slate-500/5 border-slate-200/50">
+                  <div className="space-y-2.5 pt-4 border-t border-white/[0.08]">
+                    <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
+                      isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-500/5 border-slate-200/50'
+                    }`}>
                       <div>
                         <span className="block text-xs font-bold">Notificaciones Nativas de Windows</span>
-                        <span className="block text-[11px] text-slate-500">Recibe alertas del sistema cuando tus servidores se inicien, fallen o finalicen.</span>
+                        <span className="block text-[11px] text-slate-400">Recibe alertas del sistema cuando tus servidores se inicien, fallen o finalicen.</span>
                       </div>
                       <button
                         type="button"
@@ -583,18 +593,20 @@ export default function SettingsModal({
                         }}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer ${
                           notificationsEnabled
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'bg-slate-300 text-slate-700'
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
+                            : isDark ? 'bg-[#181B28] text-slate-400 border border-white/[0.08]' : 'bg-slate-300 text-slate-700'
                         }`}
                       >
                         {notificationsEnabled ? 'ACTIVADAS' : 'DESACTIVADAS'}
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 rounded-2xl border bg-rose-500/5 border-rose-500/20">
+                    <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
+                      isDark ? 'bg-[#12141F] border-rose-500/20' : 'bg-rose-500/5 border-rose-500/20'
+                    }`}>
                       <div>
-                        <span className="block text-xs font-bold text-rose-500">Memoria de Logs de Servidores</span>
-                        <span className="block text-[11px] text-slate-500">Libera memoria RAM borrando el historial de texto acumulado en las consolas.</span>
+                        <span className="block text-xs font-bold text-rose-400">Memoria de Logs de Servidores</span>
+                        <span className="block text-[11px] text-slate-400">Libera memoria RAM borrando el historial de texto acumulado en las consolas.</span>
                       </div>
                       <button
                         type="button"
@@ -602,7 +614,7 @@ export default function SettingsModal({
                         className={`p-2.5 rounded-xl transition-all flex items-center justify-center cursor-pointer shadow-xs ${
                           clearedLogsNotice
                             ? 'bg-emerald-600 text-white'
-                            : 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/20'
+                            : 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-600/20'
                         }`}
                         title={clearedLogsNotice ? '¡Logs Limpiados!' : 'Limpiar Todo los Logs'}
                       >

@@ -52,10 +52,10 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
   const bottomPadding = Math.max(0, (totalCount - endIndex) * rowHeight);
 
   return (
-    <div className={`rounded-2xl border ${isDark ? 'border-[#27272a] bg-[#121215]' : 'border-slate-200 bg-slate-50/50'}`}>
+    <div className={`rounded-2xl border overflow-hidden ${isDark ? 'border-white/[0.08] bg-[#0D0E15]' : 'border-slate-200 bg-slate-50/50'}`}>
       {/* Quick Filter Header */}
       <div className={`px-4 py-2 border-b flex items-center justify-between gap-3 text-xs font-mono min-h-[44px] ${
-        isDark ? 'bg-[#09090b] border-[#27272a]' : 'bg-slate-100/80 border-slate-200'
+        isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-100/80 border-slate-200'
       }`}>
         <div className="flex items-center flex-1 max-w-md">
           <AnimatePresence mode="wait">
@@ -71,13 +71,13 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                   setIsExpanded(true);
                   setTimeout(() => inputRef.current?.focus(), 80);
                 }}
-                className={`p-2 rounded-xl border flex items-center justify-center transition-all ${
+                className={`p-2 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
                   isDark
-                    ? 'bg-[#18181b] border-[#27272a] text-slate-300 hover:text-white hover:border-blue-500/50 shadow-xs'
+                    ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:text-white hover:border-blue-500/50 shadow-xs'
                     : 'bg-white border-slate-300 text-slate-700 hover:text-slate-900 hover:border-blue-500 shadow-xs'
                 }`}
               >
-                <Search className="h-4 w-4 text-blue-500" />
+                <Search className="h-4 w-4 text-blue-400" />
               </motion.button>
             ) : (
               <motion.div
@@ -88,11 +88,11 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                 transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-mono w-full ${
                   isDark
-                    ? 'bg-[#18181b] border-blue-500/60 text-slate-200 shadow-sm shadow-blue-500/10'
+                    ? 'bg-[#12141F] border-blue-500/60 text-slate-200 shadow-sm shadow-blue-500/10'
                     : 'bg-white border-blue-500 text-slate-900 shadow-sm'
                 }`}
               >
-                <Search className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                <Search className="h-3.5 w-3.5 text-blue-400 shrink-0" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -106,8 +106,8 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                     setFilterTerm('');
                     setIsExpanded(false);
                   }}
-                  className={`p-1 rounded-lg transition-colors shrink-0 ${
-                    isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                  className={`p-1 rounded-lg transition-colors shrink-0 cursor-pointer ${
+                    isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                   title="Cerrar búsqueda"
                 >
@@ -117,7 +117,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
             )}
           </AnimatePresence>
         </div>
-        <span className="text-[11px] text-slate-500 font-semibold shrink-0">
+        <span className="text-[11px] text-slate-400 font-semibold shrink-0">
           {filterTerm ? `${filteredRows.length} / ${rows.length} coincidencias` : `${rows.length} filas`}
         </span>
       </div>
@@ -126,20 +126,20 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
         ref={containerRef}
         onScroll={handleScroll}
         style={{ maxHeight: `${containerHeight}px` }}
-        className="overflow-auto scrollbar-thin"
+        className="overflow-auto custom-scrollbar"
       >
         <table className="w-full text-left text-xs font-mono">
           <thead className={`sticky top-0 z-10 border-b text-[11px] uppercase ${
-            isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
+            isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
           }`}>
             <tr>
-              <th className="px-3 py-3 w-12 text-center text-slate-500">#</th>
+              <th className="px-3 py-3 w-12 text-center text-slate-400">#</th>
               {keys.map((key) => (
                 <th key={key} className="px-4 py-3 font-bold whitespace-nowrap">{key}</th>
               ))}
             </tr>
           </thead>
-          <tbody className={`divide-y ${isDark ? 'divide-[#2a2a2a] text-slate-300' : 'divide-slate-200 text-slate-800'}`}>
+          <tbody className={`divide-y ${isDark ? 'divide-white/[0.06] text-slate-300' : 'divide-slate-200 text-slate-800'}`}>
             {topPadding > 0 && (
               <tr>
                 <td colSpan={keys.length + 1} style={{ height: `${topPadding}px` }} />
@@ -149,13 +149,13 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
               <tr 
                 key={originalIndex} 
                 style={{ height: `${rowHeight}px` }}
-                className={isDark ? 'hover:bg-[#202020] group' : 'hover:bg-white group'}
+                className={isDark ? 'hover:bg-[#181B28] group transition-colors' : 'hover:bg-white group transition-colors'}
               >
-                <td className="px-2 py-2 text-center text-[10px] text-slate-500 font-mono select-none">
+                <td className="px-2 py-2 text-center text-[10px] text-slate-400 font-mono select-none">
                   {onDeleteRow ? (
                     <button
                       onClick={() => onDeleteRow(row, originalIndex)}
-                      className="p-1 text-slate-400 hover:text-rose-500 transition-colors opacity-70 group-hover:opacity-100"
+                      className="p-1 text-slate-400 hover:text-rose-400 transition-colors opacity-70 group-hover:opacity-100 cursor-pointer"
                       title="Eliminar esta fila"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -167,7 +167,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                 {Object.values(row).map((val, cellIdx) => (
                   <td key={cellIdx} className="px-4 py-2 whitespace-nowrap max-w-xs truncate" title={String(val)}>
                     {val === null || val === undefined ? (
-                      <span className="italic text-slate-500">NULL</span>
+                      <span className="italic text-slate-500 font-semibold">NULL</span>
                     ) : (
                       String(val)
                     )}
@@ -184,7 +184,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
         </table>
       </div>
       <div className={`px-4 py-2 border-t text-[10px] font-mono flex items-center justify-between ${
-        isDark ? 'border-[#2a2a2a] bg-[#1a1a1a] text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-600'
+        isDark ? 'border-white/[0.08] bg-[#090A0F] text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-600'
       }`}>
         <span>Total: {totalCount} fila(s)</span>
         <span>Mostrando filas {startIndex + 1} - {Math.min(totalCount, endIndex)} (Virtualizado)</span>

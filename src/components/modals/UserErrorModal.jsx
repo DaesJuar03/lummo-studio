@@ -70,17 +70,17 @@ export default function UserErrorModal({
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-lg rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
             isDark 
-              ? 'bg-[#14161c] border-[#232631] text-[#e6e8ec]' 
+              ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' 
               : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header Bar */}
           <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'bg-[#181a20] border-[#232631]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                isDark ? 'bg-[#1f222e] border border-[#2c3040]' : 'bg-rose-50 border border-rose-100'
+                isDark ? 'bg-[#181B28] border border-white/[0.08]' : 'bg-rose-50 border border-rose-100'
               }`}>
                 {renderIcon()}
               </div>
@@ -90,8 +90,8 @@ export default function UserErrorModal({
             </div>
             <button
               onClick={onClose}
-              className={`p-2 rounded-xl transition-colors ${
-                isDark ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1d202a]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200'
+              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200'
               }`}
             >
               <X className="h-4 w-4" />
@@ -103,7 +103,7 @@ export default function UserErrorModal({
             {/* Friendly Simple Message Card */}
             <div className={`p-4 rounded-2xl border space-y-2 ${
               isDark 
-                ? 'bg-[#1a1c24] border-[#232631] text-[#e6e8ec]' 
+                ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' 
                 : 'bg-slate-50 border-slate-200 text-slate-800'
             }`}>
               <p className="text-xs font-semibold leading-relaxed">
@@ -116,14 +116,14 @@ export default function UserErrorModal({
               <button
                 type="button"
                 onClick={() => setShowTechnicalDetails(prev => !prev)}
-                className={`w-full flex items-center justify-between text-[11px] font-bold font-mono py-1.5 px-3 rounded-xl transition-all ${
+                className={`w-full flex items-center justify-between text-[11px] font-bold font-mono py-1.5 px-3 rounded-xl transition-all cursor-pointer ${
                   isDark 
-                    ? 'text-[#8a8f9e] hover:text-white hover:bg-[#1a1c24]' 
+                    ? 'text-slate-400 hover:text-white hover:bg-[#181B28]' 
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center space-x-1.5">
-                  <Terminal className="h-3.5 w-3.5 text-blue-500" />
+                  <Terminal className="h-3.5 w-3.5 text-blue-400" />
                   <span>Detalle técnico para desarrolladores</span>
                 </div>
                 {showTechnicalDetails ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -139,7 +139,7 @@ export default function UserErrorModal({
                   >
                     <pre className={`p-3 rounded-xl text-[11px] font-mono whitespace-pre-wrap max-h-36 overflow-y-auto custom-scrollbar border ${
                       isDark 
-                        ? 'bg-[#0d0e11] border-[#232631] text-[#8a8f9e]' 
+                        ? 'bg-[#090A0F] border-white/[0.08] text-slate-400' 
                         : 'bg-slate-100 border-slate-200 text-slate-700'
                     }`}>
                       {parsed.rawDetails || 'Sin detalles técnicos adicionales.'}
@@ -152,12 +152,12 @@ export default function UserErrorModal({
 
           {/* Modal Footer Controls */}
           <div className={`px-6 py-4 border-t flex items-center justify-end space-x-3 shrink-0 ${
-            isDark ? 'bg-[#181a20] border-[#232631]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             {parsed.actionKey === 'OPEN_INSTALLER' && (
               <button
                 onClick={handleActionClick}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center space-x-2 shadow-md shadow-blue-600/20 transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center space-x-2 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer"
               >
                 <Sparkles className="h-3.5 w-3.5" />
                 <span>{parsed.actionText}</span>
@@ -168,8 +168,8 @@ export default function UserErrorModal({
               onClick={onClose}
               className={`px-5 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer ${
                 parsed.actionKey === 'OPEN_INSTALLER'
-                  ? isDark ? 'text-[#8a8f9e] hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20'
+                  ? isDark ? 'text-slate-400 hover:text-white hover:bg-[#181B28]' : 'text-slate-600 hover:text-slate-900'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)]'
               }`}
             >
               <span>{parsed.actionKey === 'OPEN_INSTALLER' ? 'Cerrar' : parsed.actionText}</span>

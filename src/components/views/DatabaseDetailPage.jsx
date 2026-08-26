@@ -361,13 +361,13 @@ export default function DatabaseDetailPage({
     >
       {/* Header */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 ${
-        isDark ? 'border-[#2a2a2a]' : 'border-slate-200'
+        isDark ? 'border-white/[0.08]' : 'border-slate-200'
       }`}>
         <div className="flex items-center space-x-3.5 min-w-0">
           <button
             onClick={onBack}
-            className={`p-2 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1 ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+            className={`p-2 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer ${
+              isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -379,11 +379,11 @@ export default function DatabaseDetailPage({
               <h2 className={`text-2xl font-extrabold tracking-tight truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {db.name}
               </h2>
-              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border bg-blue-500/10 text-blue-400 border-blue-500/30">
+              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border bg-blue-500/10 text-blue-400 border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.15)]">
                 {isRedis ? 'Redis Key-Value Cache' : db.tech || 'Base de Datos Relacional'}
               </span>
             </div>
-            <div className="flex items-center space-x-2 text-xs text-slate-500 font-mono mt-0.5">
+            <div className="flex items-center space-x-2 text-xs text-slate-400 font-mono mt-0.5">
               <span>{connectionString}</span>
               <button
                 onClick={handleCopyConn}
@@ -402,8 +402,8 @@ export default function DatabaseDetailPage({
             <>
               <button
                 onClick={() => setShowErModal(true)}
-                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-all ${
-                  isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
+                  isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <Network className="h-4 w-4 text-purple-400" />
@@ -412,8 +412,8 @@ export default function DatabaseDetailPage({
 
               <button
                 onClick={() => setShowExportModal(true)}
-                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-all ${
-                  isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
+                  isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <Download className="h-4 w-4 text-emerald-400" />
@@ -422,8 +422,8 @@ export default function DatabaseDetailPage({
 
               <button
                 onClick={() => setShowImportExport(true)}
-                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-all ${
-                  isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
+                  isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
               >
                 <Upload className="h-4 w-4 text-blue-400" />
@@ -434,7 +434,7 @@ export default function DatabaseDetailPage({
             <>
               <button
                 onClick={() => setShowAddRedisKeyModal(true)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center space-x-1.5"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all flex items-center space-x-1.5 cursor-pointer"
               >
                 <Plus className="h-4 w-4" />
                 <span>Nueva Clave</span>
@@ -446,7 +446,7 @@ export default function DatabaseDetailPage({
                     handleFlushRedis();
                   }
                 }}
-                className="px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 font-bold text-xs hover:bg-rose-500/20 transition-all flex items-center space-x-1.5"
+                className="px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 font-bold text-xs hover:bg-rose-500/20 transition-all flex items-center space-x-1.5 cursor-pointer"
               >
                 <Trash2 className="h-4 w-4" />
                 <span>Vaciar BD (FLUSHDB)</span>
@@ -478,14 +478,14 @@ export default function DatabaseDetailPage({
                   value={redisPattern}
                   onChange={(e) => setRedisPattern(e.target.value)}
                   placeholder="Patrón (ej: * o user:*)"
-                  className={`w-full border rounded-xl py-2 pl-9 pr-3 text-xs font-mono focus:outline-none ${
-                    isDark ? 'bg-[#181818] border-[#2e2e2e] text-white' : 'bg-slate-50 border-slate-200'
+                  className={`w-full border rounded-xl py-2 pl-9 pr-3 text-xs font-mono focus:outline-none transition-all ${
+                    isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200'
                   }`}
                 />
               </div>
               <button
                 onClick={() => fetchRedisKeys(redisPattern)}
-                className="p-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                className="p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-colors cursor-pointer"
                 title="Buscar / Refrescar"
               >
                 <RefreshCw className="h-4 w-4" />
@@ -493,10 +493,10 @@ export default function DatabaseDetailPage({
             </div>
 
             <div className={`border rounded-2xl p-2 max-h-[520px] overflow-y-auto space-y-1.5 custom-scrollbar ${
-              isDark ? 'bg-[#141414] border-[#262626]' : 'bg-white border-slate-200'
+              isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
             }`}>
               {redisKeys.length === 0 ? (
-                <div className="py-12 text-center text-xs text-slate-500 font-mono">
+                <div className="py-12 text-center text-xs text-slate-400 font-mono">
                   No se encontraron claves en Redis.
                 </div>
               ) : (
@@ -508,16 +508,16 @@ export default function DatabaseDetailPage({
                       onClick={() => handleSelectRedisKey(k.key)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
                         isSelected
-                          ? 'bg-blue-600/15 border-blue-500 text-blue-400'
+                          ? 'bg-blue-600/15 border-blue-500 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.15)]'
                           : isDark
-                          ? 'bg-[#1b1b1f] border-[#27272a] text-slate-300 hover:border-slate-600'
+                          ? 'bg-[#181B28] border-white/[0.06] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.12]'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
                       }`}
                     >
                       <div className="min-w-0 flex-1 pr-2">
                         <div className="font-mono text-xs font-bold truncate">{k.key}</div>
                         <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-1">
-                          <span className="font-mono uppercase px-1.5 py-0.2 rounded bg-slate-800 text-indigo-400 border border-slate-700">
+                          <span className="font-mono uppercase px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
                             {k.type}
                           </span>
                           <span className="flex items-center space-x-1">
@@ -531,7 +531,7 @@ export default function DatabaseDetailPage({
                           e.stopPropagation();
                           handleDeleteRedisKey(k.key);
                         }}
-                        className="p-1.5 text-slate-400 hover:text-rose-400 transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
                         title="Eliminar clave"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -545,22 +545,22 @@ export default function DatabaseDetailPage({
 
           {/* Right Column: Key Value Inspector */}
           <div className={`lg:col-span-7 border rounded-2xl p-6 space-y-4 ${
-            isDark ? 'bg-[#181818] border-[#2e2e2e]' : 'bg-white border-slate-200'
+            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
           }`}>
             {selectedRedisKey && redisKeyDetail ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b pb-3 border-slate-700/40">
+                <div className="flex items-center justify-between border-b pb-3 border-white/[0.08]">
                   <div>
                     <h3 className="font-mono text-sm font-bold text-white break-all">{redisKeyDetail.key}</h3>
                     <div className="flex items-center space-x-2 text-xs text-slate-400 mt-1 font-mono">
-                      <span>Tipo: <strong className="text-indigo-400 uppercase">{redisKeyDetail.type}</strong></span>
+                      <span>Tipo: <strong className="text-purple-400 uppercase">{redisKeyDetail.type}</strong></span>
                       <span>•</span>
                       <span>TTL: <strong>{redisKeyDetail.ttl === -1 ? 'Persistente' : `${redisKeyDetail.ttl} segundos`}</strong></span>
                     </div>
                   </div>
                   <button
                     onClick={handleSaveRedisVal}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center space-x-1.5"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center space-x-1.5 cursor-pointer"
                   >
                     <Check className="h-3.5 w-3.5" />
                     <span>Guardar Valor</span>
@@ -573,15 +573,15 @@ export default function DatabaseDetailPage({
                     rows={14}
                     value={redisEditVal}
                     onChange={(e) => setRedisEditVal(e.target.value)}
-                    className={`w-full p-3.5 font-mono text-xs rounded-xl border focus:outline-none ${
-                      isDark ? 'bg-[#121214] border-[#27272a] text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-900'
+                    className={`w-full p-3.5 font-mono text-xs rounded-xl border focus:outline-none transition-all ${
+                      isDark ? 'bg-[#090A0F] border-white/[0.08] text-slate-100 focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                     }`}
                   />
                 </div>
               </div>
             ) : (
-              <div className="py-24 text-center text-xs text-slate-500 font-mono space-y-2">
-                <Key className="h-8 w-8 mx-auto text-slate-600" />
+              <div className="py-24 text-center text-xs text-slate-400 font-mono space-y-2">
+                <Key className="h-8 w-8 mx-auto text-slate-500" />
                 <p>Selecciona una clave a la izquierda para inspeccionar y editar su valor.</p>
               </div>
             )}
@@ -593,13 +593,13 @@ export default function DatabaseDetailPage({
         /* ------------------------------------------------------------------ */
         <div className="space-y-4">
           {/* Sub Navigation Tabs */}
-          <div className={`flex items-center space-x-2 border-b pb-2 ${isDark ? 'border-[#262626]' : 'border-slate-200'}`}>
+          <div className={`flex items-center space-x-2 border-b pb-2 ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
             <button
               onClick={() => setActiveSubTab('tables')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-colors ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
                 activeSubTab === 'tables'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.25)]'
+                  : isDark ? 'text-slate-400 hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Table className="h-3.5 w-3.5" />
@@ -608,10 +608,10 @@ export default function DatabaseDetailPage({
 
             <button
               onClick={() => setActiveSubTab('query')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-colors ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
                 activeSubTab === 'query'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.25)]'
+                  : isDark ? 'text-slate-400 hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Code className="h-3.5 w-3.5" />
@@ -627,7 +627,7 @@ export default function DatabaseDetailPage({
                   <span className="text-xs font-mono font-bold text-slate-400 uppercase">Tablas ({tablesList.length})</span>
                   <button
                     onClick={() => setShowSchemaDesigner(true)}
-                    className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
+                    className="p-1 text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
                     title="Diseñar nueva tabla"
                   >
                     <Plus className="h-4 w-4" />
@@ -635,7 +635,7 @@ export default function DatabaseDetailPage({
                 </div>
 
                 <div className={`border rounded-2xl p-2 max-h-[500px] overflow-y-auto space-y-1 custom-scrollbar ${
-                  isDark ? 'bg-[#141414] border-[#262626]' : 'bg-white border-slate-200'
+                  isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
                 }`}>
                   {tablesList.map(t => (
                     <div
@@ -646,8 +646,8 @@ export default function DatabaseDetailPage({
                       }}
                       className={`p-2.5 rounded-xl border text-xs font-mono font-bold cursor-pointer transition-all flex items-center justify-between ${
                         selectedTable === t
-                          ? 'bg-blue-600/15 border-blue-500 text-blue-400'
-                          : isDark ? 'bg-[#1b1b1f] border-[#27272a] text-slate-300 hover:border-slate-600' : 'bg-slate-50 border-slate-200 text-slate-700'
+                          ? 'bg-blue-600/15 border-blue-500 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.15)]'
+                          : isDark ? 'bg-[#181B28] border-white/[0.06] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.12]' : 'bg-slate-50 border-slate-200 text-slate-700'
                       }`}
                     >
                       <span className="truncate">{t}</span>
@@ -659,11 +659,11 @@ export default function DatabaseDetailPage({
 
               {/* Table Data Grid with Server-Side Pagination & In-line Cell Editing */}
               <div className={`lg:col-span-9 border rounded-2xl overflow-hidden shadow-sm ${
-                isDark ? 'bg-[#181818] border-[#2e2e2e]' : 'bg-white border-slate-200'
+                isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
               }`}>
                 {/* Table Toolbar */}
                 <div className={`p-4 border-b flex items-center justify-between ${
-                  isDark ? 'bg-[#141414] border-[#262626]' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-[#0D0E15] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
                 }`}>
                   <div className="flex items-center space-x-2">
                     <Table className="h-4 w-4 text-blue-400" />
@@ -685,13 +685,13 @@ export default function DatabaseDetailPage({
                       <span>Cargando filas de la base de datos...</span>
                     </div>
                   ) : tableRows.length === 0 ? (
-                    <div className="py-20 text-center text-xs font-mono text-slate-500">
+                    <div className="py-20 text-center text-xs font-mono text-slate-400">
                       Esta tabla no contiene registros.
                     </div>
                   ) : (
                     <table className="w-full text-xs font-mono text-left border-collapse">
                       <thead>
-                        <tr className={`border-b ${isDark ? 'bg-[#141414] border-[#262626] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'}`}>
+                        <tr className={`border-b ${isDark ? 'bg-[#090A0F] border-white/[0.08] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'}`}>
                           {tableColumns.map(col => (
                             <th
                               key={col}
@@ -715,7 +715,7 @@ export default function DatabaseDetailPage({
                           <tr
                             key={rIdx}
                             className={`border-b transition-colors ${
-                              isDark ? 'border-[#262626] hover:bg-[#202024]' : 'border-slate-200 hover:bg-slate-50'
+                              isDark ? 'border-white/[0.06] hover:bg-[#181B28]' : 'border-slate-200 hover:bg-slate-50'
                             }`}
                           >
                             {tableColumns.map(col => {
@@ -739,7 +739,7 @@ export default function DatabaseDetailPage({
                                         if (e.key === 'Enter') handleSaveCellEdit(rIdx, col, val);
                                         if (e.key === 'Escape') setEditingCell(null);
                                       }}
-                                      className="w-full px-1.5 py-0.5 rounded bg-blue-950 border border-blue-500 text-white font-mono text-xs focus:outline-none"
+                                      className="w-full px-1.5 py-0.5 rounded bg-[#090A0F] border border-blue-500 text-white font-mono text-xs focus:outline-none shadow-[0_0_10px_rgba(59,130,246,0.25)]"
                                     />
                                   ) : (
                                     <span className={val === null ? 'text-slate-600 italic' : ''}>
@@ -758,7 +758,7 @@ export default function DatabaseDetailPage({
 
                 {/* Server-Side Pagination Footer */}
                 <div className={`p-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono ${
-                  isDark ? 'bg-[#141414] border-[#262626] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+                  isDark ? 'bg-[#0D0E15] border-white/[0.08] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
                 }`}>
                   <div className="flex items-center space-x-2">
                     <span>Filas por página:</span>
@@ -768,8 +768,8 @@ export default function DatabaseDetailPage({
                         setPageSize(Number(e.target.value));
                         setCurrentPage(1);
                       }}
-                      className={`px-2 py-1 rounded-lg border font-mono font-bold focus:outline-none ${
-                        isDark ? 'bg-[#1c1c20] border-[#2e2e33] text-white' : 'bg-white border-slate-300'
+                      className={`px-2 py-1 rounded-lg border font-mono font-bold focus:outline-none transition-all ${
+                        isDark ? 'bg-[#181B28] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300'
                       }`}
                     >
                       <option value={25}>25</option>
@@ -787,8 +787,8 @@ export default function DatabaseDetailPage({
                       <button
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         disabled={currentPage <= 1}
-                        className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors ${
-                          isDark ? 'bg-[#1c1c20] border-[#2e2e33] text-white hover:bg-[#25252a]' : 'bg-white border-slate-300'
+                        className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors cursor-pointer ${
+                          isDark ? 'bg-[#181B28] border-white/[0.08] text-white hover:bg-[#1E2235]' : 'bg-white border-slate-300'
                         }`}
                       >
                         <ChevronLeft className="h-4 w-4" />
@@ -796,8 +796,8 @@ export default function DatabaseDetailPage({
                       <button
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={currentPage >= totalPages}
-                        className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors ${
-                          isDark ? 'bg-[#1c1c20] border-[#2e2e33] text-white hover:bg-[#25252a]' : 'bg-white border-slate-300'
+                        className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors cursor-pointer ${
+                          isDark ? 'bg-[#181B28] border-white/[0.08] text-white hover:bg-[#1E2235]' : 'bg-white border-slate-300'
                         }`}
                       >
                         <ChevronRight className="h-4 w-4" />
@@ -811,7 +811,7 @@ export default function DatabaseDetailPage({
 
           {activeSubTab === 'query' && (
             <div className={`p-6 border rounded-2xl space-y-4 ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e]' : 'bg-white border-slate-200'
+              isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
             }`}>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -830,7 +830,7 @@ export default function DatabaseDetailPage({
                         setQueryMessage(`Error: ${res?.error}`);
                       }
                     }}
-                    className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center space-x-1.5"
+                    className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all flex items-center space-x-1.5 cursor-pointer"
                   >
                     <Play className="h-3.5 w-3.5 fill-white" />
                     <span>Ejecutar SQL</span>
@@ -841,8 +841,8 @@ export default function DatabaseDetailPage({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="SELECT * FROM users;"
-                  className={`w-full p-3.5 font-mono text-xs rounded-xl border focus:outline-none ${
-                    isDark ? 'bg-[#121214] border-[#27272a] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  className={`w-full p-3.5 font-mono text-xs rounded-xl border focus:outline-none transition-all ${
+                    isDark ? 'bg-[#090A0F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 />
               </div>
@@ -899,12 +899,12 @@ export default function DatabaseDetailPage({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               className={`w-full max-w-md rounded-2xl border shadow-2xl overflow-hidden p-6 space-y-4 ${
-                isDark ? 'bg-[#18181b] border-[#27272a] text-white' : 'bg-white border-slate-200 text-slate-900'
+                isDark ? 'bg-[#0D0E15] border-white/[0.08] text-white' : 'bg-white border-slate-200 text-slate-900'
               }`}
             >
-              <div className="flex items-center justify-between border-b pb-3 border-slate-700/40">
+              <div className="flex items-center justify-between border-b pb-3 border-white/[0.08]">
                 <h3 className="font-bold text-sm">Crear Nueva Clave Redis</h3>
-                <button onClick={() => setShowAddRedisKeyModal(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setShowAddRedisKeyModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -918,8 +918,8 @@ export default function DatabaseDetailPage({
                     placeholder="ej: user:100:profile"
                     value={newRedisKeyName}
                     onChange={(e) => setNewRedisKeyName(e.target.value)}
-                    className={`w-full p-2 rounded-xl border font-mono ${
-                      isDark ? 'bg-[#202024] border-[#27272a] text-white' : 'bg-slate-50 border-slate-200'
+                    className={`w-full p-2 rounded-xl border font-mono transition-all ${
+                      isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200'
                     }`}
                   />
                 </div>
@@ -930,8 +930,8 @@ export default function DatabaseDetailPage({
                     <select
                       value={newRedisKeyType}
                       onChange={(e) => setNewRedisKeyType(e.target.value)}
-                      className={`w-full p-2 rounded-xl border font-mono ${
-                        isDark ? 'bg-[#202024] border-[#27272a] text-white' : 'bg-slate-50 border-slate-200'
+                      className={`w-full p-2 rounded-xl border font-mono transition-all ${
+                        isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200'
                       }`}
                     >
                       <option value="string">STRING</option>
@@ -945,8 +945,8 @@ export default function DatabaseDetailPage({
                       type="number"
                       value={newRedisKeyTtl}
                       onChange={(e) => setNewRedisKeyTtl(e.target.value)}
-                      className={`w-full p-2 rounded-xl border font-mono ${
-                        isDark ? 'bg-[#202024] border-[#27272a] text-white' : 'bg-slate-50 border-slate-200'
+                      className={`w-full p-2 rounded-xl border font-mono transition-all ${
+                        isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200'
                       }`}
                     />
                   </div>
@@ -959,8 +959,8 @@ export default function DatabaseDetailPage({
                     value={newRedisKeyVal}
                     onChange={(e) => setNewRedisKeyVal(e.target.value)}
                     placeholder="Escribe el valor o JSON..."
-                    className={`w-full p-2 rounded-xl border font-mono ${
-                      isDark ? 'bg-[#202024] border-[#27272a] text-white' : 'bg-slate-50 border-slate-200'
+                    className={`w-full p-2 rounded-xl border font-mono transition-all ${
+                      isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200'
                     }`}
                   />
                 </div>
@@ -969,13 +969,13 @@ export default function DatabaseDetailPage({
                   <button
                     type="button"
                     onClick={() => setShowAddRedisKeyModal(false)}
-                    className="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white"
+                    className="px-4 py-2 rounded-xl border border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#181B28] cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] cursor-pointer"
                   >
                     Guardar Clave
                   </button>

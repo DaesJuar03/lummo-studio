@@ -87,6 +87,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Project Script Launcher
   runProjectScript: (projectId, folderPath, scriptCommand) => ipcRenderer.invoke('run-project-script', { projectId, folderPath, scriptCommand }),
 
+  // Docker Compose & Container Manager
+  docker: {
+    checkAvailable: () => ipcRenderer.invoke('docker-check-available'),
+    detectFiles: (folderPath) => ipcRenderer.invoke('docker-detect-files', folderPath),
+    getStatus: (folderPath) => ipcRenderer.invoke('docker-get-status', folderPath),
+    runAction: (folderPath, action, serviceName) => ipcRenderer.invoke('docker-run-action', { folderPath, action, serviceName }),
+    getLogs: (folderPath, serviceName, tail) => ipcRenderer.invoke('docker-get-logs', { folderPath, serviceName, tail }),
+    generateCompose: (folderPath, selectedServices, customConfig) => ipcRenderer.invoke('docker-generate-compose', { folderPath, selectedServices, customConfig })
+  },
+
   // API Client & REST/GraphQL Runner
   apiClient: {
     sendRequest: (requestData) => ipcRenderer.invoke('api-send-request', requestData),

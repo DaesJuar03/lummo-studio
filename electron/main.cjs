@@ -13,6 +13,7 @@ const { registerDbHandlers } = require('./ipc/dbHandlers.cjs');
 const { registerTunnelProxyHandlers } = require('./ipc/tunnelProxyHandlers.cjs');
 const { registerProjectHandlers } = require('./ipc/projectHandlers.cjs');
 const { registerApiWebhookHandlers } = require('./ipc/apiWebhookHandlers.cjs');
+const { registerDockerHandlers } = require('./ipc/dockerHandlers.cjs');
 
 // Modular Window and Tray Managers
 const { createMainWindow } = require('./managers/windowManager.cjs');
@@ -235,6 +236,7 @@ app.whenReady().then(() => {
   // Register Modular IPC Handlers
   registerSystemHandlers(() => mainWindow, appIconPath);
   registerDbHandlers(() => mainWindow);
+  registerDockerHandlers();
   registerApiWebhookHandlers(
     () => mainWindow,
     (projectId, msg) => {

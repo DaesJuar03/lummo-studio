@@ -91,12 +91,12 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
 
   const content = (
     <div className={`w-full rounded-2xl border overflow-hidden flex flex-col transition-colors ${
-      isDark ? 'border-[#262626] bg-[#141414]' : 'border-slate-200 bg-white'
+      isDark ? 'border-white/[0.08] bg-[#0D0E15]' : 'border-slate-200 bg-white'
     } ${isEmbedded ? 'h-[600px]' : 'h-full'}`}>
       
       {/* Header Bar */}
       <div className={`px-5 py-3.5 border-b flex items-center justify-between ${
-        isDark ? 'border-[#262626] bg-[#181818]' : 'border-slate-200 bg-slate-50/80'
+        isDark ? 'border-white/[0.08] bg-[#090A0F]' : 'border-slate-200 bg-slate-50/80'
       }`}>
         <div className="flex items-center gap-3">
           <div className="p-2 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20">
@@ -117,7 +117,7 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
           <button
             onClick={() => setZoom((z) => Math.min(z + 0.15, 2))}
             className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+              isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:bg-[#1E2235]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
             title="Acercar Zoom"
           >
@@ -126,7 +126,7 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
           <button
             onClick={() => setZoom((z) => Math.max(z - 0.15, 0.5))}
             className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+              isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:bg-[#1E2235]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
             title="Alejar Zoom"
           >
@@ -135,7 +135,7 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
           <button
             onClick={() => setZoom(1)}
             className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-              isDark ? 'bg-[#181818] border-[#2e2e2e] text-slate-300 hover:bg-[#252525]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+              isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:bg-[#1E2235]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
             title="Restablecer Zoom"
           >
@@ -144,11 +144,11 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
 
           {onClose && !isEmbedded && (
             <>
-              <div className={`h-5 w-[1px] mx-1 ${isDark ? 'bg-[#2e2e2e]' : 'bg-slate-200'}`} />
+              <div className={`h-5 w-[1px] mx-1 ${isDark ? 'bg-white/[0.08]' : 'bg-slate-200'}`} />
               <button
                 onClick={onClose}
                 className={`p-2 rounded-xl transition-all cursor-pointer ${
-                  isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <X className="w-5 h-5" />
@@ -160,7 +160,7 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
 
       {/* Interactive Canvas Area */}
       <div className={`flex-1 relative overflow-auto p-6 ${
-        isDark ? 'bg-[#121212]' : 'bg-slate-50'
+        isDark ? 'bg-[#090A0F]' : 'bg-slate-50'
       }`}>
         {loading ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-3">
@@ -236,32 +236,32 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
                     isSelected
                       ? 'border-purple-500 ring-2 ring-purple-500/30'
                       : isDark
-                        ? 'bg-[#181818] border-[#2e2e2e] hover:border-slate-600'
+                        ? 'bg-[#12141F] border-white/[0.08] hover:border-purple-500/40'
                         : 'bg-white border-slate-200 hover:border-slate-300'
                   } ${
                     isSelected && isDark ? 'bg-purple-950/40 text-purple-200' : ''
                   }`}
                 >
                   <div className={`px-4 py-2.5 border-b flex items-center justify-between rounded-t-2xl ${
-                    isDark ? 'border-[#2e2e2e] bg-[#222222]' : 'border-slate-200 bg-slate-100/70'
+                    isDark ? 'border-white/[0.08] bg-[#181B28]' : 'border-slate-200 bg-slate-100/70'
                   }`}>
                     <div className="flex items-center gap-2 font-bold text-xs truncate">
                       <Table className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                       <span className={`truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{entity.name}</span>
                     </div>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
-                      isDark ? 'bg-[#141414] text-slate-400' : 'bg-white text-slate-600 border border-slate-200'
+                      isDark ? 'bg-[#12141F] text-slate-400' : 'bg-white text-slate-600 border border-slate-200'
                     }`}>
                       {entity.columns?.length || 0} cols
                     </span>
                   </div>
 
-                  <div className="p-2.5 space-y-1 max-h-52 overflow-y-auto font-mono text-xs">
+                  <div className="p-2.5 space-y-1 max-h-52 overflow-y-auto font-mono text-xs custom-scrollbar">
                     {entity.columns?.map((col) => (
                       <div
                         key={col.name}
                         className={`flex items-center justify-between p-1.5 rounded-lg transition-colors ${
-                          isDark ? 'hover:bg-[#242424] text-slate-300' : 'hover:bg-slate-100 text-slate-700'
+                          isDark ? 'hover:bg-[#1A1D2D] text-slate-300' : 'hover:bg-slate-100 text-slate-700'
                         }`}
                       >
                         <div className="flex items-center gap-1.5 truncate">

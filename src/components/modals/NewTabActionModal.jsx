@@ -74,23 +74,23 @@ export default function NewTabActionModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-lg rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#1e1e1e] border-[#2a2a2a] text-[#e4e4e7]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div>
               <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 Nueva Pestaña o Acción
               </h3>
-              <p className="text-xs text-slate-500">¿Qué te gustaría hacer a continuación?</p>
+              <p className="text-xs text-slate-400">¿Qué te gustaría hacer a continuación?</p>
             </div>
             <button
               onClick={onClose}
-              className={`p-1.5 rounded-xl transition-colors ${
-                isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+              className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -107,15 +107,15 @@ export default function NewTabActionModal({
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={act.action}
-                  className={`w-full p-4 rounded-2xl border flex items-center justify-between text-left transition-all group ${
+                  className={`w-full p-4 rounded-2xl border flex items-center justify-between text-left transition-all group cursor-pointer ${
                     isDark 
-                      ? 'bg-[#181818] border-[#2a2a2a] hover:border-[#3f3f46] hover:bg-[#222222]' 
+                      ? 'bg-[#12141F] border-white/[0.08] hover:border-blue-500/40 hover:bg-[#181B28]' 
                       : 'bg-slate-50/70 border-slate-200 hover:border-blue-400 hover:bg-white'
                   }`}
                 >
                   <div className="flex items-center space-x-3.5 min-w-0">
                     <div className={`w-10 h-10 rounded-xl border flex items-center justify-center font-bold shrink-0 ${
-                      isDark ? 'bg-[#282828] border-[#383838] text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
+                      isDark ? 'bg-[#181B28] border-white/[0.08] text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
                     }`}>
                       <Icon className="h-5 w-5" />
                     </div>
@@ -123,7 +123,7 @@ export default function NewTabActionModal({
                       <h4 className={`font-bold text-xs ${isDark ? 'text-white group-hover:text-blue-400' : 'text-slate-900 group-hover:text-blue-600'} transition-colors`}>
                         {act.title}
                       </h4>
-                      <p className="text-[11px] text-slate-500 truncate mt-0.5">{act.subtitle}</p>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">{act.subtitle}</p>
                     </div>
                   </div>
 

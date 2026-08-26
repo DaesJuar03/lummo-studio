@@ -65,9 +65,6 @@ function registerProjectHandlers({
       if (processManager && typeof processManager.checkPortFree === 'function') {
         return await processManager.checkPortFree(port);
       }
-      if (processManager && typeof processManager.checkPort === 'function') {
-        return await processManager.checkPort(port);
-      }
     } catch (e) {
       console.error('Error al checar puerto:', e);
     }
@@ -79,13 +76,72 @@ function registerProjectHandlers({
       if (processManager && typeof processManager.findNextFreePort === 'function') {
         return await processManager.findNextFreePort(startPort);
       }
-      if (processManager && typeof processManager.findFreePort === 'function') {
-        return await processManager.findFreePort(startPort);
-      }
     } catch (e) {
       console.error('Error al buscar puerto libre:', e);
     }
     return startPort || 3000;
+  });
+
+  // Identificar qué proceso y PID ocupa un puerto específico
+  safeHandle('identify-port-process', async (event, port) => {
+    try {
+      if (processManager && typeof processManager.identifyPortProcess === 'function') {
+        return await processManager.identifyPortProcess(port);
+      }
+    } catch (e) {
+      console.error('Error identificando proceso en puerto:', e);
+    }
+    return { busy: false };
+  });
+
+  // Liberar forzosamente el puerto ocupado por un proceso
+  safeHandle('kill-port-process', async (event, port) => {
+    try {
+      if (processManager && typeof processManager.killProcessOnPort === 'function') {
+        return await processManager.killProcessOnPort(port);
+      }
+    } catch (e) {
+      console.error('Error liberando puerto:', e);
+      return { success: false, error: e.message };
+    }
+    return { success: false, error: 'No se pudo ejecutar la acción' };
+  });
+
+  // Telemetría Real de CPU y RAM por PID
+  safeHandle('get-process-metrics', async (event, { projectId, pid }) => {
+    try {
+      let targetPid = pid;
+      if (!targetPid && runningProcesses.has(projectId)) {
+        const item = runningProcesses.get(projectId);
+        const child = item.child || item;
+        targetPid = child?.pid;
+      }
+
+      if (targetPid && processManager && typeof processManager.getProcessMetrics === 'function') {
+        return await processManager.getProcessMetrics(targetPid);
+      }
+    } catch (e) {
+      // ignore
+    }
+    return { success: false, cpu: 0, memoryMb: 0, elapsedMs: 0 };
+  });
+
+  // Scaffolding de Nuevos Proyectos desde Cero (New Project Wizard)
+  safeHandle('scaffold-project', async (event, options) => {
+    try {
+      const emitScaffoldLog = (msg) => {
+        const win = getMainWindow();
+        if (win && !win.isDestroyed()) {
+          win.webContents.send('scaffold-progress', { message: msg });
+        }
+      };
+      if (processManager && typeof processManager.scaffoldNewProject === 'function') {
+        return await processManager.scaffoldNewProject(options, emitScaffoldLog);
+      }
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+    return { success: false, error: 'Motor de creación de proyectos no disponible' };
   });
 
   safeHandle('get-recent-projects', async () => {
@@ -115,23 +171,34 @@ function registerProjectHandlers({
   safeHandle('read-env-file', async (event, folderPath) => {
     if (!folderPath) return { success: false, error: 'Ruta no especificada' };
     const envPath = path.join(folderPath, '.env');
+    const examplePath = path.join(folderPath, '.env.example');
     try {
+      let content = '';
+      let exists = false;
+      let exampleContent = '';
+      let exampleExists = false;
+
       if (fs.existsSync(envPath)) {
-        const content = fs.readFileSync(envPath, 'utf-8');
-        return { success: true, content, exists: true };
+        content = fs.readFileSync(envPath, 'utf-8');
+        exists = true;
       }
-      return { success: true, content: '', exists: false };
+      if (fs.existsSync(examplePath)) {
+        exampleContent = fs.readFileSync(examplePath, 'utf-8');
+        exampleExists = true;
+      }
+
+      return { success: true, content, exists, exampleContent, exampleExists };
     } catch (err) {
       return { success: false, error: err.message };
     }
   });
 
-  safeHandle('write-env-file', async (event, { folderPath, content }) => {
+  safeHandle('write-env-file', async (event, { folderPath, content, fileName = '.env' }) => {
     if (!folderPath) return { success: false, error: 'Ruta no especificada' };
-    const envPath = path.join(folderPath, '.env');
+    const targetPath = path.join(folderPath, fileName);
     try {
-      fs.writeFileSync(envPath, content, 'utf-8');
-      return { success: true, message: 'Archivo .env guardado correctamente.' };
+      fs.writeFileSync(targetPath, content, 'utf-8');
+      return { success: true, message: `Archivo ${fileName} guardado correctamente.` };
     } catch (err) {
       return { success: false, error: err.message };
     }

@@ -14,9 +14,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openInEditor: (folderPath, editorCmd) => ipcRenderer.invoke('open-in-editor', { folderPath, editorCmd }),
   detectEditors: () => ipcRenderer.invoke('detect-editors'),
   
-  // .env file editor
+  // Real Process Telemetry (PID based CPU % and RAM MB)
+  getProcessMetrics: (payload) => ipcRenderer.invoke('get-process-metrics', payload),
+
+  // Port Conflict Identification and Termination
+  identifyPortProcess: (port) => ipcRenderer.invoke('identify-port-process', port),
+  killPortProcess: (port) => ipcRenderer.invoke('kill-port-process', port),
+
+  // Scaffolding Wizard (Create Projects from Scratch)
+  scaffoldProject: (options) => ipcRenderer.invoke('scaffold-project', options),
+  onScaffoldProgress: (callback) => {
+    const subscription = (event, value) => callback(value);
+    ipcRenderer.on('scaffold-progress', subscription);
+    return () => ipcRenderer.removeListener('scaffold-progress', subscription);
+  },
+
+  // .env file editor & comparison
   readEnvFile: (folderPath) => ipcRenderer.invoke('read-env-file', folderPath),
-  writeEnvFile: (folderPath, content) => ipcRenderer.invoke('write-env-file', { folderPath, content }),
+  writeEnvFile: (folderPath, content, fileName) => ipcRenderer.invoke('write-env-file', { folderPath, content, fileName }),
 
   // Git Repository Clone & Cancel
   cloneRepository: (repoUrl, destinationParentFolder) => ipcRenderer.invoke('clone-repository', { repoUrl, destinationParentFolder }),
@@ -31,6 +46,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   db: {
     testConnection: (config) => ipcRenderer.invoke('db-test-connection', config),
     getSchema: (config) => ipcRenderer.invoke('db-get-schema', config),
+    getTableRows: (payload) => ipcRenderer.invoke('db-get-table-rows', payload),
+    updateTableRow: (payload) => ipcRenderer.invoke('db-update-table-row', payload),
     getErDiagram: (config) => ipcRenderer.invoke('db-get-er-diagram', config),
     executeQuery: (config, query) => ipcRenderer.invoke('db-execute-query', { config, query }),
     importSql: (config, filePath) => ipcRenderer.invoke('db-import-sql', { config, filePath }),
@@ -38,15 +55,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
     exportDataFile: (payload) => ipcRenderer.invoke('db-export-data-file', payload),
     createSnapshot: (config, targetFolder) => ipcRenderer.invoke('db-create-snapshot', { config, targetFolder }),
     getDefaultDbPath: (name) => ipcRenderer.invoke('db-get-default-path', name),
-    migrateDatabaseFile: (config) => ipcRenderer.invoke('db-migrate-database-file', config)
+    migrateDatabaseFile: (config) => ipcRenderer.invoke('db-migrate-database-file', config),
+    // Redis API
+    redis: {
+      test: (config) => ipcRenderer.invoke('db-redis-test', config),
+      getKeys: (config, pattern) => ipcRenderer.invoke('db-redis-get-keys', { config, pattern }),
+      getValue: (config, key) => ipcRenderer.invoke('db-redis-get-value', { config, key }),
+      setValue: (config, payload) => ipcRenderer.invoke('db-redis-set-value', { config, payload }),
+      deleteKey: (config, key) => ipcRenderer.invoke('db-redis-delete-key', { config, key }),
+      flush: (config) => ipcRenderer.invoke('db-redis-flush', config)
+    }
   },
 
   // Project Dependency Manager & HTTPS
   installDependencies: (projectId, folderPath, manager) => ipcRenderer.invoke('install-dependencies', { projectId, folderPath, manager }),
   setupHttps: (projectId, folderPath, domain, port) => ipcRenderer.invoke('setup-https', { projectId, folderPath, domain, port }),
 
-  // Public Tunnels
-  startTunnel: (projectId, port) => ipcRenderer.invoke('start-tunnel', { projectId, port }),
+  // Public Tunnels (Cloudflare & Localtunnel)
+  startTunnel: (projectId, port, provider = 'cloudflare') => ipcRenderer.invoke('start-tunnel', { projectId, port, provider }),
   stopTunnel: (projectId) => ipcRenderer.invoke('stop-tunnel', projectId),
   onTunnelUrl: (callback) => {
     const subscription = (event, value) => callback(value);
@@ -123,4 +149,3 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('logs-cleared', subscription);
   }
 });
-

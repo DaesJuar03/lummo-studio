@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Database, 
@@ -10,7 +10,8 @@ import {
   Upload, 
   Search,
   Table,
-  ChevronRight
+  ChevronRight,
+  Server
 } from 'lucide-react';
 import CreateDatabaseModal from '../modals/CreateDatabaseModal';
 import ImportExportSqlModal from '../modals/ImportExportSqlModal';
@@ -22,9 +23,7 @@ export default function DatabasesPanel({
   onSelectDatabaseDetail, 
   theme 
 }) {
-  // Dynamic database status state map
   const [dbStatuses, setDbStatuses] = useState({});
-
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -50,9 +49,11 @@ export default function DatabasesPanel({
     const createdItem = {
       id: 'db-' + Date.now(),
       name: newDb.name,
-      port: newDb.engine === 'mysql' ? 3306 : newDb.engine === 'postgres' ? 5432 : null,
+      engine: newDb.engine || 'sqlite',
+      type: newDb.engine || 'sqlite',
+      port: newDb.engine === 'mysql' ? 3306 : newDb.engine === 'postgres' ? 5432 : newDb.engine === 'redis' ? 6379 : null,
       status: 'READY',
-      tech: `Esquema ${newDb.engine.toUpperCase()}`,
+      tech: `Esquema ${(newDb.engine || 'sqlite').toUpperCase()}`,
       installed: true,
       size: '0.0 MB',
       tables: 0,
@@ -70,11 +71,11 @@ export default function DatabasesPanel({
 
   const copyConnectionString = (db) => {
     let str = '';
-    if (db.id === 'mysql') str = `mysql://root@127.0.0.1:${db.port}/test`;
-    if (db.id === 'postgres') str = `postgresql://postgres:postgres@127.0.0.1:${db.port}/mydb`;
-    if (db.id === 'sqlite') str = `sqlite://local.db`;
-    if (db.id === 'mongodb') str = `mongodb://127.0.0.1:${db.port}`;
-    if (!str) str = `${db.name}://127.0.0.1`;
+    if (db.engine === 'redis' || db.type === 'redis' || db.id === 'redis') str = `redis://127.0.0.1:${db.port || 6379}`;
+    else if (db.id === 'mysql' || db.engine === 'mysql') str = `mysql://root@127.0.0.1:${db.port || 3306}/${db.name || 'test'}`;
+    else if (db.id === 'postgres' || db.engine === 'postgres') str = `postgresql://postgres:postgres@127.0.0.1:${db.port || 5432}/${db.name || 'mydb'}`;
+    else if (db.id === 'sqlite' || db.engine === 'sqlite') str = `sqlite://local.db`;
+    else str = `${db.name}://127.0.0.1:${db.port || 3306}`;
 
     navigator.clipboard.writeText(str);
     setCopiedId(db.id);
@@ -98,7 +99,7 @@ export default function DatabasesPanel({
             Gestor de Bases de Datos
           </h2>
           <p className="text-slate-500 text-sm mt-1">
-            Arranca, detén y administra tus instancias locales de bases de datos.
+            Arranca, detén y administra SQLite, MySQL, PostgreSQL y Redis.
           </p>
         </div>
 
@@ -108,7 +109,7 @@ export default function DatabasesPanel({
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-2xl flex items-center space-x-2 shadow-md shadow-blue-600/20 transition-all text-xs"
         >
           <Plus className="h-4 w-4" />
-          <span>Crear Nueva BD</span>
+          <span>Conectar / Crear BD</span>
         </motion.button>
       </div>
 
@@ -128,7 +129,7 @@ export default function DatabasesPanel({
         </div>
       </div>
 
-      {/* INSTALLED & CUSTOM DATABASES WITH WORKING START/STOP CONTROLS */}
+      {/* INSTALLED & CUSTOM DATABASES */}
       <div className="space-y-4">
         <span className="text-xs font-bold font-mono text-slate-500 uppercase tracking-wider">
           Instancias Activas y Disponibles ({installedDatabases.length})
@@ -145,7 +146,7 @@ export default function DatabasesPanel({
                 Sin bases de datos configuradas
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto font-sans">
-                El panel está limpio. Puedes conectar o crear tu primera instancia local de SQLite, MySQL o PostgreSQL para comenzar.
+                El panel está limpio. Puedes conectar o crear tu primera instancia local de SQLite, MySQL, PostgreSQL o Redis.
               </p>
             </div>
             <button
@@ -159,6 +160,7 @@ export default function DatabasesPanel({
         ) : (
           installedDatabases.map((db) => {
             const isRunning = db.status === 'RUNNING' || db.status === 'READY';
+            const isRedis = db.engine === 'redis' || db.type === 'redis';
 
             return (
               <motion.div
@@ -175,7 +177,9 @@ export default function DatabasesPanel({
                   {/* Info Block */}
                   <div className="flex items-center space-x-3.5 min-w-0">
                     <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center font-bold shrink-0 ${
-                      isDark ? 'bg-blue-950/60 border-blue-800 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
+                      isRedis
+                        ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                        : isDark ? 'bg-blue-950/60 border-blue-800 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
                     }`}>
                       <Database className="h-5 w-5" />
                     </div>
@@ -212,19 +216,21 @@ export default function DatabasesPanel({
                       <span>{copiedId === db.id ? '¡Copiado!' : 'Copiar URL'}</span>
                     </button>
 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setImportExportDb(db);
-                      }}
-                      className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors ${
-                        isDark ? 'bg-[#181818] border-[#2e2e2e] text-[#a1a1aa] hover:bg-[#282828] hover:text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                      }`}
-                      title="Importar o Exportar respaldos SQL"
-                    >
-                      <Upload className="h-3.5 w-3.5 text-blue-500" />
-                      <span>Dump SQL</span>
-                    </button>
+                    {!isRedis && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setImportExportDb(db);
+                        }}
+                        className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors ${
+                          isDark ? 'bg-[#181818] border-[#2e2e2e] text-[#a1a1aa] hover:bg-[#282828] hover:text-white' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                        title="Importar o Exportar respaldos SQL"
+                      >
+                        <Upload className="h-3.5 w-3.5 text-blue-500" />
+                        <span>Dump SQL</span>
+                      </button>
+                    )}
 
                     <button
                       onClick={(e) => {
@@ -234,7 +240,7 @@ export default function DatabasesPanel({
                       className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-3.5 rounded-xl transition-all shadow-xs flex items-center space-x-1.5"
                     >
                       <Table className="h-3.5 w-3.5" />
-                      <span>Abrir Tablas & Consultas</span>
+                      <span>{isRedis ? 'Explorar Claves Redis' : 'Abrir Tablas & Consultas'}</span>
                     </button>
                   </div>
                 </div>
@@ -272,6 +278,7 @@ export default function DatabasesPanel({
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreate={handleCreateDB}
+        theme={theme}
       />
 
       <ImportExportSqlModal

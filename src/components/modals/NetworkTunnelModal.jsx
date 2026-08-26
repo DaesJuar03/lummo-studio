@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Share2, Copy, Check, ExternalLink, Link2, RefreshCw, Square, Globe } from 'lucide-react';
+import { X, Share2, Copy, Check, ExternalLink, Link2, RefreshCw, Square, Globe, Shield, Zap } from 'lucide-react';
 
 export default function NetworkTunnelModal({
   isOpen,
@@ -18,6 +18,7 @@ export default function NetworkTunnelModal({
   onOpenBrowser,
   theme
 }) {
+  const [provider, setProvider] = useState('cloudflare');
   const isDark = theme === 'dark';
 
   if (!isOpen || !project) return null;
@@ -28,7 +29,7 @@ export default function NetworkTunnelModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/65 backdrop-blur-xs p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-xs p-4"
         onClick={onClose}
       >
         <motion.div
@@ -83,12 +84,52 @@ export default function NetworkTunnelModal({
               </div>
 
               <p className="text-slate-400 leading-relaxed">
-                Genera un enlace público seguro <code className="text-emerald-400 font-bold font-mono">HTTPS</code> para probar tu servidor local en teléfonos móviles, compartir avances con clientes o recibir webhooks (Stripe, WhatsApp, OAuth).
+                Genera un enlace público seguro <code className="text-emerald-400 font-bold font-mono">HTTPS</code> para probar tu servidor en teléfonos móviles, compartir avances o recibir webhooks (Stripe, WhatsApp, GitHub).
               </p>
+
+              {/* Provider Selector */}
+              {!tunnelUrl && (
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-[11px] font-bold text-slate-300">Proveedor de Túnel:</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setProvider('cloudflare')}
+                      className={`p-2.5 rounded-xl border text-left flex items-center space-x-2 transition-all ${
+                        provider === 'cloudflare'
+                          ? 'bg-amber-500/10 border-amber-500/40 text-amber-300 ring-1 ring-amber-500/30'
+                          : isDark ? 'bg-[#202024] border-[#2e2e2e] text-slate-400' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <Shield className="h-4 w-4 text-amber-400 shrink-0" />
+                      <div>
+                        <div className="font-bold text-xs">Cloudflare (Recomendado)</div>
+                        <div className="text-[10px] text-slate-500 font-mono">trycloudflare.com</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setProvider('localtunnel')}
+                      className={`p-2.5 rounded-xl border text-left flex items-center space-x-2 transition-all ${
+                        provider === 'localtunnel'
+                          ? 'bg-blue-500/10 border-blue-500/40 text-blue-300 ring-1 ring-blue-500/30'
+                          : isDark ? 'bg-[#202024] border-[#2e2e2e] text-slate-400' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <Globe className="h-4 w-4 text-blue-400 shrink-0" />
+                      <div>
+                        <div className="font-bold text-xs">Localtunnel</div>
+                        <div className="text-[10px] text-slate-500 font-mono">loca.lt</div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
                 <button
-                  onClick={onToggleTunnel}
+                  onClick={() => onToggleTunnel(provider)}
                   disabled={isStartingTunnel}
                   className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md ${
                     tunnelUrl 

@@ -16,10 +16,12 @@ import {
   Cpu,
   X,
   GitBranch,
-  Download
+  Download,
+  Sparkles
 } from 'lucide-react';
 import CreateDatabaseModal from '../modals/CreateDatabaseModal';
 import CloneRepoModal from '../modals/CloneRepoModal';
+import NewProjectWizardModal from '../modals/NewProjectWizardModal';
 import { getTranslations } from '../../locales';
 
 export default function HomeDashboard({
@@ -41,6 +43,7 @@ export default function HomeDashboard({
 }) {
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showCloneRepoModal, setShowCloneRepoModal] = useState(false);
+  const [showWizardModal, setShowWizardModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const isDark = theme === 'dark';
 
@@ -98,36 +101,48 @@ export default function HomeDashboard({
       {/* Main Grid: Left Launcher Cards & Right Recent List */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
 
-        {/* Left Column: Launcher Cards (Including Git Clone Card) */}
-        <div className="lg:col-span-5 space-y-5">
+        {/* Left Column: Launcher Cards (Including Wizard, Import & Git Clone) */}
+        <div className="lg:col-span-5 space-y-4">
           
-          {/* Card 1: Import Local Project Folder */}
-          <div className="space-y-3 py-1">
+          {/* Card 1: New Project Wizard & Import Folder Row */}
+          <div className="space-y-2 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <FolderPlus className="h-4.5 w-4.5" />
               </div>
               <div>
                 <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Importar Proyecto Local
+                  Crear o Importar Proyectos
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Arrastra o selecciona una carpeta de tu equipo para comenzar.
+                  Crea desde cero con plantillas o abre una carpeta existente.
                 </p>
               </div>
             </div>
 
-            <button
-              onClick={onAddProject}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center justify-center space-x-2"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Importar Proyecto</span>
-            </button>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                onClick={() => setShowWizardModal(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-md shadow-blue-600/20 transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Nuevo (Wizard)</span>
+              </button>
+
+              <button
+                onClick={onAddProject}
+                className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
+                  isDark ? 'bg-[#252526] border-[#2b2b2b] text-slate-200 hover:bg-[#2a2d2e] hover:border-blue-500' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                }`}
+              >
+                <FolderOpen className="h-3.5 w-3.5 text-blue-500" />
+                <span>Importar Carpeta</span>
+              </button>
+            </div>
           </div>
 
           {/* Card 2: Clone Git Repository */}
-          <div className="space-y-3 py-1">
+          <div className="space-y-2 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <GitBranch className="h-4.5 w-4.5" />
@@ -154,7 +169,7 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 3: Projects Panel Shortcut */}
-          <div className="space-y-3 py-1">
+          <div className="space-y-2 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <Layers className="h-4.5 w-4.5" />
@@ -164,7 +179,7 @@ export default function HomeDashboard({
                   Gestor de Proyectos
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  React, Vite, PHP, Express, Python y Node.js
+                  React, Vite, Next.js, Express, Python y PHP
                 </p>
               </div>
             </div>
@@ -181,7 +196,7 @@ export default function HomeDashboard({
           </div>
 
           {/* Card 4: Databases Panel Shortcut */}
-          <div className="space-y-3 py-1">
+          <div className="space-y-2 py-1">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-500 flex items-center justify-center shrink-0">
                 <Database className="h-4.5 w-4.5" />
@@ -191,7 +206,7 @@ export default function HomeDashboard({
                   Gestor de Bases de Datos
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  MySQL, PostgreSQL & SQLite nativo
+                  SQLite, MySQL, PostgreSQL y Redis
                 </p>
               </div>
             </div>
@@ -413,6 +428,16 @@ export default function HomeDashboard({
 
       </div>
 
+      {/* New Project Wizard Modal */}
+      <NewProjectWizardModal
+        isOpen={showWizardModal}
+        onClose={() => setShowWizardModal(false)}
+        onProjectCreated={(folderPath) => {
+          if (onImportFolder) onImportFolder(folderPath);
+        }}
+        theme={theme}
+      />
+
       {/* Git Clone Repo Modal */}
       <CloneRepoModal
         isOpen={showCloneRepoModal}
@@ -510,7 +535,7 @@ export default function HomeDashboard({
             name: newDb.name,
             engine: newDb.engine || 'sqlite',
             type: newDb.engine || 'sqlite',
-            port: newDb.engine === 'mysql' ? 3306 : newDb.engine === 'postgres' ? 5432 : null,
+            port: newDb.engine === 'mysql' ? 3306 : newDb.engine === 'postgres' ? 5432 : newDb.engine === 'redis' ? 6379 : null,
             status: 'READY',
             tech: `Esquema ${(newDb.engine || 'sqlite').toUpperCase()}`,
             installed: true,

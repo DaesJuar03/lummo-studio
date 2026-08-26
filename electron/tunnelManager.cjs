@@ -4,14 +4,16 @@ const webhookProxyManager = require('./webhookProxyManager.cjs');
 const activeTunnels = new Map();
 
 /**
- * Inicia un túnel público para un puerto local mediante `npx localtunnel` y lo conecta al proxy interceptor
+ * Inicia un túnel público para un puerto local mediante Cloudflare Tunnels o Localtunnel
+ * y lo conecta al proxy interceptor de Webhooks.
  * @param {string} projectId 
  * @param {number} port 
  * @param {function} emitLog 
  * @param {function} emitUrl 
  * @param {function} emitWebhookEvent 
+ * @param {string} provider - 'cloudflare' | 'localtunnel'
  */
-async function startTunnel(projectId, port, emitLog, emitUrl, emitWebhookEvent) {
+async function startTunnel(projectId, port, emitLog, emitUrl, emitWebhookEvent, provider = 'cloudflare') {
   const log = (id, msg) => {
     if (typeof emitLog === 'function') emitLog(id, msg);
   };
@@ -37,34 +39,54 @@ async function startTunnel(projectId, port, emitLog, emitUrl, emitWebhookEvent) 
     log(projectId, `[Lummo Webhook Warning] No se pudo iniciar interceptor: ${err.message}. Conectando directo.`);
   }
 
-  log(projectId, `[Lummo Tunnel] Creando túnel público en el puerto ${tunnelPort}...`);
+  const useCloudflare = provider !== 'localtunnel';
+  const providerName = useCloudflare ? 'Cloudflare Tunnel (trycloudflare.com)' : 'Localtunnel';
+  log(projectId, `[Lummo Tunnel] Creando túnel público seguro con ${providerName} en el puerto ${tunnelPort}...`);
 
-  const cmd = `npx -y localtunnel --port ${tunnelPort}`;
+  let cmd = '';
+  if (useCloudflare) {
+    // Cloudflare Tunnel zero-config quick tunnel
+    cmd = `npx --yes cloudflared tunnel --url http://127.0.0.1:${tunnelPort}`;
+  } else {
+    // Localtunnel fallback
+    cmd = `npx -y localtunnel --port ${tunnelPort}`;
+  }
+
   const child = spawn(cmd, [], { shell: true });
-
   activeTunnels.set(projectId, child);
 
-  child.stdout.on('data', (data) => {
-    const output = data.toString();
+  let urlFound = false;
+
+  const checkUrlOutput = (output) => {
     log(projectId, `[Lummo Tunnel] ${output}`);
 
-    // Extraer URL del túnel (ej. "your url is: https://abc-123.loca.lt")
-    const match = output.match(/your url is:\s*(https:\/\/[^\s]+)/i) || output.match(/(https:\/\/[a-zA-Z0-9-]+\.loca\.lt)/i);
-    if (match && match[1]) {
-      const tunnelUrl = match[1].trim();
-      log(projectId, `[Lummo Tunnel] ¡Túnel listo con Live Webhook Inspector! URL Pública: ${tunnelUrl}`);
-      urlCB(projectId, tunnelUrl);
+    if (useCloudflare) {
+      // Look for https://...trycloudflare.com
+      const cfMatch = output.match(/(https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com)/i);
+      if (cfMatch && cfMatch[1] && !urlFound) {
+        urlFound = true;
+        const tunnelUrl = cfMatch[1].trim();
+        log(projectId, `[Lummo Tunnel 🌐] ¡Túnel Cloudflare activo con Webhook Inspector! URL Pública: ${tunnelUrl}`);
+        urlCB(projectId, tunnelUrl);
+      }
+    } else {
+      // Localtunnel format
+      const match = output.match(/your url is:\s*(https:\/\/[^\s]+)/i) || output.match(/(https:\/\/[a-zA-Z0-9-]+\.loca\.lt)/i);
+      if (match && match[1] && !urlFound) {
+        urlFound = true;
+        const tunnelUrl = match[1].trim();
+        log(projectId, `[Lummo Tunnel 🌐] ¡Túnel Localtunnel listo con Webhook Inspector! URL Pública: ${tunnelUrl}`);
+        urlCB(projectId, tunnelUrl);
+      }
     }
+  };
+
+  child.stdout.on('data', (data) => {
+    checkUrlOutput(data.toString());
   });
 
   child.stderr.on('data', (data) => {
-    const errStr = data.toString();
-    log(projectId, `[Lummo Tunnel] ${errStr}`);
-    const match = errStr.match(/your url is:\s*(https:\/\/[^\s]+)/i) || errStr.match(/(https:\/\/[a-zA-Z0-9-]+\.loca\.lt)/i);
-    if (match && match[1]) {
-      const tunnelUrl = match[1].trim();
-      urlCB(projectId, tunnelUrl);
-    }
+    checkUrlOutput(data.toString());
   });
 
   child.on('error', (err) => {

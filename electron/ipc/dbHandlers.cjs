@@ -17,6 +17,43 @@ function registerDbHandlers(getMainWindow) {
     return await dbManager.getSchema(config);
   });
 
+  // Consultas Paginadas Server-Side
+  safeHandle('db-get-table-rows', async (event, payload) => {
+    return await dbManager.getTableRows(payload);
+  });
+
+  // Actualización de Celda en Línea (In-line Cell Edit)
+  safeHandle('db-update-table-row', async (event, payload) => {
+    return await dbManager.updateTableRow(payload);
+  });
+
+  // --------------------------------------------------------------------------
+  // REDIS Specific IPC Handlers
+  // --------------------------------------------------------------------------
+  safeHandle('db-redis-test', async (event, config) => {
+    return await dbManager.testConnection(config);
+  });
+
+  safeHandle('db-redis-get-keys', async (event, { config, pattern }) => {
+    return await dbManager.getRedisKeys(config, pattern);
+  });
+
+  safeHandle('db-redis-get-value', async (event, { config, key }) => {
+    return await dbManager.getRedisKeyValue(config, key);
+  });
+
+  safeHandle('db-redis-set-value', async (event, { config, payload }) => {
+    return await dbManager.setRedisKeyValue(config, payload);
+  });
+
+  safeHandle('db-redis-delete-key', async (event, { config, key }) => {
+    return await dbManager.deleteRedisKey(config, key);
+  });
+
+  safeHandle('db-redis-flush', async (event, config) => {
+    return await dbManager.flushRedisDb(config);
+  });
+
   safeHandle('db-get-er-diagram', async (event, config) => {
     try {
       const schemaRes = await dbManager.getSchema(config);

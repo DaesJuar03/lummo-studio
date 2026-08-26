@@ -8,7 +8,7 @@ function safeHandle(channel, listener) {
 }
 
 function registerTunnelProxyHandlers(emitLogToProject, emitUrlToProject, emitWebhookEvent) {
-  safeHandle('start-tunnel', async (event, { projectId, port }) => {
+  safeHandle('start-tunnel', async (event, { projectId, port, provider = 'cloudflare' }) => {
     try {
       const emitLog = (id, msg) => {
         if (typeof emitLogToProject === 'function') emitLogToProject(id, msg);
@@ -19,7 +19,7 @@ function registerTunnelProxyHandlers(emitLogToProject, emitUrlToProject, emitWeb
       const emitWebhook = (id, eventObj) => {
         if (typeof emitWebhookEvent === 'function') emitWebhookEvent(id, eventObj);
       };
-      await tunnelManager.startTunnel(projectId, port, emitLog, emitUrl, emitWebhook);
+      await tunnelManager.startTunnel(projectId, port, emitLog, emitUrl, emitWebhook, provider);
       return { success: true };
     } catch (err) {
       if (typeof emitLogToProject === 'function') {

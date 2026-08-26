@@ -552,6 +552,14 @@ export default function App() {
             onSelectLanguage={(lang) => setLanguage(lang)}
             onOpenOnboarding={() => setShowOnboarding(true)}
             onClearAllLogs={handleClearAllLogs}
+            projects={projects}
+            onSaveProjects={saveProjects}
+            onRemoveProject={handleRemoveProject}
+            onOpenFolder={(folderPath) => {
+              if (window.electronAPI?.openFolder) {
+                window.electronAPI.openFolder(folderPath);
+              }
+            }}
           />
         )}
 

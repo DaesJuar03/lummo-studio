@@ -32,10 +32,14 @@ export default function ProjectsPanel({
   theme
 }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterView, setFilterView] = useState('active'); // 'active' | 'archived' | 'all'
   const [copiedId, setCopiedId] = useState(null);
   const [portStatus, setPortStatus] = useState({});
 
   const isDark = theme === 'dark';
+
+  const activeCount = projects.filter(p => !p.isArchived).length;
+  const archivedCount = projects.filter(p => p.isArchived).length;
 
   useEffect(() => {
     projects.forEach((p) => {
@@ -74,10 +78,14 @@ export default function ProjectsPanel({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const filteredProjects = projects.filter((p) =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.path.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProjects = projects.filter((p) => {
+    if (filterView === 'active' && p.isArchived) return false;
+    if (filterView === 'archived' && !p.isArchived) return false;
+    return (
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.path.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   return (
     <div className={`py-6 px-8 max-w-7xl w-full mx-auto space-y-8 flex-1 ${
@@ -108,8 +116,8 @@ export default function ProjectsPanel({
         </button>
       </div>
 
-      {/* Search Filter Bar */}
-      <div className="flex items-center space-x-3">
+      {/* Search & Filter View Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -122,6 +130,51 @@ export default function ProjectsPanel({
             }`}
           />
         </div>
+
+        {archivedCount > 0 && (
+          <div className={`p-1 rounded-2xl border flex items-center space-x-1 shrink-0 ${
+            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+          }`}>
+            <button
+              onClick={() => setFilterView('active')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                filterView === 'active'
+                  ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Activos</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-blue-500/20 text-blue-400 font-mono">
+                {activeCount}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setFilterView('archived')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                filterView === 'archived'
+                  ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Archivados</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-400 font-mono font-bold">
+                {archivedCount}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setFilterView('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                filterView === 'all'
+                  ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Todos ({projects.length})</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Projects List */}

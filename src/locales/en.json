@@ -40,6 +40,8 @@
     "systemServices": "System Services",
     "defaultPorts": "Default Ports",
     "codeEditorTab": "Code Editor",
+    "projectsManagerTab": "Project Management",
+    "sslTab": "SSL & HTTPS Certificates",
     "generalTab": "General",
     "rescan": "Rescan Environment",
     "installed": "Installed",

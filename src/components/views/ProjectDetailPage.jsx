@@ -344,12 +344,14 @@ export default function ProjectDetailPage({
     const domain = localDomainInput.trim();
     if (!domain) return;
     if (window.electronAPI?.setLocalDomain) {
-      const res = await window.electronAPI.setLocalDomain(domain, project.port);
+      const res = await window.electronAPI.setLocalDomain(domain, project.port, true);
       if (res.success) {
         setDomainSaveMsg({
           type: 'success',
-          text: `Dominio configurado: http://${domain}:3838`,
-          url: res.proxyUrl || `http://${domain}:3838`
+          text: `Dominio seguro vinculado con éxito`,
+          url: res.httpsUrl || `https://${domain}:8443`,
+          httpUrl: res.httpUrl || `http://${domain}:3838`,
+          sslActive: res.sslActive
         });
       } else {
         setDomainSaveMsg({ type: 'error', text: res.error || 'Error al configurar dominio' });

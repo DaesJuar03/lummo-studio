@@ -80,8 +80,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('tunnel-url', subscription);
   },
 
+  // Trusted Local CA & SSL Certificate API
+  ssl: {
+    getStatus: () => ipcRenderer.invoke('ssl-get-status'),
+    installCa: () => ipcRenderer.invoke('ssl-install-ca'),
+    uninstallCa: () => ipcRenderer.invoke('ssl-uninstall-ca'),
+    generateCert: (domain) => ipcRenderer.invoke('ssl-generate-cert', domain)
+  },
+
   // Custom Local Domains (.test)
-  setLocalDomain: (domain, port) => ipcRenderer.invoke('set-local-domain', { domain, port }),
+  setLocalDomain: (domain, port, enableSsl) => ipcRenderer.invoke('set-local-domain', { domain, port, enableSsl }),
   getLocalDomains: () => ipcRenderer.invoke('get-local-domains'),
 
   // Project Script Launcher

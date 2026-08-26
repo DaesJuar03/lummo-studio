@@ -40,6 +40,8 @@
     "systemServices": "Servicios del Sistema",
     "defaultPorts": "Puertos por Defecto",
     "codeEditorTab": "Editor de Código",
+    "projectsManagerTab": "Gestión de Proyectos",
+    "sslTab": "Certificados SSL & HTTPS",
     "generalTab": "General",
     "rescan": "Volver a Escanear",
     "installed": "Instalado",

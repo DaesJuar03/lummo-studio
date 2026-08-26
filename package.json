@@ -11,12 +11,14 @@
     "electron:dev": "concurrently -k \"vite\" \"electron .\"",
     "electron:start": "electron .",
     "build": "vite build",
-    "dist": "npm run build && electron-builder",
+    "build:electron": "cross-env ELECTRON_RUN_AS_NODE=1 electron ./scripts/compile-bytecode.cjs",
+    "dist": "npm run build && npm run build:electron && electron-builder",
     "test": "vitest run"
   },
   "dependencies": {
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@fontsource/plus-jakarta-sans": "^5.3.0",
+    "bytenode": "^1.6.0",
     "clsx": "^2.1.1",
     "express": "^4.21.2",
     "framer-motion": "^13.1.0",
@@ -39,6 +41,8 @@
     "cross-env": "^7.0.3",
     "electron": "^34.2.0",
     "electron-builder": "^25.1.8",
+    "javascript-obfuscator": "^5.6.0",
+    "rollup-plugin-obfuscator": "^1.1.0",
     "tailwindcss": "^4.0.0",
     "vite": "^6.1.0",
     "vitest": "^3.2.7"
@@ -51,7 +55,9 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*",
+      "electron/main.cjs",
+      "electron/main.core.jsc",
+      "electron/preload.cjs",
       "public/**/*",
       "package.json"
     ],

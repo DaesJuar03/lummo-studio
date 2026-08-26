@@ -49,10 +49,11 @@ export default function HomeDashboard({
 
   const t = getTranslations(language);
 
-  const allDbs = customDatabases.map(d => ({ ...d, isDb: true }));
-  const combinedList = [...projects.map(p => ({ ...p, isDb: false })), ...allDbs];
+  const allDbs = (customDatabases || []).map(d => ({ ...d, isDb: true }));
+  const activeProjects = (projects || []).filter(p => !p.isArchived);
+  const combinedList = [...activeProjects.map(p => ({ ...p, isDb: false })), ...allDbs];
 
-  const runningCount = projects.filter(p => p.status === 'RUNNING').length;
+  const runningCount = activeProjects.filter(p => p.status === 'RUNNING').length;
 
   // Maximum 4 items displayed directly on the Home Dashboard card list to keep layout compact
   const displayedList = combinedList.slice(0, 4);
@@ -87,7 +88,7 @@ export default function HomeDashboard({
           <span className="text-slate-400">/</span>
 
           <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-            {projects.length} Proyectos
+            {activeProjects.length} Proyectos
           </span>
 
           <span className="text-slate-400">/</span>

@@ -178,25 +178,30 @@ export default function NetworkTunnelModal({
             {/* Divider */}
             <div className={`border-t ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}></div>
 
-            {/* Section 2: Custom Local Domain (.test) */}
+            {/* Section 2: Custom Local Domain (.test) with Trusted HTTPS SSL */}
             <div className="space-y-3">
-              <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                2. Dominio Local Personalizado (.test)
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
+                  2. Dominio Local Seguro (.test / .local)
+                </span>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shadow-[0_0_8px_rgba(16,185,129,0.2)]">
+                  <Shield className="h-3 w-3" /> SSL Local Confiable
+                </span>
+              </div>
 
               <p className="text-slate-400 leading-relaxed">
-                Asigna un nombre de dominio limpio (ej: <code className="text-purple-400 font-bold font-mono">http://app.test</code>) a este proyecto para acceder directamente sin recordar el puerto asignado.
+                Asigna un nombre de dominio limpio con <code className="text-emerald-400 font-bold font-mono">HTTPS Seguro</code> (ej: <code className="text-purple-400 font-bold font-mono">https://app.test:8443</code>). Emite certificados reconocidos por tu navegador sin pantallas rojas ni advertencias.
               </p>
 
               <div className="flex items-center space-x-2 pt-1">
                 <div className="flex-1 relative">
-                  <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-xs">http://</span>
+                  <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-xs">https://</span>
                   <input
                     type="text"
                     value={localDomainInput}
                     onChange={(e) => setLocalDomainInput(e.target.value)}
                     placeholder="mi-proyecto.test"
-                    className={`w-full border rounded-xl py-2 pl-14 pr-3 text-xs font-mono font-bold focus:outline-none transition-all ${
+                    className={`w-full border rounded-xl py-2 pl-16 pr-3 text-xs font-mono font-bold focus:outline-none transition-all ${
                       isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                     }`}
                   />
@@ -206,29 +211,51 @@ export default function NetworkTunnelModal({
                   className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-md shadow-purple-600/20 hover:shadow-[0_0_15px_rgba(168,85,247,0.35)] transition-all cursor-pointer"
                 >
                   <Link2 className="h-4 w-4" />
-                  <span>Vincular</span>
+                  <span>Vincular & SSL</span>
                 </button>
               </div>
 
               {domainSaveMsg && (
-                <div className={`p-3 rounded-xl font-mono text-xs border ${
+                <div className={`p-3.5 rounded-2xl font-mono text-xs border space-y-2 ${
                   typeof domainSaveMsg === 'object' && domainSaveMsg.type === 'warning'
                     ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
                     : typeof domainSaveMsg === 'object' && domainSaveMsg.type === 'error'
                     ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                    : 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                 }`}>
-                  <p className="leading-relaxed">
-                    {typeof domainSaveMsg === 'string' ? domainSaveMsg : domainSaveMsg.text}
-                  </p>
+                  <div className="flex items-center space-x-2 font-bold">
+                    <Check className="h-4 w-4 text-emerald-400" />
+                    <span>{typeof domainSaveMsg === 'string' ? domainSaveMsg : domainSaveMsg.text}</span>
+                  </div>
+
                   {typeof domainSaveMsg === 'object' && domainSaveMsg.url && (
-                    <button
-                      onClick={() => onOpenBrowser(domainSaveMsg.url)}
-                      className="mt-2 flex items-center gap-1.5 font-bold text-emerald-400 hover:underline cursor-pointer"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      <span>Abrir {domainSaveMsg.url}</span>
-                    </button>
+                    <div className="pt-2 border-t border-emerald-500/20 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                          🔒 HTTPS :8443
+                        </span>
+                        <span className="font-bold text-slate-200">{domainSaveMsg.url}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (navigator.clipboard) navigator.clipboard.writeText(domainSaveMsg.url);
+                          }}
+                          className="px-2.5 py-1 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-300 transition-colors text-[11px] cursor-pointer"
+                        >
+                          Copiar Enlace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onOpenBrowser(domainSaveMsg.url)}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          <span>Abrir en Navegador</span>
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}

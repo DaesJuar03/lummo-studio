@@ -1,27 +1,113 @@
-const { BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+/**
+ * Aplica políticas de seguridad y endurecimiento de runtime a una ventana
+ */
+function applySecurityPolicies(window) {
+  if (!window || !window.webContents) return;
+
+  if (app.isPackaged) {
+    // 1. Cerrar DevTools automáticamente si alguien intenta forzar la apertura
+    window.webContents.on('devtools-opened', () => {
+      window.webContents.closeDevTools();
+    });
+
+    // 2. Bloquear atajos de teclado de depuración e inspección (F12, Ctrl+Shift+I/J/C, Ctrl+U)
+    window.webContents.on('before-input-event', (event, input) => {
+      const key = (input.key || '').toLowerCase();
+      // Atajo F12
+      if (input.key === 'F12') {
+        event.preventDefault();
+      }
+      // Atajos de DevTools: Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if (input.control && input.shift && ['i', 'j', 'c'].includes(key)) {
+        event.preventDefault();
+      }
+      // Ver código fuente: Ctrl+U
+      if (input.control && key === 'u') {
+        event.preventDefault();
+      }
+    });
+  }
+
+  // 3. Prevenir navegación insegura y abrir enlaces externos en el navegador del sistema
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('mailto:')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
+  window.webContents.on('will-navigate', (event, url) => {
+    const isLocal = url.startsWith('http://localhost') || url.startsWith('http://127.0.0.1') || url.startsWith('file://');
+    if (!isLocal) {
+      event.preventDefault();
+      shell.openExternal(url);
+    }
+  });
+}
+
+function getPreloadPath() {
+  const candidates = [
+    path.join(__dirname, '../preload.cjs'),
+    path.join(__dirname, 'preload.cjs'),
+    path.join(app.getAppPath(), 'electron/preload.cjs')
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return path.join(__dirname, '../preload.cjs');
+}
+
+function getAppHtmlPath() {
+  const candidates = [
+    path.join(__dirname, '../../dist/index.html'),
+    path.join(__dirname, '../dist/index.html'),
+    path.join(app.getAppPath(), 'dist/index.html')
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return path.join(app.getAppPath(), 'dist/index.html');
+}
+
 function createMainWindow(appIconPath, getIsQuitting) {
+  const resolvedIcon = (appIconPath && fs.existsSync(appIconPath))
+    ? appIconPath
+    : (fs.existsSync(path.join(__dirname, '../public/Lummo.png'))
+        ? path.join(__dirname, '../public/Lummo.png')
+        : path.join(__dirname, '../../public/Lummo.png'));
+
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 900,
     minHeight: 600,
     title: 'Lummo Studio',
-    icon: fs.existsSync(appIconPath) ? appIconPath : path.join(__dirname, '../../public/Lummo.png'),
+    icon: resolvedIcon,
     frame: false,
     webPreferences: {
-      preload: path.join(__dirname, '../preload.cjs'),
+      preload: getPreloadPath(),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      devTools: !app.isPackaged // Desactivar DevTools completamente en producción
     }
   });
+
+  // Aplicar hardening de seguridad a la ventana principal
+  applySecurityPolicies(mainWindow);
+
+  // Eliminar la barra de menú predeterminada de Electron en producción
+  if (app.isPackaged) {
+    Menu.setApplicationMenu(null);
+  }
 
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../../dist/index.html'));
+    mainWindow.loadFile(getAppHtmlPath());
   }
 
   // Minimize to System Tray when closing the main window
@@ -37,5 +123,7 @@ function createMainWindow(appIconPath, getIsQuitting) {
 }
 
 module.exports = {
-  createMainWindow
+  createMainWindow,
+  applySecurityPolicies
 };
+

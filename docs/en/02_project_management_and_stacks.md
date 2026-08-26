@@ -1,7 +1,7 @@
 # Project Management & Tech Stacks
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Technical Module 02 (English)</strong>
+  <strong>Lummo Studio v2.3.0 — Technical Module 02 (English)</strong>
 </p>
 
 <p align="center">

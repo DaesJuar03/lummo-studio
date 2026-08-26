@@ -143,6 +143,13 @@ export default function Header({
             <span className={`font-extrabold text-xs tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Lummo Studio
             </span>
+            <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
+              isDark 
+                ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
+                : 'bg-blue-50 text-blue-600 border border-blue-200'
+            }`}>
+              v2.3.0
+            </span>
           </div>
         </div>
 

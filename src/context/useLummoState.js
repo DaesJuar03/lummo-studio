@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getTranslations } from '../locales';
+import { getTranslations, detectSystemLanguage } from '../locales';
+import { useTabNavigation } from '../hooks/useTabNavigation';
 
 export function useLummoState() {
   const [projects, setProjects] = useState([]);
@@ -7,6 +8,10 @@ export function useLummoState() {
   const [isScanning, setIsScanning] = useState(false);
   const [logs, setLogs] = useState({});
   const [activeLogsProject, setActiveLogsProject] = useState(null);
+  const [userError, setUserError] = useState(null);
+
+  // Auto-detect user system language on first run
+  const [langDetection] = useState(() => detectSystemLanguage());
 
   // Onboarding state
   const [showOnboarding, setShowOnboarding] = useState(() => {
@@ -15,7 +20,7 @@ export function useLummoState() {
 
   // i18n Language state
   const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('lummo-language') || 'es';
+    return langDetection.language;
   });
 
   // Custom user databases state
@@ -34,19 +39,15 @@ export function useLummoState() {
   const [showNewTabModal, setShowNewTabModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
 
-  // Tabs state
-  const [activeTabId, setActiveTabId] = useState('home');
-  const [tabs, setTabs] = useState([
-    { id: 'home', title: 'Inicio / Dashboard', type: 'home' }
-  ]);
-
-  // Theme state ('dark' | 'light')
+  // Theme state ('light' | 'dark')
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('lummo-theme') || 'dark';
+    return localStorage.getItem('lummo-theme') || 'light';
   });
 
-  const isDark = theme === 'dark';
   const t = getTranslations(language);
+
+  // Use centralized tab navigation
+  const tabNav = useTabNavigation(t);
 
   // Persist language
   useEffect(() => {
@@ -55,50 +56,35 @@ export function useLummoState() {
 
   // Persist theme
   useEffect(() => {
+    document.body.classList.remove('light-theme', 'dark-theme');
+    document.body.classList.add(`${theme}-theme`);
     localStorage.setItem('lummo-theme', theme);
   }, [theme]);
 
   // Persist custom databases
   useEffect(() => {
-    localStorage.setItem('lummo-custom-databases', JSON.stringify(customDatabases));
+    try {
+      localStorage.setItem('lummo-custom-databases', JSON.stringify(customDatabases));
+    } catch (e) {
+      console.error(e);
+    }
   }, [customDatabases]);
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   }, []);
 
-  const openTab = useCallback((tabObj) => {
-    setTabs(prev => {
-      if (prev.some(t => t.id === tabObj.id)) return prev;
-      return [...prev, tabObj];
-    });
-    setActiveTabId(tabObj.id);
-  }, []);
-
-  const closeTab = useCallback((tabId, e) => {
-    if (e) e.stopPropagation();
-    setTabs(prev => {
-      const next = prev.filter(t => t.id !== tabId);
-      if (next.length === 0) {
-        setActiveTabId('home');
-        return [{ id: 'home', title: t.home || 'Inicio', type: 'home' }];
-      }
-      return next;
-    });
-    setActiveTabId(prev => (prev === tabId ? 'home' : prev));
-  }, [t.home]);
-
-  const handleClearProjectLogs = useCallback((projectId) => {
+  const handleClearProjectLogs = useCallback(async (projectId) => {
     setLogs(prev => ({ ...prev, [projectId]: [] }));
-    if (window.electronAPI?.project?.clearProjectLogs) {
-      window.electronAPI.project.clearProjectLogs(projectId);
+    if (window.electronAPI?.clearProjectLogs) {
+      await window.electronAPI.clearProjectLogs(projectId);
     }
   }, []);
 
-  const handleClearAllLogs = useCallback(() => {
+  const handleClearAllLogs = useCallback(async () => {
     setLogs({});
-    if (window.electronAPI?.project?.clearAllLogs) {
-      window.electronAPI.project.clearAllLogs();
+    if (window.electronAPI?.clearAllLogs) {
+      await window.electronAPI.clearAllLogs();
     }
   }, []);
 
@@ -113,10 +99,13 @@ export function useLummoState() {
     setLogs,
     activeLogsProject,
     setActiveLogsProject,
+    userError,
+    setUserError,
     showOnboarding,
     setShowOnboarding,
     language,
     setLanguage,
+    langDetection,
     customDatabases,
     setCustomDatabases,
     showSettings,
@@ -127,16 +116,10 @@ export function useLummoState() {
     setShowNewTabModal,
     showImportModal,
     setShowImportModal,
-    activeTabId,
-    setActiveTabId,
-    tabs,
-    setTabs,
     theme,
-    isDark,
     toggleTheme,
     t,
-    openTab,
-    closeTab,
+    tabNav,
     handleClearProjectLogs,
     handleClearAllLogs
   };

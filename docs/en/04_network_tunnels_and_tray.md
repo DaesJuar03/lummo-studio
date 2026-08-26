@@ -1,7 +1,7 @@
 # Network Services, HTTPS Tunnels & System Tray
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Technical Module 04 (English)</strong>
+  <strong>Lummo Studio v2.3.0 — Technical Module 04 (English)</strong>
 </p>
 
 <p align="center">

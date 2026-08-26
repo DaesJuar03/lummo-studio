@@ -1,7 +1,7 @@
 # Guía para Desarrolladores, Compilación y Pruebas
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Módulo Técnico 05 (Español)</strong>
+  <strong>Lummo Studio v2.3.0 — Módulo Técnico 05 (Español)</strong>
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
 
 ### Requisitos Previos:
 - **Sistema Operativo**: Windows 10 u 11 (64-bit).
-- **Node.js**: Versión 18.0.0 o superior (se recomienda Node 20 LTS).
+- **Node.js**: Versión 18.0.0 o superior (se recomienda Node 20 / 22 LTS).
 - **Gestor de Paquetes**: `npm` v9.0.0+ (incluido con Node.js).
 - **Git**: Git CLI instalado y registrado en la variable de entorno `PATH`.
 
@@ -39,10 +39,11 @@ Los comandos de desarrollo y empaquetado disponibles son:
 | :--- | :--- |
 | `npm run dev` | Inicia el servidor de desarrollo de Vite para el proceso Renderer. |
 | `npm run electron:dev` | Ejecuta Vite y Electron concurrentemente con hot-reloading de UI. |
-| `npm run electron:start` | Inicia Electron apuntando a los archivos compilados o en ejecución. |
-| `npm run build` | Compila el bundle de producción de React con Vite en la carpeta `dist/`. |
-| `npm run dist` | Executa la compilación de Vite y empaqueta el ejecutable final con Electron Builder. |
-| `npm test` | Ejecuta la suite de pruebas unitarias y de integración con **Vitest**. |
+| `npm run electron:start` | Inicia Electron apuntando a los archivos de desarrollo o producción. |
+| `npm run build` | Compila y ofusca el bundle de producción de React con Vite (`inlineDynamicImports`). |
+| `npm run build:electron` | Empaqueta el backend y compila los módulos a **Bytecode V8 (`.jsc`)** con Bytenode. |
+| `npm run dist` | Ejecuta el pipeline completo de compilación, bytecode y empaquetado con Electron Builder. |
+| `npm test` | Ejecuta la suite completa de pruebas unitarias y de integración con **Vitest**. |
 
 ---
 
@@ -55,6 +56,10 @@ Las pruebas automatizadas residen en el directorio `tests/`:
 - `tests/dbManager.test.js`: Pruebas de integración para la persistencia SQLite local.
 - `tests/features.test.js`: Pruebas funcionales de los componentes lógicos de la aplicación.
 - `tests/locales.test.js`: Validación de la paridad y completitud de las claves de i18n.
+- `tests/dockerManager.test.js`: Pruebas del orquestador y generador de Docker Compose.
+- `tests/sslManager.test.js`: Validación de certificados SSL y Autoridad de Certificación local.
+- `tests/portResolver.test.js`: Identificación y resolución de conflictos de puertos.
+- `tests/telemetry.test.js`: Métricas reales de CPU y memoria RAM por PID.
 
 ### Para ejecutar las pruebas:
 ```bash
@@ -67,18 +72,15 @@ npm test
 
 La configuración de distribución de Windows está definida en `package.json` en la clave `"build"`.
 
-### Proceso de Empaquetado:
+### Proceso de Empaquetado Blindado:
 ```bash
-# Paso 1: Generar bundle estático web
-npm run build
-
-# Paso 2: Generar distribuibles nativos de Windows
-npx electron-builder
+# Ejecuta automáticamente: vite build -> build:electron (bytecode .jsc) -> electron-builder
+npm run dist
 ```
 
 ### Binarios Generados en `release/`:
-- **Instalador NSIS**: `release/Lummo Studio Setup 2.1.0.exe` (Permite seleccionar directorio de instalación y crea accesos directos en Escritorio y Menú Inicio).
-- **Ejecutable Portable**: `release/Lummo Studio 2.1.0.exe` (Ejecución directa sin instalación previa).
+- **Instalador NSIS**: `release/Lummo Studio Setup 2.3.0.exe` (Permite seleccionar directorio de instalación y crea accesos directos en Escritorio y Menú Inicio).
+- **Ejecutable Portable**: `release/Lummo Studio 2.3.0.exe` (Ejecución directa sin instalación previa).
 
 ---
 

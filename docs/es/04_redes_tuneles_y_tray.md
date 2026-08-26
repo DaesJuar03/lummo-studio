@@ -1,7 +1,7 @@
 # Servicios de Red, Túneles HTTPS y System Tray
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Módulo Técnico 04 (Español)</strong>
+  <strong>Lummo Studio v2.3.0 — Módulo Técnico 04 (Español)</strong>
 </p>
 
 <p align="center">

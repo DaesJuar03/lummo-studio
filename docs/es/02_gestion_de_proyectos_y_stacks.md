@@ -1,7 +1,7 @@
 # Gestión de Proyectos y Stacks Tecnológicos
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Módulo Técnico 02 (Español)</strong>
+  <strong>Lummo Studio v2.3.0 — Módulo Técnico 02 (Español)</strong>
 </p>
 
 <p align="center">

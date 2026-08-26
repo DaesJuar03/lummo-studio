@@ -2,7 +2,7 @@
   <img src="../public/Lummo.png" alt="Lummo Studio Logo" width="140" />
 </p>
 
-<h1 align="center">Lummo Studio v2.1.0 — Índice General de la Documentación</h1>
+<h1 align="center">Lummo Studio v2.3.0 — Índice General de la Documentación</h1>
 
 <p align="center">
   <strong>Guía Navegable y Centro de Recursos Técnicos de Lummo Studio</strong>

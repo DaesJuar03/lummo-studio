@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron');
+const { ipcMain, BrowserWindow } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -11,15 +11,74 @@ function safeHandle(channel, listener) {
   ipcMain.handle(channel, listener);
 }
 
+function validateAndSanitizeGitUrl(repoUrl) {
+  if (typeof repoUrl !== 'string') {
+    return { valid: false, error: 'URL del repositorio no válida.' };
+  }
+  const cleanUrl = repoUrl.trim();
+  if (!cleanUrl) {
+    return { valid: false, error: 'Por favor ingresa una URL de repositorio Git.' };
+  }
+  if (cleanUrl.startsWith('-')) {
+    return { valid: false, error: 'URL inválida. No se permiten opciones de comando en la URL.' };
+  }
+  if (/[\x00-\x1F\x7F\r\n]/.test(cleanUrl)) {
+    return { valid: false, error: 'La URL contiene caracteres prohibidos o saltos de línea.' };
+  }
+  const validGitProtocol = /^(https?:\/\/|git@|ssh:\/\/|git:\/\/)/i;
+  if (!validGitProtocol.test(cleanUrl)) {
+    return { 
+      valid: false, 
+      error: 'Formato de URL no soportado. Debe comenzar con https://, http://, git@, ssh:// o git://' 
+    };
+  }
+  return { valid: true, cleanUrl };
+}
+
 function registerProjectHandlers({
   getMainWindow,
   runningProcesses,
   projectLogsStore,
   logWindows,
   emitLog,
-  MAX_LOG_LINES,
-  activeCloneProcessRef
+  MAX_LOG_LINES = 1000,
+  stopProjectById,
+  updateTrayContextMenu,
+  showNativeNotification,
+  openLogWindow
 }) {
+  let activeCloneProcess = null;
+
+  const emitStatus = (projectId, status) => {
+    const win = getMainWindow();
+    if (win && !win.isDestroyed()) {
+      win.webContents.send('process-status', { projectId, status });
+    }
+    if (logWindows && logWindows.has(projectId)) {
+      const logWin = logWindows.get(projectId);
+      if (logWin && !logWin.isDestroyed()) {
+        logWin.webContents.send('process-status', { projectId, status });
+      }
+    }
+  };
+
+  const notifyLog = (projectId, message) => {
+    if (typeof emitLog === 'function') {
+      emitLog(projectId, message);
+    } else {
+      let existing = projectLogsStore.get(projectId) || [];
+      existing.push(message);
+      if (existing.length > MAX_LOG_LINES) existing = existing.slice(-MAX_LOG_LINES);
+      projectLogsStore.set(projectId, existing);
+
+      const win = getMainWindow();
+      if (win && !win.isDestroyed()) {
+        win.webContents.send('process-log', { projectId, message });
+      }
+    }
+  };
+
+  // 1. Escaneo del entorno del sistema
   safeHandle('scan-environment', async () => {
     try {
       if (scanner && typeof scanner.scanSystemEnvironment === 'function') {
@@ -37,6 +96,7 @@ function registerProjectHandlers({
     };
   });
 
+  // 2. Detección automática de tipo de proyecto y stack
   safeHandle('detect-project', async (event, folderPath) => {
     try {
       if (detector && typeof detector.detectProjectType === 'function') {
@@ -60,6 +120,7 @@ function registerProjectHandlers({
     };
   });
 
+  // 3. Puertos: Comprobar, buscar libre, identificar proceso y liberar
   safeHandle('check-port', async (event, port) => {
     try {
       if (processManager && typeof processManager.checkPortFree === 'function') {
@@ -82,7 +143,6 @@ function registerProjectHandlers({
     return startPort || 3000;
   });
 
-  // Identificar qué proceso y PID ocupa un puerto específico
   safeHandle('identify-port-process', async (event, port) => {
     try {
       if (processManager && typeof processManager.identifyPortProcess === 'function') {
@@ -94,7 +154,6 @@ function registerProjectHandlers({
     return { busy: false };
   });
 
-  // Liberar forzosamente el puerto ocupado por un proceso
   safeHandle('kill-port-process', async (event, port) => {
     try {
       if (processManager && typeof processManager.killProcessOnPort === 'function') {
@@ -107,11 +166,11 @@ function registerProjectHandlers({
     return { success: false, error: 'No se pudo ejecutar la acción' };
   });
 
-  // Telemetría Real de CPU y RAM por PID
+  // 4. Telemetría Real de CPU y RAM por PID (pidusage)
   safeHandle('get-process-metrics', async (event, { projectId, pid }) => {
     try {
       let targetPid = pid;
-      if (!targetPid && runningProcesses.has(projectId)) {
+      if (!targetPid && runningProcesses && runningProcesses.has(projectId)) {
         const item = runningProcesses.get(projectId);
         const child = item.child || item;
         targetPid = child?.pid;
@@ -126,7 +185,233 @@ function registerProjectHandlers({
     return { success: false, cpu: 0, memoryMb: 0, elapsedMs: 0 };
   });
 
-  // Scaffolding de Nuevos Proyectos desde Cero (New Project Wizard)
+  // 5. Iniciar y Detener Proyectos
+  safeHandle('start-project', async (event, project) => {
+    if (!project.path || !fs.existsSync(project.path)) {
+      const errorMsg = `[Lummo Studio Error] La carpeta del proyecto no existe: "${project.path}"`;
+      notifyLog(project.id, errorMsg);
+      emitStatus(project.id, 'ERROR');
+      if (typeof showNativeNotification === 'function') {
+        showNativeNotification({
+          title: 'Error al iniciar ⚠️',
+          body: `La carpeta no existe: ${project.path}`
+        });
+      }
+      return { success: false, error: errorMsg };
+    }
+
+    const baseCommand = project.command || 'npm run dev';
+    const port = project.port || 3000;
+
+    let finalCommand = baseCommand;
+    if (baseCommand.includes('npm run dev') || baseCommand.includes('npm start')) {
+      if (!baseCommand.includes('--port')) {
+        finalCommand = `${baseCommand} -- --port ${port}`;
+      }
+    } else if (baseCommand.includes('vite')) {
+      if (!baseCommand.includes('--port')) {
+        finalCommand = `${baseCommand} --port ${port}`;
+      }
+    } else if (baseCommand.includes('php artisan serve')) {
+      if (!baseCommand.includes('--port')) {
+        finalCommand = `${baseCommand} --port=${port}`;
+      }
+    }
+
+    notifyLog(project.id, `[Lummo Studio] Ejecutando: ${finalCommand} en ${project.path} (Puerto ${port})...`);
+
+    try {
+      const child = spawn(finalCommand, [], {
+        cwd: project.path,
+        shell: true,
+        env: { 
+          ...process.env, 
+          PORT: String(port), 
+          VITE_PORT: String(port),
+          NEXT_PUBLIC_PORT: String(port)
+        }
+      });
+
+      child.on('error', (err) => {
+        notifyLog(project.id, `[Lummo Studio Error] Error al iniciar proceso: ${err.message}`);
+        if (runningProcesses) runningProcesses.delete(project.id);
+        if (typeof updateTrayContextMenu === 'function') updateTrayContextMenu();
+        emitStatus(project.id, 'ERROR');
+        if (typeof showNativeNotification === 'function') {
+          showNativeNotification({
+            title: 'Error al iniciar ⚠️',
+            body: err.message
+          });
+        }
+      });
+
+      if (runningProcesses) {
+        runningProcesses.set(project.id, { child, name: project.name || 'Proyecto', port, path: project.path });
+      }
+      emitStatus(project.id, 'RUNNING');
+      if (typeof updateTrayContextMenu === 'function') updateTrayContextMenu();
+
+      if (typeof showNativeNotification === 'function') {
+        showNativeNotification({
+          title: 'Servidor Iniciado 🟢',
+          body: `${project.name || 'Proyecto'} escuchando en http://localhost:${port}`
+        });
+      }
+
+      child.stdout.on('data', (data) => {
+        notifyLog(project.id, data.toString());
+      });
+
+      child.stderr.on('data', (data) => {
+        notifyLog(project.id, data.toString());
+      });
+
+      child.on('close', (code) => {
+        notifyLog(project.id, `[Lummo Studio] El proceso terminó con código ${code}`);
+        if (runningProcesses) runningProcesses.delete(project.id);
+        if (typeof updateTrayContextMenu === 'function') updateTrayContextMenu();
+        emitStatus(project.id, 'STOPPED');
+
+        if (code !== 0 && code !== null && typeof showNativeNotification === 'function') {
+          showNativeNotification({
+            title: 'Servidor Finalizado ⚠️',
+            body: `${project.name || 'El proceso'} terminó con código de salida ${code}`
+          });
+        }
+      });
+
+      return { success: true };
+    } catch (err) {
+      notifyLog(project.id, `[Lummo Studio Error] No se pudo lanzar el proceso: ${err.message}`);
+      emitStatus(project.id, 'ERROR');
+      return { success: false, error: err.message };
+    }
+  });
+
+  safeHandle('stop-project', async (event, projectId) => {
+    if (typeof stopProjectById === 'function') {
+      stopProjectById(projectId);
+    }
+    return { success: true };
+  });
+
+  // 6. Clonación de Repositorios Git
+  safeHandle('cancel-clone-repository', async () => {
+    if (activeCloneProcess) {
+      try {
+        if (process.platform === 'win32') {
+          exec(`taskkill /pid ${activeCloneProcess.pid} /T /F`);
+        } else {
+          activeCloneProcess.kill('SIGTERM');
+        }
+      } catch (e) {}
+      activeCloneProcess = null;
+    }
+    return { success: true };
+  });
+
+  safeHandle('clone-repository', async (event, { repoUrl, destinationParentFolder }) => {
+    return new Promise((resolve) => {
+      try {
+        const validation = validateAndSanitizeGitUrl(repoUrl);
+        if (!validation.valid) {
+          return resolve({ success: false, error: validation.error });
+        }
+
+        const cleanUrl = validation.cleanUrl;
+        let repoName = path.basename(cleanUrl, '.git') || 'cloned-repo';
+        if (repoName.endsWith('/')) repoName = repoName.slice(0, -1);
+        repoName = path.basename(repoName, '.git');
+        repoName = repoName.replace(/[^a-zA-Z0-9_\-\.]/g, '_') || 'cloned-repo';
+
+        const targetFolder = path.join(destinationParentFolder, repoName);
+        const win = getMainWindow();
+
+        const emitProgress = (percentage, statusText) => {
+          if (win && !win.isDestroyed()) {
+            win.webContents.send('clone-progress', { percentage, statusText, targetFolder, repoName });
+          }
+        };
+
+        emitProgress(10, 'Iniciando conexión con el servidor Git remoto...');
+
+        const child = spawn('git', ['clone', '--progress', '--', cleanUrl, targetFolder], {
+          shell: false,
+          cwd: destinationParentFolder
+        });
+
+        activeCloneProcess = child;
+        let stdErrLogs = '';
+
+        child.stderr.on('data', (data) => {
+          const msg = data.toString();
+          stdErrLogs += msg;
+
+          if (msg.includes('Receiving objects')) {
+            const match = msg.match(/Receiving objects:\s*(\d+)%/);
+            if (match) {
+              const percent = Math.min(90, 10 + Math.floor(parseInt(match[1], 10) * 0.7));
+              emitProgress(percent, 'Descargando objetos del repositorio...');
+            }
+          } else if (msg.includes('Resolving deltas')) {
+            emitProgress(95, 'Resolviendo deltas y estructurando archivos...');
+          } else if (msg.includes('Cloning into')) {
+            emitProgress(20, 'Clonando repositorio remoto...');
+          } else {
+            emitProgress(40, msg.trim().slice(0, 80).replace(/:\s*\d+%/g, ''));
+          }
+        });
+
+        child.on('close', (code) => {
+          activeCloneProcess = null;
+          if (code === 0) {
+            emitProgress(100, '¡Repositorio descargado e importado con éxito!');
+            if (typeof showNativeNotification === 'function') {
+              showNativeNotification({
+                title: 'Clonación Completada 🚀',
+                body: `El repositorio "${repoName}" se importó correctamente a Lummo Studio.`
+              });
+            }
+            resolve({ success: true, targetFolder, repoName });
+          } else {
+            let errorDetail = 'Error al clonar el repositorio.';
+            if (stdErrLogs.includes('Repository not found') || stdErrLogs.includes('not found')) {
+              errorDetail = 'El repositorio no existe o es privado (requiere credenciales SSH/token).';
+            } else if (stdErrLogs.includes('already exists')) {
+              errorDetail = `La carpeta "${repoName}" ya existe en el destino seleccionado.`;
+            } else if (stdErrLogs.includes('Could not resolve host')) {
+              errorDetail = 'No se pudo conectar al servidor Git. Verifica tu conexión a internet o la URL.';
+            } else if (stdErrLogs.trim()) {
+              errorDetail = stdErrLogs.trim().split('\n').pop() || errorDetail;
+            }
+            if (typeof showNativeNotification === 'function') {
+              showNativeNotification({
+                title: 'Error de Clonación ⚠️',
+                body: errorDetail
+              });
+            }
+            resolve({ success: false, error: errorDetail });
+          }
+        });
+
+        child.on('error', (err) => {
+          activeCloneProcess = null;
+          if (typeof showNativeNotification === 'function') {
+            showNativeNotification({
+              title: 'Error de Clonación ⚠️',
+              body: err.message
+            });
+          }
+          resolve({ success: false, error: err.message });
+        });
+      } catch (err) {
+        activeCloneProcess = null;
+        resolve({ success: false, error: err.message });
+      }
+    });
+  });
+
+  // 7. Scaffolding de Nuevos Proyectos (New Project Wizard)
   safeHandle('scaffold-project', async (event, options) => {
     try {
       const emitScaffoldLog = (msg) => {
@@ -144,6 +429,7 @@ function registerProjectHandlers({
     return { success: false, error: 'Motor de creación de proyectos no disponible' };
   });
 
+  // 8. Persistencia de Proyectos Recientes
   safeHandle('get-recent-projects', async () => {
     try {
       const configPath = path.join(process.cwd(), 'lummo_projects.json');
@@ -168,6 +454,7 @@ function registerProjectHandlers({
     }
   });
 
+  // 9. Lectura y Edición de Archivos .env
   safeHandle('read-env-file', async (event, folderPath) => {
     if (!folderPath) return { success: false, error: 'Ruta no especificada' };
     const envPath = path.join(folderPath, '.env');
@@ -204,7 +491,7 @@ function registerProjectHandlers({
     }
   });
 
-  // Project Dependency Manager (NPM, Yarn, pnpm, Bun, Pip, Composer)
+  // 10. Gestor de Dependencias del Proyecto
   safeHandle('install-dependencies', async (event, { projectId, folderPath, manager }) => {
     if (!folderPath) return { success: false, error: 'Ruta no especificada' };
 
@@ -226,8 +513,8 @@ function registerProjectHandlers({
     else if (pkgMgr === 'composer') cmd = 'composer install';
     else if (pkgMgr === 'pip') cmd = 'pip install -r requirements.txt';
 
-    emitLog(projectId, `\n[Dependencias] === Iniciando instalación con "${cmd}" ===`);
-    emitLog(projectId, `[Dependencias] Carpeta objetivo: ${folderPath}`);
+    notifyLog(projectId, `\n[Dependencias] === Iniciando instalación con "${cmd}" ===`);
+    notifyLog(projectId, `[Dependencias] Carpeta objetivo: ${folderPath}`);
 
     return new Promise((resolve) => {
       const child = spawn(cmd, [], {
@@ -237,31 +524,31 @@ function registerProjectHandlers({
       });
 
       child.stdout.on('data', (data) => {
-        emitLog(projectId, data.toString());
+        notifyLog(projectId, data.toString());
       });
 
       child.stderr.on('data', (data) => {
-        emitLog(projectId, data.toString());
+        notifyLog(projectId, data.toString());
       });
 
       child.on('error', (err) => {
-        emitLog(projectId, `[Dependencias Error] ${err.message}`);
+        notifyLog(projectId, `[Dependencias Error] ${err.message}`);
         resolve({ success: false, error: err.message });
       });
 
       child.on('close', (code) => {
         if (code === 0) {
-          emitLog(projectId, `[Dependencias] Instalación completada exitosamente.`);
+          notifyLog(projectId, `[Dependencias] Instalación completada exitosamente.`);
           resolve({ success: true, message: 'Dependencias instaladas correctamente.' });
         } else {
-          emitLog(projectId, `[Dependencias] Proceso finalizado con código de salida ${code}.`);
+          notifyLog(projectId, `[Dependencias] Proceso finalizado con código de salida ${code}.`);
           resolve({ success: false, error: `Código de salida ${code}` });
         }
       });
     });
   });
 
-  // HTTPS & Self-Signed SSL Local Certificate Setup
+  // 11. Generación de Certificados HTTPS Autofirmados
   safeHandle('setup-https', async (event, { projectId, folderPath, domain, port }) => {
     try {
       const sslDir = path.join(process.cwd(), '.lummo_ssl', projectId || 'default');
@@ -285,8 +572,8 @@ function registerProjectHandlers({
       }
 
       const httpsUrl = `https://${domain || 'localhost'}:${port || 443}`;
-      emitLog(projectId, `\n[HTTPS Configurado] Certificados SSL listos en: ${sslDir}`);
-      emitLog(projectId, `[HTTPS Configurado] Enlace seguro disponible en: ${httpsUrl}`);
+      notifyLog(projectId, `\n[HTTPS Configurado] Certificados SSL listos en: ${sslDir}`);
+      notifyLog(projectId, `[HTTPS Configurado] Enlace seguro disponible en: ${httpsUrl}`);
 
       return {
         success: true,
@@ -300,10 +587,11 @@ function registerProjectHandlers({
     }
   });
 
+  // 12. Lanzador de Scripts de Proyecto
   safeHandle('run-project-script', async (event, { projectId, folderPath, scriptCommand }) => {
     if (!folderPath || !scriptCommand) return { success: false, error: 'Comando o carpeta vacíos' };
-    emitLog(projectId, `\n[Lummo Script] === Ejecutando: "${scriptCommand}" ===`);
-    emitLog(projectId, `[Lummo Script] Carpeta: ${folderPath}`);
+    notifyLog(projectId, `\n[Lummo Script] === Ejecutando: "${scriptCommand}" ===`);
+    notifyLog(projectId, `[Lummo Script] Carpeta: ${folderPath}`);
 
     return new Promise((resolve) => {
       const child = spawn(scriptCommand, [], {
@@ -313,15 +601,15 @@ function registerProjectHandlers({
       });
 
       child.stdout.on('data', (data) => {
-        emitLog(projectId, data.toString());
+        notifyLog(projectId, data.toString());
       });
 
       child.stderr.on('data', (data) => {
-        emitLog(projectId, data.toString());
+        notifyLog(projectId, data.toString());
       });
 
       child.on('error', (err) => {
-        emitLog(projectId, `[Lummo Script Error] ${err.message}`);
+        notifyLog(projectId, `[Lummo Script Error] ${err.message}`);
         resolve({ success: false, error: err.message });
       });
 
@@ -329,33 +617,59 @@ function registerProjectHandlers({
         const msg = code === 0 
           ? `[Lummo Script] Comando "${scriptCommand}" completado exitosamente.`
           : `[Lummo Script] Comando "${scriptCommand}" finalizó con código ${code}.`;
-        emitLog(projectId, msg);
+        notifyLog(projectId, msg);
         resolve({ success: code === 0, code });
       });
     });
   });
 
+  // 13. Logs y Terminal Stdin
+  safeHandle('open-log-window', (event, { projectId, projectName }) => {
+    if (typeof openLogWindow === 'function') {
+      openLogWindow(projectId, projectName);
+      return { success: true };
+    }
+    return { success: false, error: 'Función de ventana de logs no disponible' };
+  });
+
   safeHandle('get-project-logs', (event, projectId) => {
-    return projectLogsStore.get(projectId) || [];
+    return projectLogsStore ? (projectLogsStore.get(projectId) || []) : [];
   });
 
   safeHandle('clear-project-logs', (event, projectId) => {
-    projectLogsStore.set(projectId, []);
+    if (projectLogsStore) projectLogsStore.set(projectId, []);
     const win = getMainWindow();
-    if (win) win.webContents.send('logs-cleared', { projectId });
+    if (win && !win.isDestroyed()) {
+      win.webContents.send('logs-cleared', { projectId });
+    }
+    if (logWindows && logWindows.has(projectId)) {
+      const logWin = logWindows.get(projectId);
+      if (logWin && !logWin.isDestroyed()) {
+        logWin.webContents.send('logs-cleared', { projectId });
+      }
+    }
     return { success: true };
   });
 
   safeHandle('write-project-stdin', (event, { projectId, input }) => {
     if (!projectId || !input) return { success: false, error: 'Id o entrada vacíos' };
-    const result = processManager.sendProjectStdin(projectId, input, emitLog);
+    const result = processManager.sendProjectStdin(projectId, input, notifyLog);
     return { success: result };
   });
 
   safeHandle('clear-all-logs', () => {
-    projectLogsStore.clear();
+    if (projectLogsStore) projectLogsStore.clear();
     const win = getMainWindow();
-    if (win) win.webContents.send('logs-cleared', { all: true });
+    if (win && !win.isDestroyed()) {
+      win.webContents.send('logs-cleared', { all: true });
+    }
+    if (logWindows) {
+      logWindows.forEach((logWin) => {
+        if (logWin && !logWin.isDestroyed()) {
+          logWin.webContents.send('logs-cleared', { all: true });
+        }
+      });
+    }
     return { success: true };
   });
 }

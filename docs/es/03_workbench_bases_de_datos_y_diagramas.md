@@ -1,7 +1,7 @@
 # Workbench de Bases de Datos y Diagramas Entidad-Relación
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Módulo Técnico 03 (Español)</strong>
+  <strong>Lummo Studio v2.3.0 — Módulo Técnico 03 (Español)</strong>
 </p>
 
 <p align="center">

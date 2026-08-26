@@ -21,4 +21,15 @@ describe('Process Telemetry Suite', () => {
     expect(metrics.success).toBe(false);
     expect(metrics.error).toBeDefined();
   });
+
+  it('should handle null, undefined or non-number PID gracefully', async () => {
+    const resNull = await getProcessMetrics(null);
+    expect(resNull.success).toBe(false);
+
+    const resUndefined = await getProcessMetrics(undefined);
+    expect(resUndefined.success).toBe(false);
+
+    const resString = await getProcessMetrics('not-a-pid');
+    expect(resString.success).toBe(false);
+  });
 });

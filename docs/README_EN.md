@@ -2,7 +2,7 @@
   <img src="../public/Lummo.png" alt="Lummo Studio Logo" width="160" />
 </p>
 
-<h1 align="center">Lummo Studio v2.1.0 — Consolidated Manual (English)</h1>
+<h1 align="center">Lummo Studio v2.3.0 — Consolidated Manual (English)</h1>
 
 <p align="center">
   <strong>Modern Control Panel for Local Development Environments & Relational Database Management</strong>

@@ -1,7 +1,7 @@
 # Arquitectura del Sistema y Proceso IPC
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Módulo Técnico 01 (Español)</strong>
+  <strong>Lummo Studio v2.3.0 — Módulo Técnico 01 (Español)</strong>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@ graph TD
         A --> C[ProjectsPanel & ProjectDetailPage]
         A --> D[DatabasesPanel & DatabaseDetailPage]
         A --> E[SQLiteWorkbench.jsx]
-        A --> F[Modales: ErDiagram, SchemaDesigner, Tunnel, etc.]
+        A --> F[Modales: SettingsModal, ErDiagram, SchemaDesigner, Tunnel, etc.]
     end
 
     subgraph Preload & IPC Bridge
@@ -30,11 +30,12 @@ graph TD
     end
 
     subgraph Proceso Principal - Electron Main (Node.js)
-        H[main.cjs - LifeCycle Orchestrator] --> I[dbManager.cjs - SQLite Persistence]
-        H --> J[processManager.js - Spawn & Log Streamer]
-        H --> K[detector.js & scanner.js - Static Analysis]
-        H --> L[proxyManager.cjs & tunnelManager.cjs]
-        H --> M[managers/trayManager.cjs & windowManager.cjs]
+        H[main.cjs - Bootstrap Loader] --> H1[main.core.jsc Bytecode V8 / main.dev.cjs]
+        H1 --> I[dbManager.cjs - SQLite Persistence]
+        H1 --> J[processManager.js - Spawn & Log Streamer]
+        H1 --> K[detector.js & scanner.js - Static Analysis]
+        H1 --> L[proxyManager.cjs & tunnelManager.cjs]
+        H1 --> M[managers/trayManager.cjs & windowManager.cjs]
     end
 
     A <-->|window.electronAPI IPC| G
@@ -47,8 +48,9 @@ graph TD
 
 El punto de entrada del Proceso Principal reside en `electron/main.cjs`. Sus responsabilidades principales incluyen:
 
-1. **Orquestación del Ciclo de Vida de la Aplicación**:
-   - Inicialización de la ventana principal `BrowserWindow` con preferencias de seguridad (`contextIsolation: true`, `nodeIntegration: false`).
+1. **Orquestación del Ciclo de Vida y Seguridad**:
+   - Loader inteligente de inicio: En producción carga el binario **Bytecode V8 (`main.core.jsc`)**; en desarrollo local carga directamente `main.dev.cjs`.
+   - Inicialización de ventanas con endurecimiento de seguridad en `windowManager.cjs` (`contextIsolation: true`, `nodeIntegration: false`, `devTools: !app.isPackaged`, bloqueo de atajos de depuración e interceptación de URLs).
    - Manejo de instancia única de la aplicación (`app.requestSingleInstanceLock()`).
    - Registro del icono en el área de notificación (System Tray) mediante `trayManager.cjs`.
 

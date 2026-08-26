@@ -1,7 +1,7 @@
 # Database Workbench & Entity-Relationship Diagrams
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Technical Module 03 (English)</strong>
+  <strong>Lummo Studio v2.3.0 — Technical Module 03 (English)</strong>
 </p>
 
 <p align="center">

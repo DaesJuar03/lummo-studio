@@ -135,11 +135,15 @@ export default function ProjectDetailPage({
           setRamUsage(stats.memoryMb || 0);
           setCpuUsage(stats.cpu || 0);
           return;
+        } else {
+          setRamUsage(0);
+          setCpuUsage(0);
+          return;
         }
       }
-      // Fallback light estimate
-      setRamUsage(+(110 + Math.random() * 15).toFixed(1));
-      setCpuUsage(+(0.5 + Math.random() * 1.2).toFixed(1));
+      // Demo fallback when running outside Electron in static browser
+      setRamUsage(0);
+      setCpuUsage(0);
     };
 
     fetchRealMetrics();

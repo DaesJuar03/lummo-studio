@@ -1,7 +1,7 @@
-# Developer Guide, Building & Testing
+# Developer Guide, Build Pipeline & Testing
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Technical Module 05 (English)</strong>
+  <strong>Lummo Studio v2.3.0 — Technical Module 05 (English)</strong>
 </p>
 
 <p align="center">
@@ -15,70 +15,72 @@
 
 ### Prerequisites:
 - **Operating System**: Windows 10 or 11 (64-bit).
-- **Node.js**: Version 18.0.0 or higher (Node 20 LTS recommended).
+- **Node.js**: Version 18.0.0 or higher (Node 20 / 22 LTS recommended).
 - **Package Manager**: `npm` v9.0.0+ (bundled with Node.js).
 - **Git**: Git CLI installed and available in the system `PATH`.
 
-### Clone & Installation Steps:
+### Clone & Install:
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/lummo-studio.git
+git clone https://github.com/your-org/lummo-studio.git
 cd lummo-studio
 
-# 2. Install dependencies
+# 2. Install all dependencies
 npm install
 ```
 
 ---
 
-## 2. npm Scripts Reference (`package.json`)
+## 2. Available Scripts (`package.json`)
 
-Available development and build commands:
+The development and packaging scripts include:
 
 | Command | Execution Description |
 | :--- | :--- |
-| `npm run dev` | Launches Vite dev server for the Renderer process. |
-| `npm run electron:dev` | Runs Vite and Electron concurrently with hot-reloading. |
-| `npm run electron:start` | Launches Electron against compiled dist files. |
-| `npm run build` | Builds production React bundle using Vite into `dist/`. |
-| `npm run dist` | Runs Vite build and packages executable using Electron Builder. |
-| `npm test` | Runs automated test suite using **Vitest**. |
+| `npm run dev` | Starts the Vite dev server for the React UI. |
+| `npm run electron:dev` | Runs Vite and Electron concurrently with live UI HMR. |
+| `npm run electron:start` | Launches Electron against development sources or dist. |
+| `npm run build` | Builds and obfuscates the production React bundle (`inlineDynamicImports`). |
+| `npm run build:electron` | Bundles and compiles main process modules into **V8 Bytecode (`.jsc`)** via Bytenode. |
+| `npm run dist` | Runs the full build, bytecode compilation, and packages the Windows binaries. |
+| `npm test` | Runs the complete automated test suite using **Vitest**. |
 
 ---
 
 ## 3. Automated Test Suite (**Vitest**)
 
-Automated unit and integration tests are located in `tests/`:
+Unit and integration tests are organized under the `tests/` directory:
 
-- `tests/sanitizer.test.js`: Input sanitization and shell injection prevention tests.
-- `tests/detector.test.js`: Verification of the framework auto-detection engine.
-- `tests/dbManager.test.js`: Integration tests for local SQLite state storage.
-- `tests/features.test.js`: Functional tests for UI helper routines.
-- `tests/locales.test.js`: Validation of i18n translation key parity.
+- `tests/sanitizer.test.js`: Shell argument escaping and command injection defense verification.
+- `tests/detector.test.js`: Static framework detector accuracy benchmarks.
+- `tests/dbManager.test.js`: SQLite local persistence integration tests.
+- `tests/features.test.js`: Core studio features and utilities validation.
+- `tests/locales.test.js`: Full i18n translation key coverage verification.
+- `tests/dockerManager.test.js`: Docker Compose generator and status inspection tests.
+- `tests/sslManager.test.js`: Local CA and SSL certificate generation tests.
+- `tests/portResolver.test.js`: Active port conflict resolution tests.
+- `tests/telemetry.test.js`: Real PID-based CPU and RAM metric validation.
 
-### Run Tests:
+### Run test suite:
 ```bash
 npm test
 ```
 
 ---
 
-## 4. Production Build & Distribution (`electron-builder`)
+## 4. Production Packaging (`electron-builder`)
 
-Packaging settings are configured in `package.json` under the `"build"` key.
+Packaging configuration for Windows targets is defined in `package.json` under `"build"`.
 
-### Build Executables:
+### Hardened Production Packaging:
 ```bash
-# Step 1: Build production web bundle
-npm run build
-
-# Step 2: Package Windows executable binaries
-npx electron-builder
+# Automatically triggers: vite build -> build:electron (.jsc bytecode) -> electron-builder
+npm run dist
 ```
 
-### Generated Binaries in `release/`:
-- **NSIS Installer**: `release/Lummo Studio Setup 2.1.0.exe` (Supports custom install path and desktop/start menu shortcuts).
-- **Portable Executable**: `release/Lummo Studio 2.1.0.exe` (Standalone execution without installation).
+### Generated Executables in `release/`:
+- **NSIS Installer**: `release/Lummo Studio Setup 2.3.0.exe` (Allows directory selection and desktop/start menu shortcuts).
+- **Portable Binary**: `release/Lummo Studio 2.3.0.exe` (Zero-installation standalone executable).
 
 ---
 

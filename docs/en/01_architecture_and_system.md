@@ -1,7 +1,7 @@
 # System Architecture & IPC Process
 
 <p align="center">
-  <strong>Lummo Studio v2.1.0 — Technical Module 01 (English)</strong>
+  <strong>Lummo Studio v2.3.0 — Technical Module 01 (English)</strong>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@ graph TD
         A --> C[ProjectsPanel & ProjectDetailPage]
         A --> D[DatabasesPanel & DatabaseDetailPage]
         A --> E[SQLiteWorkbench.jsx]
-        A --> F[Modals: ErDiagram, SchemaDesigner, Tunnel, etc.]
+        A --> F[Modals: SettingsModal, ErDiagram, SchemaDesigner, Tunnel, etc.]
     end
 
     subgraph Preload & IPC Bridge
@@ -30,11 +30,12 @@ graph TD
     end
 
     subgraph Main Process - Electron Main (Node.js)
-        H[main.cjs - LifeCycle Orchestrator] --> I[dbManager.cjs - SQLite Persistence]
-        H --> J[processManager.js - Spawn & Log Streamer]
-        H --> K[detector.js & scanner.js - Static Analysis]
-        H --> L[proxyManager.cjs & tunnelManager.cjs]
-        H --> M[managers/trayManager.cjs & windowManager.cjs]
+        H[main.cjs - Bootstrap Loader] --> H1[main.core.jsc Bytecode V8 / main.dev.cjs]
+        H1 --> I[dbManager.cjs - SQLite Persistence]
+        H1 --> J[processManager.js - Spawn & Log Streamer]
+        H1 --> K[detector.js & scanner.js - Static Analysis]
+        H1 --> L[proxyManager.cjs & tunnelManager.cjs]
+        H1 --> M[managers/trayManager.cjs & windowManager.cjs]
     end
 
     A <-->|window.electronAPI IPC| G
@@ -47,8 +48,9 @@ graph TD
 
 The Main process entrypoint is `electron/main.cjs`. Key responsibilities include:
 
-1. **Application Lifecycle Management**:
-   - Initializing `BrowserWindow` instances with security hardening (`contextIsolation: true`, `nodeIntegration: false`).
+1. **Application Lifecycle & Security Hardening**:
+   - Smart bootstrap loader: Executes compiled **V8 Bytecode (`main.core.jsc`)** in production packages and raw `main.dev.cjs` during local development.
+   - Initializing `BrowserWindow` instances with runtime hardening (`contextIsolation: true`, `nodeIntegration: false`, `devTools: !app.isPackaged`, dev shortcut blocking and URL confinement in `windowManager.cjs`).
    - Single-instance application lock enforcement (`app.requestSingleInstanceLock()`).
    - Registering system tray notifications via `trayManager.cjs`.
 

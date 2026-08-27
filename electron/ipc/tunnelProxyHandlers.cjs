@@ -1,11 +1,7 @@
 const { ipcMain } = require('electron');
 const tunnelManager = require('../tunnelManager.cjs');
 const proxyManager = require('../proxyManager.cjs');
-
-function safeHandle(channel, listener) {
-  ipcMain.removeHandler(channel);
-  ipcMain.handle(channel, listener);
-}
+const { safeHandle } = require('./ipcUtils.cjs');
 
 function registerTunnelProxyHandlers(emitLogToProject, emitUrlToProject, emitWebhookEvent) {
   safeHandle('start-tunnel', async (event, { projectId, port, provider = 'cloudflare' }) => {

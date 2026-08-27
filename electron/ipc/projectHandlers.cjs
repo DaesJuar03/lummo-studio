@@ -5,11 +5,7 @@ const { spawn, exec } = require('child_process');
 const scanner = require('../scanner.js');
 const detector = require('../detector.js');
 const processManager = require('../processManager.js');
-
-function safeHandle(channel, listener) {
-  ipcMain.removeHandler(channel);
-  ipcMain.handle(channel, listener);
-}
+const { safeHandle } = require('./ipcUtils.cjs');
 
 function validateAndSanitizeGitUrl(repoUrl) {
   if (typeof repoUrl !== 'string') {
@@ -221,7 +217,7 @@ function registerProjectHandlers({
     notifyLog(project.id, `[Lummo Studio] Ejecutando: ${finalCommand} en ${project.path} (Puerto ${port})...`);
 
     try {
-      const child = spawn(finalCommand, [], {
+      const child = spawn(finalCommand, {
         cwd: project.path,
         shell: true,
         env: { 
@@ -517,7 +513,7 @@ function registerProjectHandlers({
     notifyLog(projectId, `[Dependencias] Carpeta objetivo: ${folderPath}`);
 
     return new Promise((resolve) => {
-      const child = spawn(cmd, [], {
+      const child = spawn(cmd, {
         cwd: folderPath,
         shell: true,
         env: { ...process.env }
@@ -594,7 +590,7 @@ function registerProjectHandlers({
     notifyLog(projectId, `[Lummo Script] Carpeta: ${folderPath}`);
 
     return new Promise((resolve) => {
-      const child = spawn(scriptCommand, [], {
+      const child = spawn(scriptCommand, {
         cwd: folderPath,
         shell: true,
         env: { ...process.env }

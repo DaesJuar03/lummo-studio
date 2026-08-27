@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   ChevronRight, 
   ChevronLeft, 
-  Cpu, 
-  Code, 
   Sliders, 
-  Check, 
   Sun, 
   Moon, 
-  Languages, 
   RefreshCw,
   Rocket,
   Minus,
@@ -22,10 +18,9 @@ import {
   Globe,
   Download,
   CheckSquare,
-  AlertCircle,
   Loader2
 } from 'lucide-react';
-import { availableLocales, getTranslations } from '../../locales';
+import { availableLocales } from '../../locales';
 import lummoLogo from '../../assets/Lummo.png';
 
 export default function OnboardingWizard({
@@ -46,7 +41,6 @@ export default function OnboardingWizard({
   const [selectedTechs, setSelectedTechs] = useState(new Set());
   const [isInstallingTechs, setIsInstallingTechs] = useState(false);
   const [installProgressMap, setInstallProgressMap] = useState({});
-  const [installLogSummary, setInstallLogSummary] = useState(null);
 
   React.useEffect(() => {
     if (envStatus) {
@@ -81,12 +75,10 @@ export default function OnboardingWizard({
   const handleStartInstallation = async () => {
     if (selectedTechs.size === 0 || !window.electronAPI?.downloadAndInstallTech) return;
     setIsInstallingTechs(true);
-    setInstallLogSummary(null);
 
     const keysToInstall = Array.from(selectedTechs);
     try {
-      const res = await window.electronAPI.downloadAndInstallTech(keysToInstall);
-      setInstallLogSummary(res?.results || {});
+      await window.electronAPI.downloadAndInstallTech(keysToInstall);
       if (onScanEnv) await onScanEnv();
     } catch (err) {
       console.error('Error al instalar tecnologías:', err);
@@ -99,7 +91,6 @@ export default function OnboardingWizard({
   if (!isOpen) return null;
 
   const isDark = theme === 'dark';
-  const t = getTranslations(language);
 
   const handleMinimize = () => {
     if (window.electronAPI?.windowMinimize) window.electronAPI.windowMinimize();
@@ -123,7 +114,7 @@ export default function OnboardingWizard({
         
         {/* Electron Custom Title Drag Bar */}
         <div 
-          className={`h-11 border-b px-6 flex items-center justify-between shrink-0 ${
+          className={`h-11 border-b pl-6 pr-0 flex items-center justify-between shrink-0 ${
             isDark ? 'bg-[#181818] border-[#2a2a2a]' : 'bg-white border-slate-200'
           }`}
           style={{ WebkitAppRegion: 'drag' }}
@@ -136,28 +127,31 @@ export default function OnboardingWizard({
           </div>
 
           {/* Window Controls */}
-          <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' }}>
+          <div className="flex items-stretch h-full" style={{ WebkitAppRegion: 'no-drag' }}>
             <button
               onClick={handleMinimize}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
                 isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
               }`}
+              title="Minimizar"
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={handleMaximize}
-              className={`p-1.5 rounded-lg transition-colors ${
+              className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
                 isDark ? 'text-[#a1a1aa] hover:text-white hover:bg-[#282828]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
               }`}
+              title="Maximizar"
             >
               <Square className="h-3 w-3" />
             </button>
             <button
               onClick={handleClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-rose-600 transition-colors"
+              className="w-12 h-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 active:bg-rose-700 transition-colors cursor-pointer"
+              title="Cerrar"
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -253,7 +247,7 @@ export default function OnboardingWizard({
       
       {/* Electron Custom Title Drag Bar */}
       <div 
-        className={`h-11 border-b px-6 flex items-center justify-between shrink-0 ${
+        className={`h-11 border-b pl-6 pr-0 flex items-center justify-between shrink-0 ${
           isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
@@ -266,28 +260,31 @@ export default function OnboardingWizard({
         </div>
 
         {/* Window Controls */}
-        <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' }}>
+        <div className="flex items-stretch h-full" style={{ WebkitAppRegion: 'no-drag' }}>
           <button
             onClick={handleMinimize}
-            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+            className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
               isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
             }`}
+            title="Minimizar"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={handleMaximize}
-            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+            className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
               isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
             }`}
+            title="Maximizar"
           >
             <Square className="h-3 w-3" />
           </button>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-rose-600 transition-colors cursor-pointer"
+            className="w-12 h-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 active:bg-rose-700 transition-colors cursor-pointer"
+            title="Cerrar"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>

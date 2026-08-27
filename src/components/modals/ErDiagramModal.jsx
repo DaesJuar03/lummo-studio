@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Database, X, ZoomIn, ZoomOut, RotateCcw, Key, Link2, Table, Loader2 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 
-export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme = 'dark', isEmbedded = false }) {
+export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, db, theme = 'dark', isEmbedded = false }) {
+  const activeDb = dbConfig || db;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({ entities: [], relationships: [] });
   const [zoom, setZoom] = useState(1);
@@ -10,17 +11,11 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
   const toast = useToast();
   const isDark = theme === 'dark';
 
-  useEffect(() => {
-    if (dbConfig) {
-      loadErDiagram();
-    }
-  }, [dbConfig]);
-
-  const loadErDiagram = async () => {
+  const loadErDiagram = useCallback(async () => {
     setLoading(true);
     try {
       if (window.electronAPI && window.electronAPI.db?.getErDiagram) {
-        const res = await window.electronAPI.db.getErDiagram(dbConfig);
+        const res = await window.electronAPI.db.getErDiagram(activeDb);
         if (res && res.success) {
           setData(res);
         } else {
@@ -70,7 +65,13 @@ export default function ErDiagramModal({ isOpen = true, onClose, dbConfig, theme
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeDb, toast]);
+
+  useEffect(() => {
+    if (activeDb) {
+      loadErDiagram();
+    }
+  }, [activeDb, loadErDiagram]);
 
   if (!isOpen && !isEmbedded) return null;
 

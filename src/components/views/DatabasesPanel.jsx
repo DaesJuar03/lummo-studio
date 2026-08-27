@@ -2,28 +2,23 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Database, 
-  Play, 
-  Square, 
   Copy, 
   Check, 
   Plus, 
   Upload, 
   Search,
-  Table,
-  ChevronRight,
-  Server
+  Table
 } from 'lucide-react';
 import CreateDatabaseModal from '../modals/CreateDatabaseModal';
 import ImportExportSqlModal from '../modals/ImportExportSqlModal';
 
 export default function DatabasesPanel({ 
-  envStatus, 
+  envStatus: _envStatus, 
   customDatabases = [], 
   onAddCustomDatabase, 
   onSelectDatabaseDetail, 
   theme 
 }) {
-  const [dbStatuses, setDbStatuses] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -33,17 +28,8 @@ export default function DatabasesPanel({
 
   const databases = customDatabases.map(db => ({
     ...db,
-    status: dbStatuses[db.id] !== undefined ? dbStatuses[db.id] : (db.status || 'READY')
+    status: db.status || 'READY'
   }));
-
-  const toggleDatabaseStatus = (dbItem) => {
-    setDbStatuses(prev => {
-      const current = prev[dbItem.id] !== undefined ? prev[dbItem.id] : (dbItem.status || 'STOPPED');
-      const isCurrentlyActive = current === 'RUNNING' || current === 'READY';
-      const next = isCurrentlyActive ? 'STOPPED' : 'RUNNING';
-      return { ...prev, [dbItem.id]: next };
-    });
-  };
 
   const handleCreateDB = (newDb) => {
     const createdItem = {
@@ -59,8 +45,6 @@ export default function DatabasesPanel({
       tables: 0,
       connections: 1
     };
-
-    setDbStatuses(prev => ({ ...prev, [createdItem.id]: 'READY' }));
 
     if (onAddCustomDatabase) {
       onAddCustomDatabase(createdItem);

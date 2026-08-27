@@ -1,11 +1,7 @@
 const { ipcMain } = require('electron');
 const sslManager = require('../managers/sslManager.cjs');
 const proxyManager = require('../proxyManager.cjs');
-
-function safeHandle(channel, listener) {
-  ipcMain.removeHandler(channel);
-  ipcMain.handle(channel, listener);
-}
+const { safeHandle } = require('./ipcUtils.cjs');
 
 function registerSslHandlers() {
   // 1. Get SSL Subsystem Status (CA state, ports, domain counts)

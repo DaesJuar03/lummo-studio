@@ -5,11 +5,7 @@ const http = require('http');
 const https = require('https');
 const { URL } = require('url');
 const webhookProxyManager = require('../webhookProxyManager.cjs');
-
-function safeHandle(channel, listener) {
-  ipcMain.removeHandler(channel);
-  ipcMain.handle(channel, listener);
-}
+const { safeHandle } = require('./ipcUtils.cjs');
 
 function registerApiWebhookHandlers(getMainWindow, emitLogToProject) {
   const emitWebhookEvent = (projectId, eventObj) => {

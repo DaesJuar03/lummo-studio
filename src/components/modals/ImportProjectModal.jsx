@@ -13,7 +13,6 @@ import {
   ArrowRight, 
   AlertTriangle
 } from 'lucide-react';
-import { getTranslations } from '../../locales';
 
 export default function ImportProjectModal({
   isOpen,
@@ -43,7 +42,6 @@ export default function ImportProjectModal({
   if (!isOpen) return null;
 
   const isDark = theme === 'dark';
-  const t = getTranslations(language);
 
   const handleDragOver = (e) => {
     e.preventDefault();

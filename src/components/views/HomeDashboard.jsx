@@ -4,7 +4,6 @@ import {
   FolderPlus, 
   Play, 
   Square, 
-  ExternalLink, 
   FolderOpen, 
   Plus, 
   Layers, 
@@ -12,17 +11,13 @@ import {
   ArrowRight,
   Trash2,
   Table,
-  Activity,
-  Cpu,
   X,
   GitBranch,
-  Download,
-  Sparkles
+  Download
 } from 'lucide-react';
 import CreateDatabaseModal from '../modals/CreateDatabaseModal';
 import CloneRepoModal from '../modals/CloneRepoModal';
 import NewProjectWizardModal from '../modals/NewProjectWizardModal';
-import { getTranslations } from '../../locales';
 
 export default function HomeDashboard({
   projects = [],
@@ -30,7 +25,7 @@ export default function HomeDashboard({
   onAddProject,
   onOpenProjectsTab,
   onOpenDatabasesTab,
-  onOpenSettings,
+  onOpenSettings: _onOpenSettings,
   onToggleProject,
   onRemoveProject,
   onSelectProjectDetail,
@@ -46,8 +41,6 @@ export default function HomeDashboard({
   const [showWizardModal, setShowWizardModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
   const isDark = theme === 'dark';
-
-  const t = getTranslations(language);
 
   const allDbs = (customDatabases || []).map(d => ({ ...d, isDb: true }));
   const activeProjects = (projects || []).filter(p => !p.isArchived);

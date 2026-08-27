@@ -199,7 +199,7 @@ export function startProcess(project, emitLog, emitStatus) {
     // Windows execution compatibility
     const isWin = process.platform === 'win32';
     
-    const child = spawn(command, [], {
+    const child = spawn(command, {
       cwd: folderPath,
       shell: true,
       env: {
@@ -280,7 +280,7 @@ export function runProjectScript(projectId, folderPath, scriptCommand, emitLog) 
     emitLog(projectId, `\n[Lummo Script] === Ejecutando: "${scriptCommand}" ===`);
     emitLog(projectId, `[Lummo Script] Carpeta: ${folderPath}`);
 
-    const child = spawn(scriptCommand, [], {
+    const child = spawn(scriptCommand, {
       cwd: folderPath,
       shell: true,
       env: { ...process.env }
@@ -417,7 +417,7 @@ export async function scaffoldNewProject(options, emitLog) {
   log(`[Lummo Scaffolder] Ejecutando: "${scaffoldCommand}"...`);
 
   return new Promise((resolve) => {
-    const child = spawn(scaffoldCommand, [], {
+    const child = spawn(scaffoldCommand, {
       cwd: projectPath,
       shell: true,
       env: { ...process.env }

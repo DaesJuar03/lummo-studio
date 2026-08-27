@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Zap, PlayCircle, Terminal, Play, RefreshCw, Plus, Trash2, Check } from 'lucide-react';
+import { X, Zap, PlayCircle, Terminal, Play, RefreshCw, Plus, Trash2 } from 'lucide-react';
 
 export default function ScriptLauncherModal({
   isOpen,
@@ -21,7 +21,7 @@ export default function ScriptLauncherModal({
     try {
       const saved = localStorage.getItem(`lummo-shortcuts-${project?.id}`);
       return saved ? JSON.parse(saved) : [];
-    } catch (e) {
+    } catch (_e) {
       return [];
     }
   });
@@ -48,7 +48,7 @@ export default function ScriptLauncherModal({
     setCustomShortcuts(updated);
     try {
       localStorage.setItem(`lummo-shortcuts-${project.id}`, JSON.stringify(updated));
-    } catch (e) {}
+    } catch (_e) {}
 
     setNewShortcutName('');
     setNewShortcutCmd('');
@@ -60,7 +60,7 @@ export default function ScriptLauncherModal({
     setCustomShortcuts(updated);
     try {
       localStorage.setItem(`lummo-shortcuts-${project.id}`, JSON.stringify(updated));
-    } catch (e) {}
+    } catch (_e) {}
   };
 
   const handleExecute = (cmd) => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Database, Check, RefreshCw, Layers } from 'lucide-react';
+import { X, Sparkles, Check, RefreshCw } from 'lucide-react';
 
 export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tableName, columns = [], onGenerated, theme }) {
   const [rowCount, setRowCount] = useState(25);

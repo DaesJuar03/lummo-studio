@@ -8,19 +8,9 @@ import {
   RotateCw, 
   Terminal, 
   Check, 
-  AlertCircle, 
-  Download, 
-  Database, 
   Plus, 
-  Layers, 
-  Radio, 
   Server, 
-  Cpu, 
-  HardDrive,
   RefreshCw,
-  FileCode,
-  ExternalLink,
-  ShieldCheck,
   Zap
 } from 'lucide-react';
 
@@ -132,21 +122,7 @@ export default function DockerComposeModal({
   const isDark = theme === 'dark';
 
   // Check Docker on mount
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const checkSystemDocker = async () => {
-      if (window.electronAPI?.docker?.checkAvailable) {
-        const res = await window.electronAPI.docker.checkAvailable();
-        setDockerAvailable(res);
-      }
-    };
-
-    checkSystemDocker();
-    refreshComposeStatus();
-  }, [isOpen, project?.path]);
-
-  const refreshComposeStatus = async () => {
+  const refreshComposeStatus = React.useCallback(async () => {
     if (!project?.path) return;
     setIsLoading(true);
 
@@ -179,7 +155,21 @@ export default function DockerComposeModal({
     }
 
     setIsLoading(false);
-  };
+  }, [project?.path]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const checkSystemDocker = async () => {
+      if (window.electronAPI?.docker?.checkAvailable) {
+        const res = await window.electronAPI.docker.checkAvailable();
+        setDockerAvailable(res);
+      }
+    };
+
+    checkSystemDocker();
+    refreshComposeStatus();
+  }, [isOpen, refreshComposeStatus]);
 
   const handleRunAction = async (action, serviceName = '') => {
     if (!project?.path) return;

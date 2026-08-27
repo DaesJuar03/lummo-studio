@@ -4,7 +4,6 @@ export { default as ProjectsPanel } from './views/ProjectsPanel';
 export { default as DatabasesPanel } from './views/DatabasesPanel';
 export { default as ProjectDetailPage } from './views/ProjectDetailPage';
 export { default as DatabaseDetailPage } from './views/DatabaseDetailPage';
-export { default as SQLiteWorkbench } from './views/SQLiteWorkbench';
 export { default as OnboardingWizard } from './views/OnboardingWizard';
 export { default as StandaloneLogWindow } from './views/StandaloneLogWindow';
 
@@ -21,7 +20,6 @@ export { default as ImportProjectModal } from './modals/ImportProjectModal';
 export { default as MockDataGeneratorModal } from './modals/MockDataGeneratorModal';
 export { default as NetworkTunnelModal } from './modals/NetworkTunnelModal';
 export { default as NewTabActionModal } from './modals/NewTabActionModal';
-export { default as ProjectDetailModal } from './modals/ProjectDetailModal';
 export { default as SchemaDesignerModal } from './modals/SchemaDesignerModal';
 export { default as ScriptLauncherModal } from './modals/ScriptLauncherModal';
 export { default as SettingsModal } from './modals/SettingsModal';

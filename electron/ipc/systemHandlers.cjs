@@ -1,12 +1,10 @@
 const { ipcMain, dialog, shell, Notification } = require('electron');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
+const { safeHandle } = require('./ipcUtils.cjs');
 
-function safeHandle(channel, listener) {
-  ipcMain.removeHandler(channel);
-  ipcMain.handle(channel, listener);
-}
+const ALLOWED_EDITORS = new Set(['code', 'cursor', 'vscodium', 'subl', 'atom', 'idea', 'webstorm', 'phpstorm', 'notepad', 'explorer']);
 
 function registerSystemHandlers(getMainWindow, appIconPath) {
   safeHandle('window-minimize', () => {
@@ -81,16 +79,21 @@ function registerSystemHandlers(getMainWindow, appIconPath) {
   });
 
   safeHandle('open-in-editor', (event, { folderPath, editorCmd }) => {
-    if (!folderPath) return;
-    const cmd = editorCmd || 'code';
+    if (!folderPath || typeof folderPath !== 'string') return;
+    const rawCmd = String(editorCmd || 'code').trim().toLowerCase();
+    const cmd = ALLOWED_EDITORS.has(rawCmd) ? rawCmd : 'code';
+
     if (cmd === 'explorer') {
       shell.openPath(folderPath);
     } else {
-      exec(`"${cmd}" "${folderPath}"`, (err) => {
-        if (err) {
-          shell.openPath(folderPath);
-        }
+      const isWin = process.platform === 'win32';
+      const child = isWin 
+        ? spawn(`"${cmd}" "${folderPath}"`, { detached: true, stdio: 'ignore', shell: true })
+        : spawn(cmd, [folderPath], { detached: true, stdio: 'ignore' });
+      child.on('error', () => {
+        shell.openPath(folderPath);
       });
+      child.unref();
     }
   });
 

@@ -66,8 +66,9 @@ export default function StandaloneLogWindow({ projectId, projectName }) {
   return (
     <div className="h-screen bg-slate-900 text-slate-100 flex flex-col font-sans select-none selection:bg-blue-600 selection:text-white">
       {/* Titlebar Header in Pure White & Blue Aesthetic */}
+      {/* Titlebar Header in Pure White & Blue Aesthetic */}
       <header 
-        className="px-4 py-2.5 bg-white border-b border-slate-200 flex items-center justify-between select-none"
+        className="pl-4 pr-0 h-11 bg-white border-b border-slate-200 flex items-center justify-between select-none"
         style={{ WebkitAppRegion: 'drag' }}
       >
         <div className="flex items-center space-x-3">
@@ -82,24 +83,24 @@ export default function StandaloneLogWindow({ projectId, projectName }) {
         </div>
 
         {/* Window controls */}
-        <div className="flex items-center space-x-1" style={{ WebkitAppRegion: 'no-drag' }}>
+        <div className="flex items-stretch h-full" style={{ WebkitAppRegion: 'no-drag' }}>
           <button
             onClick={() => window.electronAPI?.windowMinimize()}
-            className="w-9 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="w-11 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             title="Minimizar"
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI?.windowMaximize()}
-            className="w-9 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="w-11 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             title="Maximizar"
           >
             <Square className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI?.windowClose()}
-            className="w-9 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-white hover:bg-rose-600 transition-colors"
+            className="w-12 h-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 active:bg-rose-700 transition-colors cursor-pointer"
             title="Cerrar"
           >
             <X className="h-3.5 w-3.5" />

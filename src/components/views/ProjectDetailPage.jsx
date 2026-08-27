@@ -25,10 +25,7 @@ import {
   Radio,
   AlertTriangle,
   Eye,
-  EyeOff,
-  Copy,
-  Layers,
-  X
+  EyeOff
 } from 'lucide-react';
 import NetworkTunnelModal from '../modals/NetworkTunnelModal';
 import ScriptLauncherModal from '../modals/ScriptLauncherModal';
@@ -72,17 +69,16 @@ export default function ProjectDetailPage({
   const [domainSaveMsg, setDomainSaveMsg] = useState('');
 
   // Custom Script State
-  const [customScriptInput, setCustomScriptInput] = useState('');
   const [isExecutingScript, setIsExecutingScript] = useState(false);
   const [scriptMsg, setScriptMsg] = useState('');
 
   // .env Variables & Example Comparison State
+  const [selectedEnvFile, setSelectedEnvFile] = useState('.env');
   const [envContent, setEnvContent] = useState('');
   const [envExampleContent, setEnvExampleContent] = useState('');
   const [hasEnvExample, setHasEnvExample] = useState(false);
   const [missingKeys, setMissingKeys] = useState([]);
   const [maskSecrets, setMaskSecrets] = useState(true);
-  const [selectedEnvFile, setSelectedEnvFile] = useState('.env');
   const [envPairs, setEnvPairs] = useState([
     { key: 'PORT', value: String(project?.port || 3000) },
     { key: 'NODE_ENV', value: 'development' },
@@ -97,6 +93,33 @@ export default function ProjectDetailPage({
 
   const isDark = theme === 'dark';
   const isRunning = project?.status === 'RUNNING';
+
+  const parseEnvPairs = React.useCallback((rawText) => {
+    const lines = rawText.split('\n');
+    const pairs = [];
+    lines.forEach((line) => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        const [k, ...v] = trimmed.split('=');
+        pairs.push({ key: k.trim(), value: v.join('=').trim() });
+      }
+    });
+    setEnvPairs(pairs.length > 0 ? pairs : [{ key: '', value: '' }]);
+  }, []);
+
+  const detectMissingEnvKeys = React.useCallback((currentEnv, exampleEnv) => {
+    const extractKeys = (txt) => {
+      return txt
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l && !l.startsWith('#') && l.includes('='))
+        .map(l => l.split('=')[0].trim());
+    };
+    const curKeys = new Set(extractKeys(currentEnv));
+    const exKeys = extractKeys(exampleEnv);
+    const missing = exKeys.filter(k => !curKeys.has(k));
+    setMissingKeys(missing);
+  }, []);
 
   // Update input state if project changes from props
   useEffect(() => {
@@ -141,7 +164,6 @@ export default function ProjectDetailPage({
           return;
         }
       }
-      // Demo fallback when running outside Electron in static browser
       setRamUsage(0);
       setCpuUsage(0);
     };
@@ -174,21 +196,7 @@ export default function ProjectDetailPage({
         setHasDockerCompose(Boolean(res && res.hasDocker));
       });
     }
-  }, [project?.path]);
-
-  const detectMissingEnvKeys = (currentEnv, exampleEnv) => {
-    const extractKeys = (txt) => {
-      return txt
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => l && !l.startsWith('#') && l.includes('='))
-        .map(l => l.split('=')[0].trim());
-    };
-    const curKeys = new Set(extractKeys(currentEnv));
-    const exKeys = extractKeys(exampleEnv);
-    const missing = exKeys.filter(k => !curKeys.has(k));
-    setMissingKeys(missing);
-  };
+  }, [project?.path, parseEnvPairs, detectMissingEnvKeys]);
 
   const handleImportMissingKeys = () => {
     if (!envExampleContent) return;
@@ -210,19 +218,6 @@ export default function ProjectDetailPage({
     setMissingKeys([]);
     setEnvSaveStatus('¡Claves de .env.example añadidas!');
     setTimeout(() => setEnvSaveStatus(''), 3000);
-  };
-
-  const parseEnvPairs = (rawText) => {
-    const lines = rawText.split('\n');
-    const pairs = [];
-    lines.forEach((line) => {
-      const trimmed = line.trim();
-      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
-        const [k, ...v] = trimmed.split('=');
-        pairs.push({ key: k.trim(), value: v.join('=').trim() });
-      }
-    });
-    if (pairs.length > 0) setEnvPairs(pairs);
   };
 
   const generateEnvText = (pairs) => {

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Download, Check, FileText, Camera, RefreshCw } from 'lucide-react';
 
-export default function ImportExportSqlModal({ isOpen, onClose, dbEngine }) {
+export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db }) {
+  const engineConfig = dbEngine || db;
   const [activeTab, setActiveTab] = useState('import'); // 'import' | 'export' | 'snapshot'
   const [selectedFile, setSelectedFile] = useState(null);
   const [statusMsg, setStatusMsg] = useState(null);
@@ -20,9 +21,9 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine }) {
     if (!selectedFile) return;
     setIsProcessing(true);
 
-    if (window.electronAPI?.db?.importSql && dbEngine) {
+    if (window.electronAPI?.db?.importSql && engineConfig) {
       const filePath = selectedFile.path || selectedFile.name;
-      const res = await window.electronAPI.db.importSql(dbEngine, filePath);
+      const res = await window.electronAPI.db.importSql(engineConfig, filePath);
       setIsProcessing(false);
 
       if (res.success) {
@@ -38,7 +39,7 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine }) {
     } else {
       setTimeout(() => {
         setIsProcessing(false);
-        setStatusMsg({ type: 'success', text: `¡Backup "${selectedFile.name}" importado!` });
+        setStatusMsg({ type: 'success', text: `¡Backup "${selectedFile.name}" importado con éxito!` });
         setTimeout(() => {
           setStatusMsg(null);
           setSelectedFile(null);
@@ -50,10 +51,10 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine }) {
 
   const handleExport = async () => {
     setIsProcessing(true);
-    const fileName = `${dbEngine?.id || 'db'}_dump_${Date.now()}.sql`;
+    const fileName = `${engineConfig?.id || 'db'}_dump_${Date.now()}.sql`;
 
-    if (window.electronAPI?.db?.exportSql && dbEngine) {
-      const res = await window.electronAPI.db.exportSql(dbEngine, fileName);
+    if (window.electronAPI?.db?.exportSql && engineConfig) {
+      const res = await window.electronAPI.db.exportSql(engineConfig, fileName);
       setIsProcessing(false);
       if (res.success) {
         setStatusMsg({ type: 'success', text: `¡Dump generado exitosamente en "${res.filePath || fileName}"!` });
@@ -78,8 +79,8 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine }) {
 
   const handleCreateSnapshot = async () => {
     setIsProcessing(true);
-    if (window.electronAPI?.db?.createSnapshot && dbEngine) {
-      const res = await window.electronAPI.db.createSnapshot(dbEngine);
+    if (window.electronAPI?.db?.createSnapshot && engineConfig) {
+      const res = await window.electronAPI.db.createSnapshot(engineConfig);
       setIsProcessing(false);
       if (res.success) {
         setStatusMsg({ type: 'success', text: res.message || '¡Snapshot instantáneo creado con éxito!' });

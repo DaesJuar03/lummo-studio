@@ -2,11 +2,7 @@ const { ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const dbManager = require('../dbManager.cjs');
-
-function safeHandle(channel, listener) {
-  ipcMain.removeHandler(channel);
-  ipcMain.handle(channel, listener);
-}
+const { safeHandle } = require('./ipcUtils.cjs');
 
 function registerDbHandlers(getMainWindow) {
   safeHandle('db-test-connection', async (event, config) => {

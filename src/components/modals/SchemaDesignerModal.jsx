@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Trash2, Code, Copy, Check, Sparkles, Layers, Database } from 'lucide-react';
+import { X, Plus, Trash2, Copy, Check, Layers } from 'lucide-react';
 
 export default function SchemaDesignerModal({ isOpen, onClose, tableName: initialTableName = 'nueva_tabla', theme }) {
   const [tableName, setTableName] = useState(initialTableName);

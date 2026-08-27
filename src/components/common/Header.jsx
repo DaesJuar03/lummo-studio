@@ -98,7 +98,7 @@ export default function Header({
     }`} onClick={closeContextMenu}>
       {/* Top Titlebar Row */}
       <div 
-        className={`h-11 px-3 flex items-center justify-between border-b ${
+        className={`h-11 pl-3 pr-0 flex items-center justify-between border-b ${
           isDark ? 'bg-[#090A0F]/95 backdrop-blur-md border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
@@ -172,13 +172,13 @@ export default function Header({
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center space-x-2 shrink-0" style={{ WebkitAppRegion: 'no-drag' }}>
+        <div className="flex items-center shrink-0 h-full" style={{ WebkitAppRegion: 'no-drag' }}>
           <button
             onClick={onOpenSettings}
-            className={`px-2.5 py-1 rounded-lg border border-transparent transition-all flex items-center space-x-1.5 text-xs font-bold cursor-pointer ${
+            className={`mr-2 px-2.5 py-1 rounded-lg border border-transparent transition-all flex items-center space-x-1.5 text-xs font-bold cursor-pointer ${
               isDark 
                 ? 'text-[#94A3B8] hover:bg-[#12141F] hover:border-white/[0.08] hover:text-white hover:shadow-2xs' 
-                : 'text-slate-700 hover:bg-slate-200/70 hover:border-slate-300 hover:text-slate-900 hover:shadow-2xs'
+                : 'text-slate-700 hover:bg-slate-300/60 hover:border-slate-300 hover:text-slate-900 hover:shadow-2xs'
             }`}
             title={t.settings}
           >
@@ -186,10 +186,10 @@ export default function Header({
             <span>{t.settings}</span>
           </button>
 
-          <div className={`flex items-center pl-2 border-l h-11 ${isDark ? 'border-white/[0.08]' : 'border-slate-300/70'}`}>
+          <div className={`flex items-stretch border-l h-full ${isDark ? 'border-white/[0.08]' : 'border-slate-300/70'}`}>
             <button
               onClick={handleMinimize}
-              className={`w-10 h-11 flex items-center justify-center transition-all cursor-pointer ${
+              className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
                 isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Minimizar"
@@ -198,7 +198,7 @@ export default function Header({
             </button>
             <button
               onClick={handleMaximize}
-              className={`w-10 h-11 flex items-center justify-center transition-all cursor-pointer ${
+              className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
                 isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Maximizar"
@@ -207,7 +207,7 @@ export default function Header({
             </button>
             <button
               onClick={handleClose}
-              className="w-10 h-11 flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 transition-colors cursor-pointer"
+              className="w-12 h-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 active:bg-rose-700 transition-colors cursor-pointer"
               title="Cerrar"
             >
               <X className="h-4 w-4" />

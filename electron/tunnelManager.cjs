@@ -52,7 +52,7 @@ async function startTunnel(projectId, port, emitLog, emitUrl, emitWebhookEvent, 
     cmd = `npx -y localtunnel --port ${tunnelPort}`;
   }
 
-  const child = spawn(cmd, [], { shell: true });
+  const child = spawn(cmd, { shell: true });
   activeTunnels.set(projectId, child);
 
   let urlFound = false;

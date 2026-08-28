@@ -37,7 +37,7 @@ function createSystemTray({ appIconPath, getMainWindow, runningProcesses, stopPr
 
     const menuTemplate = [
       { 
-        label: 'Lummo Studio v2.3.11', 
+        label: `Lummo Studio v${app.getVersion ? app.getVersion() : '2.3.12'}`, 
         enabled: false 
       },
       {

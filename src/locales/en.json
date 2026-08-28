@@ -6,7 +6,7 @@
     "badge": "EN"
   },
   "translations": {
-    "appVersion": "v2.3.11",
+    "appVersion": "v2.3.12",
     "home": "Home",
     "projects": "Projects",
     "databases": "Databases",
@@ -14,7 +14,6 @@
     "quickCommand": "Quick Command",
     "active": "Active",
     "running": "Running",
-
     "welcome": "Welcome to Lummo Studio",
     "runYourProject": "Build and run your stack without limits",
     "launcherDesc": "Local development environment launcher. Open Projects or Databases tabs instantly.",
@@ -34,9 +33,8 @@
     "noItems": "No recent items found",
     "noItemsDesc": "Use the launchers on the left to add your first projects or databases.",
     "baseDeDatos": "Database",
-
     "settingsTitle": "Settings & Preferences",
-    "settingsDesc": "Global configuration for Lummo Studio v2.3.11",
+    "settingsDesc": "Global configuration for Lummo Studio v2.3.12",
     "systemServices": "System Services",
     "defaultPorts": "Default Ports",
     "codeEditorTab": "Code Editor",
@@ -56,7 +54,6 @@
     "openBrowserAuto": "Open browser automatically when launching a project",
     "scanOnStart": "Scan system executables when Lummo starts",
     "saveAndClose": "Save & Close",
-
     "createDb": "+ Create New DB",
     "createTable": "+ Create New Table",
     "dumpSql": "Dump SQL",

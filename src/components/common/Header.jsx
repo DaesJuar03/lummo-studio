@@ -150,7 +150,7 @@ export default function Header({
                 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
                 : 'bg-blue-50 text-blue-600 border border-blue-200'
             }`}>
-              v2.3.11
+              {updater?.currentVersion ? (updater.currentVersion.startsWith('v') ? updater.currentVersion : `v${updater.currentVersion}`) : 'v2.3.12'}
             </span>
           </div>
         </div>

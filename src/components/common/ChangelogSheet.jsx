@@ -4,7 +4,7 @@ import { FileText, CheckCircle2, Sparkles, X, ArrowRight, ShieldCheck, Zap } fro
 
 export default function ChangelogSheet({
   show,
-  version = '2.3.11',
+  version = '2.3.12',
   releaseNotes,
   onClose
 }) {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import packageInfo from '../../package.json';
 
-const CURRENT_VERSION = packageInfo.version || '2.3.11';
+const CURRENT_VERSION = packageInfo.version || '2.3.12';
 const STORAGE_KEY_LAST_VERSION = 'lummo_last_seen_version';
 const STORAGE_KEY_CHANGELOG_DISMISSED = 'lummo_changelog_dismissed_version';
 

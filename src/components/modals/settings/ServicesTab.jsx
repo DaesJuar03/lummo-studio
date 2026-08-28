@@ -7,7 +7,8 @@ export default function ServicesTab({
   onScanEnv,
   isScanning,
   theme,
-  t
+  t,
+  language = 'es'
 }) {
   const isDark = theme === 'dark';
   const [selectedTechs, setSelectedTechs] = useState(new Set());
@@ -65,7 +66,7 @@ export default function ServicesTab({
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 gap-3 ${isDark ? 'border-white/[0.08]' : 'border-slate-100'}`}>
         <div>
           <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.systemServices}</h4>
-          <p className="text-xs text-slate-400">Diagnóstico de ejecutables y motores locales detectados en tu equipo</p>
+          <p className="text-xs text-slate-400">{t.diagnosticsDesc || 'Diagnostics of local executables and engines detected on your machine'}</p>
         </div>
 
         <div className="flex items-center space-x-2 shrink-0">
@@ -79,7 +80,7 @@ export default function ServicesTab({
               }`}
             >
               <RefreshCw className={`h-4 w-4 shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
-              <span className="whitespace-nowrap">{isScanning ? 'Escaneando...' : 'Re-Escanear'}</span>
+              <span className="whitespace-nowrap">{isScanning ? (language === 'es' ? 'Escaneando...' : 'Scanning...') : (t.rescanShort || t.rescan || 'Rescan')}</span>
             </motion.button>
           )}
 
@@ -96,8 +97,8 @@ export default function ServicesTab({
               )}
               <span className="whitespace-nowrap">
                 {isInstallingTechs 
-                  ? 'Instalando...' 
-                  : `Descargar e Instalar (${selectedTechs.size})`}
+                  ? (language === 'es' ? 'Instalando...' : 'Installing...') 
+                  : `${t.downloadAndInstall || 'Download & Install'} (${selectedTechs.size})`}
               </span>
             </button>
           )}
@@ -113,11 +114,11 @@ export default function ServicesTab({
             <div className="flex items-center space-x-2">
               <Loader2 className={`h-4 w-4 text-blue-500 ${isInstallingTechs ? 'animate-spin' : ''}`} />
               <h4 className={`font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Progreso de Instalación en el Sistema
+                {language === 'es' ? 'Progreso de Instalación en el Sistema' : 'System Installation Progress'}
               </h4>
             </div>
             <span className="text-[10px] font-mono font-bold text-blue-400">
-              {isInstallingTechs ? 'Instalando...' : 'Completado'}
+              {isInstallingTechs ? (language === 'es' ? 'Instalando...' : 'Installing...') : (language === 'es' ? 'Completado' : 'Completed')}
             </span>
           </div>
 
@@ -134,7 +135,7 @@ export default function ServicesTab({
                       {progressData.name || techKey}
                     </span>
                     <span className="text-slate-400">
-                      {progressData.message || (stage === 'waiting' ? 'En cola...' : `${percent}%`)}
+                      {progressData.message || (stage === 'waiting' ? (language === 'es' ? 'En cola...' : 'Queued...') : `${percent}%`)}
                     </span>
                   </div>
                   <div className="w-full bg-slate-700/30 h-2 rounded-full overflow-hidden">
@@ -165,7 +166,7 @@ export default function ServicesTab({
           { name: 'Python', key: 'python' },
           { name: 'Git for Windows', key: 'git' },
           { name: 'Docker', key: 'docker' },
-          { name: 'SQLite Nativo', key: 'sqlite' }
+          { name: t.nativeSqlite || 'Native SQLite', key: 'sqlite' }
         ].map((srv) => {
           const status = envStatus ? envStatus[srv.key] : null;
           const isInstalled = status?.installed;
@@ -196,7 +197,7 @@ export default function ServicesTab({
                 )}
                 <div>
                   <span className={`block font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>{srv.name}</span>
-                  <span className="block text-[11px] font-mono text-slate-400">{status?.version || (isInstalled ? 'Instalado' : 'No instalado')}</span>
+                  <span className="block text-[11px] font-mono text-slate-400">{status?.version || (isInstalled ? (t.installed || 'Installed') : (t.notInstalled || 'Not installed'))}</span>
                 </div>
               </div>
               <span className={`w-2.5 h-2.5 rounded-full ${isInstalled ? 'bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-amber-400'}`}></span>

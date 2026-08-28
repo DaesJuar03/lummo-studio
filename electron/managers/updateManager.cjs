@@ -128,7 +128,9 @@ function initUpdateManager(getMainWindow) {
   safeHandle('updater-restart-and-apply', () => {
     try {
       if (app.isPackaged && autoUpdater) {
-        autoUpdater.quitAndInstall(false, true);
+        // isSilent: true (instalación silenciosa en segundo plano sin abrir ventanas de asistente)
+        // isForceRunAfter: true (rearranca Lummo Studio inmediatamente al terminar)
+        autoUpdater.quitAndInstall(true, true);
       } else {
         app.relaunch();
         app.exit(0);

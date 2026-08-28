@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Trash2, X, Pause, Play, ArrowDown } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
-export default function LogsConsole({ logs, activeProjectId, projects, onClose, onClearLogs }) {
+export default function LogsConsole({ logs, activeProjectId, projects, onClose, onClearLogs, language = 'es' }) {
   const endRef = useRef(null);
   const containerRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const t = getTranslations(language);
 
   const currentProject = projects.find(p => p.id === activeProjectId);
   const projectLogs = logs[activeProjectId] || [];
 
-  // Buffering: limit visible rendered lines for extreme performance
   const displayLogs = useMemo(() => {
     return projectLogs.length > 500 ? projectLogs.slice(projectLogs.length - 500) : projectLogs;
   }, [projectLogs]);
@@ -51,14 +52,14 @@ export default function LogsConsole({ logs, activeProjectId, projects, onClose, 
           <div className="flex items-center space-x-3">
             <Terminal className="h-4 w-4 text-blue-400" />
             <span className="text-xs font-bold font-mono text-slate-200">
-              Console Logs: <span className="text-blue-400 font-mono">{currentProject?.name || activeProjectId}</span>
+              {t.consoleLogs || 'Console Logs'}: <span className="text-blue-400 font-mono">{currentProject?.name || activeProjectId}</span>
             </span>
             <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
-              {projectLogs.length} líneas
+              {projectLogs.length} {language === 'es' ? 'líneas' : 'lines'}
             </span>
             {!autoScroll && (
               <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono flex items-center gap-1 animate-pulse">
-                Auto-scroll Pausado
+                {language === 'es' ? 'Auto-scroll Pausado' : 'Auto-scroll Paused'}
               </span>
             )}
           </div>
@@ -67,23 +68,23 @@ export default function LogsConsole({ logs, activeProjectId, projects, onClose, 
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={autoScroll ? () => setAutoScroll(false) : scrollToBottom}
-              className={`px-2 py-1 text-xs rounded-lg font-mono flex items-center gap-1 transition-colors ${
+              className={`px-2 py-1 text-xs rounded-lg font-mono flex items-center gap-1 transition-colors cursor-pointer ${
                 autoScroll 
                   ? 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700' 
                   : 'bg-amber-600 text-white hover:bg-amber-500'
               }`}
-              title={autoScroll ? 'Pausar auto-scroll' : 'Reanudar auto-scroll'}
+              title={autoScroll ? (language === 'es' ? 'Pausar auto-scroll' : 'Pause auto-scroll') : (language === 'es' ? 'Reanudar auto-scroll' : 'Resume auto-scroll')}
             >
               {autoScroll ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-              <span>{autoScroll ? 'Pausar' : 'Reanudar'}</span>
+              <span>{autoScroll ? (language === 'es' ? 'Pausar' : 'Pause') : (language === 'es' ? 'Reanudar' : 'Resume')}</span>
             </motion.button>
 
             {!autoScroll && (
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={scrollToBottom}
-                className="p-1.5 rounded-lg text-blue-400 hover:text-white hover:bg-slate-800 transition-colors"
-                title="Ir al final de los logs"
+                className="p-1.5 rounded-lg text-blue-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                title={language === 'es' ? 'Ir al final de los logs' : 'Scroll to bottom'}
               >
                 <ArrowDown className="h-4 w-4" />
               </motion.button>
@@ -92,8 +93,8 @@ export default function LogsConsole({ logs, activeProjectId, projects, onClose, 
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => onClearLogs(activeProjectId)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              title="Limpiar logs"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              title={language === 'es' ? 'Limpiar logs' : 'Clear logs'}
             >
               <Trash2 className="h-4 w-4" />
             </motion.button>
@@ -101,8 +102,8 @@ export default function LogsConsole({ logs, activeProjectId, projects, onClose, 
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              title="Cerrar consola"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              title={language === 'es' ? 'Cerrar consola' : 'Close console'}
             >
               <X className="h-4 w-4" />
             </motion.button>
@@ -116,7 +117,7 @@ export default function LogsConsole({ logs, activeProjectId, projects, onClose, 
           className="p-4 h-52 overflow-y-auto font-mono text-xs text-slate-300 space-y-1 bg-black/90 selection:bg-blue-600 selection:text-white scrollbar-thin"
         >
           {displayLogs.length === 0 ? (
-            <p className="text-slate-600 italic">No hay logs registrados para este servicio aún...</p>
+            <p className="text-slate-600 italic">{language === 'es' ? 'No hay logs registrados para este servicio aún...' : 'No logs recorded for this service yet...'}</p>
           ) : (
             displayLogs.map((line, idx) => (
               <div key={idx} className="whitespace-pre-wrap leading-relaxed border-l-2 border-transparent hover:border-blue-500 hover:bg-white/5 px-2 py-0.5 rounded">
@@ -146,18 +147,17 @@ export default function LogsConsole({ logs, activeProjectId, projects, onClose, 
           <input
             name="stdinInput"
             type="text"
-            placeholder="Escribe un comando o interactúa con la consola (stdin)..."
+            placeholder={language === 'es' ? "Escribe un comando o interactúa con la consola (stdin)..." : "Type a command or interact with console (stdin)..."}
             className="flex-1 bg-transparent text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none"
           />
           <button
             type="submit"
-            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white font-mono text-[11px] font-bold rounded-lg transition-colors shadow-2xs"
+            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white font-mono text-[11px] font-bold rounded-lg transition-colors shadow-2xs cursor-pointer"
           >
-            Enviar (Enter)
+            {language === 'es' ? 'Enviar (Enter)' : 'Send (Enter)'}
           </button>
         </form>
       </motion.div>
     </AnimatePresence>
   );
 }
-

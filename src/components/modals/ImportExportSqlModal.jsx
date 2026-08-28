@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Download, Check, FileText, Camera, RefreshCw } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
-export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db }) {
+export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db, theme, language = 'es' }) {
   const engineConfig = dbEngine || db;
-  const [activeTab, setActiveTab] = useState('import'); // 'import' | 'export' | 'snapshot'
+  const [activeTab, setActiveTab] = useState('import');
   const [selectedFile, setSelectedFile] = useState(null);
   const [statusMsg, setStatusMsg] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   if (!isOpen) return null;
 
@@ -27,19 +31,19 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db }) 
       setIsProcessing(false);
 
       if (res.success) {
-        setStatusMsg({ type: 'success', text: res.message || `¡Backup "${selectedFile.name}" importado con éxito!` });
+        setStatusMsg({ type: 'success', text: res.message || (language === 'es' ? `¡Backup "${selectedFile.name}" importado con éxito!` : `Backup "${selectedFile.name}" imported successfully!`) });
         setTimeout(() => {
           setStatusMsg(null);
           setSelectedFile(null);
           onClose();
         }, 2000);
       } else {
-        setStatusMsg({ type: 'error', text: res.error || 'Error al ejecutar el archivo SQL.' });
+        setStatusMsg({ type: 'error', text: res.error || (language === 'es' ? 'Error al ejecutar el archivo SQL.' : 'Error executing SQL file.') });
       }
     } else {
       setTimeout(() => {
         setIsProcessing(false);
-        setStatusMsg({ type: 'success', text: `¡Backup "${selectedFile.name}" importado con éxito!` });
+        setStatusMsg({ type: 'success', text: language === 'es' ? `¡Backup "${selectedFile.name}" importado con éxito!` : `Backup "${selectedFile.name}" imported successfully!` });
         setTimeout(() => {
           setStatusMsg(null);
           setSelectedFile(null);
@@ -57,18 +61,18 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db }) 
       const res = await window.electronAPI.db.exportSql(engineConfig, fileName);
       setIsProcessing(false);
       if (res.success) {
-        setStatusMsg({ type: 'success', text: `¡Dump generado exitosamente en "${res.filePath || fileName}"!` });
+        setStatusMsg({ type: 'success', text: language === 'es' ? `¡Dump generado exitosamente en "${res.filePath || fileName}"!` : `Dump generated successfully at "${res.filePath || fileName}"!` });
         setTimeout(() => {
           setStatusMsg(null);
           onClose();
         }, 2500);
       } else {
-        setStatusMsg({ type: 'error', text: res.error || 'Error exportando SQL dump.' });
+        setStatusMsg({ type: 'error', text: res.error || (language === 'es' ? 'Error exportando SQL dump.' : 'Error exporting SQL dump.') });
       }
     } else {
       setTimeout(() => {
         setIsProcessing(false);
-        setStatusMsg({ type: 'success', text: `¡Dump "${fileName}" generado!` });
+        setStatusMsg({ type: 'success', text: language === 'es' ? `¡Dump "${fileName}" generado!` : `Dump "${fileName}" generated!` });
         setTimeout(() => {
           setStatusMsg(null);
           onClose();
@@ -83,18 +87,18 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db }) 
       const res = await window.electronAPI.db.createSnapshot(engineConfig);
       setIsProcessing(false);
       if (res.success) {
-        setStatusMsg({ type: 'success', text: res.message || '¡Snapshot instantáneo creado con éxito!' });
+        setStatusMsg({ type: 'success', text: res.message || (language === 'es' ? '¡Snapshot instantáneo creado con éxito!' : 'Instant snapshot created successfully!') });
         setTimeout(() => {
           setStatusMsg(null);
           onClose();
         }, 2500);
       } else {
-        setStatusMsg({ type: 'error', text: res.error || 'Error al crear snapshot.' });
+        setStatusMsg({ type: 'error', text: res.error || (language === 'es' ? 'Error al crear snapshot.' : 'Error creating snapshot.') });
       }
     } else {
       setTimeout(() => {
         setIsProcessing(false);
-        setStatusMsg({ type: 'success', text: '¡Snapshot instantáneo creado correctamente!' });
+        setStatusMsg({ type: 'success', text: language === 'es' ? '¡Snapshot instantáneo creado correctamente!' : 'Instant snapshot created successfully!' });
         setTimeout(() => {
           setStatusMsg(null);
           onClose();
@@ -109,7 +113,7 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db }) 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 select-none"
         onClick={onClose}
       >
         <motion.div
@@ -118,166 +122,118 @@ export default function ImportExportSqlModal({ isOpen, onClose, dbEngine, db }) 
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white w-full max-w-lg rounded-3xl border border-slate-200 shadow-2xl overflow-hidden"
+          className={`w-full max-w-md rounded-3xl border shadow-2xl overflow-hidden ${
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
+          }`}
         >
           {/* Header */}
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
-                <FileText className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-extrabold text-slate-900 text-base">Respaldos & Dumps SQL</h3>
-                <p className="text-xs text-slate-500">Herramientas de respaldo para {dbEngine?.name || 'Base de datos'}</p>
-              </div>
-            </div>
+          <div className={`px-6 py-4 border-b flex items-center justify-between ${
+            isDark ? 'bg-[#181818] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+          }`}>
+            <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              {language === 'es' ? 'Respaldos & SQL Dump' : 'Backups & SQL Dump'}
+            </h3>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+              className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+              }`}
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Sub-tabs */}
-          <div className="px-6 py-2.5 bg-slate-100/70 border-b border-slate-200 flex items-center space-x-2">
+          {/* Sub Navigation */}
+          <div className="flex border-b border-white/[0.06] text-xs font-bold">
             <button
               onClick={() => setActiveTab('import')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                activeTab === 'import' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-200/60'
+              className={`flex-1 py-3 text-center transition-colors cursor-pointer ${
+                activeTab === 'import' ? 'border-b-2 border-blue-500 text-blue-400' : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Upload className="h-3.5 w-3.5" />
-              <span>Importar (.sql)</span>
+              {language === 'es' ? 'Importar SQL' : 'Import SQL'}
             </button>
             <button
               onClick={() => setActiveTab('export')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                activeTab === 'export' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-200/60'
+              className={`flex-1 py-3 text-center transition-colors cursor-pointer ${
+                activeTab === 'export' ? 'border-b-2 border-blue-500 text-blue-400' : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Download className="h-3.5 w-3.5" />
-              <span>Exportar Dump</span>
+              {language === 'es' ? 'Exportar Dump' : 'Export Dump'}
             </button>
             <button
               onClick={() => setActiveTab('snapshot')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
-                activeTab === 'snapshot' ? 'bg-purple-600 text-white shadow-xs' : 'text-purple-600 hover:bg-purple-100'
+              className={`flex-1 py-3 text-center transition-colors cursor-pointer ${
+                activeTab === 'snapshot' ? 'border-b-2 border-blue-500 text-blue-400' : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Camera className="h-3.5 w-3.5" />
-              <span>Snapshot Instantáneo</span>
+              {language === 'es' ? 'Snapshot Rápido' : 'Quick Snapshot'}
             </button>
           </div>
 
           {/* Body */}
           <div className="p-6 space-y-4 text-xs">
             {statusMsg && (
-              <div className={`p-3 border rounded-xl font-semibold flex items-center gap-2 ${
-                statusMsg.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              <div className={`p-3 rounded-xl font-mono text-xs ${
+                statusMsg.type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
               }`}>
-                <Check className="h-4 w-4 shrink-0" />
-                <span>{statusMsg.text}</span>
+                {statusMsg.text}
               </div>
             )}
 
             {activeTab === 'import' && (
               <div className="space-y-4">
-                <p className="text-slate-600">
-                  Selecciona un archivo script de respaldo <strong className="text-slate-900 font-mono">.sql</strong> para restaurarlo:
+                <p className="text-slate-400">
+                  {language === 'es' ? 'Selecciona un archivo .sql o .dump para restaurar tablas y registros en esta base de datos.' : 'Select a .sql or .dump file to restore tables and records into this database.'}
                 </p>
-
-                <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:border-blue-400 transition-colors bg-slate-50/50">
-                  <input
-                    type="file"
-                    accept=".sql"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    id="sql-file-input"
-                  />
-                  <label htmlFor="sql-file-input" className="cursor-pointer space-y-2 block">
-                    <Upload className="h-8 w-8 text-blue-600 mx-auto" />
-                    <span className="font-bold text-slate-800 block">
-                      {selectedFile ? selectedFile.name : 'Haz clic para seleccionar tu archivo .sql'}
-                    </span>
-                    <span className="text-[11px] text-slate-400 block">Archivos aceptados: .sql, .dump</span>
-                  </label>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    onClick={handleImport}
-                    disabled={!selectedFile || isProcessing}
-                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-600/20 transition-all flex items-center space-x-1.5 disabled:opacity-40 cursor-pointer"
-                  >
-                    {isProcessing && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
-                    <span>{isProcessing ? 'Importando...' : 'Ejecutar Importación'}</span>
-                  </button>
-                </div>
+                <input
+                  type="file"
+                  accept=".sql,.dump,.txt"
+                  onChange={handleFileChange}
+                  className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+                />
+                <button
+                  type="button"
+                  disabled={!selectedFile || isProcessing}
+                  onClick={handleImport}
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-600/20 cursor-pointer disabled:opacity-50"
+                >
+                  {isProcessing ? (language === 'es' ? 'Restaurando...' : 'Restoring...') : (language === 'es' ? 'Ejecutar Restauración SQL' : 'Run SQL Restore')}
+                </button>
               </div>
             )}
 
             {activeTab === 'export' && (
               <div className="space-y-4">
-                <p className="text-slate-600">
-                  Genera un archivo dump SQL con la estructura <code className="font-mono font-bold text-blue-600">CREATE TABLE</code> y todos los registros:
+                <p className="text-slate-400">
+                  {language === 'es' ? 'Genera un volcado completo de la estructura y datos en un archivo .sql descargable.' : 'Generate a complete dump of structure and data into a downloadable .sql file.'}
                 </p>
-
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl space-y-2 font-mono text-[11px] text-blue-900">
-                  <div className="flex justify-between">
-                    <span>Motor:</span>
-                    <span className="font-bold">{dbEngine?.name || 'Base de datos'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Formato:</span>
-                    <span className="font-bold">SQL Standard Dump (.sql)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Cotejamiento:</span>
-                    <span className="font-bold">UTF-8 Unicode</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    onClick={handleExport}
-                    disabled={isProcessing}
-                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-600/20 transition-all flex items-center space-x-2 disabled:opacity-40 cursor-pointer"
-                  >
-                    {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                    <span>{isProcessing ? 'Generando...' : 'Generar Dump SQL'}</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  disabled={isProcessing}
+                  onClick={handleExport}
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>{isProcessing ? (language === 'es' ? 'Generando Dump...' : 'Generating Dump...') : (language === 'es' ? 'Generar y Descargar Dump' : 'Generate & Download Dump')}</span>
+                </button>
               </div>
             )}
 
             {activeTab === 'snapshot' && (
               <div className="space-y-4">
-                <p className="text-slate-600">
-                  Crea una foto de respaldo instantánea (snapshot) etiquetada con fecha y hora en el directorio local:
+                <p className="text-slate-400">
+                  {language === 'es' ? 'Guarda una copia en caliente del estado actual de la base de datos sin detener los servicios.' : 'Save a hot copy of the current database state without stopping services.'}
                 </p>
-
-                <div className="p-4 bg-purple-50 border border-purple-200 rounded-2xl space-y-2 font-mono text-[11px] text-purple-900">
-                  <div className="flex justify-between">
-                    <span>Destino:</span>
-                    <span className="font-bold">.lummo_backups/</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Marca de Tiempo:</span>
-                    <span className="font-bold">{new Date().toLocaleTimeString()}</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    onClick={handleCreateSnapshot}
-                    disabled={isProcessing}
-                    className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-md shadow-purple-600/20 transition-all flex items-center space-x-2 disabled:opacity-40 cursor-pointer"
-                  >
-                    {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-                    <span>{isProcessing ? 'Guardando...' : 'Crear Snapshot Instantáneo'}</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  disabled={isProcessing}
+                  onClick={handleCreateSnapshot}
+                  className="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-md shadow-purple-600/20 flex items-center justify-center space-x-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <Camera className="h-4 w-4" />
+                  <span>{isProcessing ? (language === 'es' ? 'Guardando Snapshot...' : 'Saving Snapshot...') : (language === 'es' ? 'Crear Snapshot Instantáneo' : 'Create Instant Snapshot')}</span>
+                </button>
               </div>
             )}
           </div>

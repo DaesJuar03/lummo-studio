@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Settings2, Save, RefreshCw, Check } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
 export default function ExecutionConfigModal({
   isOpen,
@@ -13,9 +14,11 @@ export default function ExecutionConfigModal({
   onSaveConfig,
   isRestarting,
   savedMessage,
-  theme
+  theme,
+  language = 'es'
 }) {
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   if (!isOpen || !project) return null;
 
@@ -48,9 +51,11 @@ export default function ExecutionConfigModal({
               </div>
               <div>
                 <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Configuración de Ejecución
+                  {language === 'es' ? 'Configuración de Ejecución' : 'Execution Configuration'}
                 </h3>
-                <p className="text-xs text-slate-400">Modifica el puerto y comando de {project.name}</p>
+                <p className="text-xs text-slate-400">
+                  {language === 'es' ? `Modifica el puerto y comando de ${project.name}` : `Modify port and start command for ${project.name}`}
+                </p>
               </div>
             </div>
             <button
@@ -67,7 +72,7 @@ export default function ExecutionConfigModal({
           <div className="p-6 space-y-4 text-xs">
             <div className="space-y-1.5">
               <label className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                Puerto Asignado
+                {language === 'es' ? 'Puerto Asignado' : 'Assigned Port'}
               </label>
               <input
                 type="number"
@@ -79,13 +84,13 @@ export default function ExecutionConfigModal({
                 }`}
               />
               <span className="text-[11px] text-slate-400 block">
-                El puerto en el que escuchará el servidor local.
+                {language === 'es' ? 'El puerto en el que escuchará el servidor local.' : 'The port where local server will listen.'}
               </span>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                Comando de Inicio
+                {language === 'es' ? 'Comando de Inicio' : 'Start Command'}
               </label>
               <input
                 type="text"
@@ -97,41 +102,48 @@ export default function ExecutionConfigModal({
                 }`}
               />
               <span className="text-[11px] text-slate-400 block">
-                Comando ejecutado al hacer clic en "Arrancar Servidor".
+                {language === 'es' ? 'Comando ejecutado al hacer clic en "Arrancar Servidor".' : 'Command executed when clicking "Start Server".'}
               </span>
             </div>
 
             {savedMessage && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl font-mono text-xs flex items-center gap-2">
-                <Check className="h-4 w-4 shrink-0" />
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs flex items-center space-x-2">
+                <Check className="h-4 w-4" />
                 <span>{savedMessage}</span>
               </div>
             )}
+
+            <div className="flex items-center justify-end space-x-2.5 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer ${
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                }`}
+              >
+                {t.cancel || 'Cancel'}
+              </button>
+
+              <button
+                type="button"
+                onClick={onSaveConfig}
+                disabled={isRestarting}
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center space-x-2 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isRestarting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>{language === 'es' ? 'Guardando...' : 'Saving...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    <span>{language === 'es' ? 'Guardar Cambios' : 'Save Changes'}</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-
-          {/* Modal Footer */}
-          <div className={`px-6 py-4 border-t flex items-center justify-between ${
-            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
-          }`}>
-            <button
-              onClick={onClose}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:bg-[#303030] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-              }`}
-            >
-              Cancelar
-            </button>
-
-            <button
-              onClick={onSaveConfig}
-              disabled={isRestarting}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl flex items-center space-x-2 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer disabled:opacity-50"
-            >
-              {isRestarting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              <span>{isRestarting ? 'Reiniciando...' : 'Guardar y Aplicar'}</span>
-            </button>
-          </div>
-
         </motion.div>
       </motion.div>
     </AnimatePresence>

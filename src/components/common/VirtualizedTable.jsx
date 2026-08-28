@@ -1,22 +1,15 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Trash2 } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
-/**
- * VirtualizedTable - Renderizador virtualizado de alto rendimiento para tablas SQL
- * @param {Object} props
- * @param {Array} props.rows - Lista de filas JSON
- * @param {boolean} props.isDark - Tema oscuro activo
- * @param {number} [props.containerHeight=420] - Altura máxima del contenedor en px
- * @param {number} [props.rowHeight=40] - Altura aproximada de cada fila en px
- * @param {Function} [props.onDeleteRow] - Callback opcional para eliminar una fila
- */
-export default function VirtualizedTable({ rows, isDark, containerHeight = 420, rowHeight = 40, onDeleteRow }) {
+export default function VirtualizedTable({ rows, isDark, containerHeight = 420, rowHeight = 40, onDeleteRow, language = 'es' }) {
   const [scrollTop, setScrollTop] = useState(0);
   const [filterTerm, setFilterTerm] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
+  const t = getTranslations(language);
 
   if (!rows || rows.length === 0) return null;
 
@@ -66,7 +59,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                title="Buscar en esta tabla"
+                title={language === 'es' ? "Buscar en esta tabla" : "Search in this table"}
                 onClick={() => {
                   setIsExpanded(true);
                   setTimeout(() => inputRef.current?.focus(), 80);
@@ -98,7 +91,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                   type="text"
                   value={filterTerm}
                   onChange={(e) => setFilterTerm(e.target.value)}
-                  placeholder="Filtrar datos al instante en esta tabla..."
+                  placeholder={language === 'es' ? "Filtrar datos al instante en esta tabla..." : "Filter data instantly in this table..."}
                   className="w-full bg-transparent focus:outline-none text-xs font-mono"
                 />
                 <button
@@ -109,7 +102,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                   className={`p-1 rounded-lg transition-colors shrink-0 cursor-pointer ${
                     isDark ? 'text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                   }`}
-                  title="Cerrar búsqueda"
+                  title={language === 'es' ? "Cerrar búsqueda" : "Close search"}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -118,7 +111,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
           </AnimatePresence>
         </div>
         <span className="text-[11px] text-slate-400 font-semibold shrink-0">
-          {filterTerm ? `${filteredRows.length} / ${rows.length} coincidencias` : `${rows.length} filas`}
+          {filterTerm ? `${filteredRows.length} / ${rows.length} ${language === 'es' ? 'coincidencias' : 'matches'}` : `${rows.length} ${language === 'es' ? 'filas' : 'rows'}`}
         </span>
       </div>
 
@@ -156,7 +149,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                     <button
                       onClick={() => onDeleteRow(row, originalIndex)}
                       className="p-1 text-slate-400 hover:text-rose-400 transition-colors opacity-70 group-hover:opacity-100 cursor-pointer"
-                      title="Eliminar esta fila"
+                      title={language === 'es' ? "Eliminar esta fila" : "Delete this row"}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -186,8 +179,8 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
       <div className={`px-4 py-2 border-t text-[10px] font-mono flex items-center justify-between ${
         isDark ? 'border-white/[0.08] bg-[#181818] text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-600'
       }`}>
-        <span>Total: {totalCount} fila(s)</span>
-        <span>Mostrando filas {startIndex + 1} - {Math.min(totalCount, endIndex)} (Virtualizado)</span>
+        <span>Total: {totalCount} {language === 'es' ? 'fila(s)' : 'row(s)'}</span>
+        <span>{language === 'es' ? 'Mostrando filas' : 'Showing rows'} {startIndex + 1} - {Math.min(totalCount, endIndex)} ({language === 'es' ? 'Virtualizado' : 'Virtualized'})</span>
       </div>
     </div>
   );

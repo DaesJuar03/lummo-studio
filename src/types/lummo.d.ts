@@ -1,5 +1,5 @@
 /**
- * Tipos de datos globales para Lummo Studio v2.4.15
+ * Tipos de datos globales para Lummo Studio v2.4.30
  */
 
 export interface LummoProject {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Terminal, Trash2, Copy, Check, Minus, Square, X, Search, Activity } from 'lucide-react';
+import { Terminal, Trash2, Copy, Check, Minus, Square, X, Search } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
-// Strip ANSI escape codes (e.g. \x1b[32m, \x1b[1m, [39m, etc.) for clean rendering
 function stripAnsi(str) {
   if (typeof str !== 'string') return '';
   return str.replace(/[\u001b\u009b][FormatSpecifier]*[a-zA-K]/g, '')
@@ -10,14 +10,14 @@ function stripAnsi(str) {
             .replace(/\[\d+;\d+m/g, '');
 }
 
-export default function StandaloneLogWindow({ projectId, projectName }) {
+export default function StandaloneLogWindow({ projectId, projectName, language = 'es' }) {
   const [logs, setLogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [copied, setCopied] = useState(false);
   const endRef = useRef(null);
+  const t = getTranslations(language);
 
   useEffect(() => {
-    // Initial fetch of stored logs
     if (window.electronAPI?.getProjectLogs) {
       window.electronAPI.getProjectLogs(projectId).then((initialLogs) => {
         if (Array.isArray(initialLogs)) {
@@ -65,8 +65,6 @@ export default function StandaloneLogWindow({ projectId, projectName }) {
 
   return (
     <div className="h-screen bg-slate-900 text-slate-100 flex flex-col font-sans select-none selection:bg-blue-600 selection:text-white">
-      {/* Titlebar Header in Pure White & Blue Aesthetic */}
-      {/* Titlebar Header in Pure White & Blue Aesthetic */}
       <header 
         className="pl-4 pr-0 h-11 bg-white border-b border-slate-200 flex items-center justify-between select-none"
         style={{ WebkitAppRegion: 'drag' }}
@@ -82,91 +80,72 @@ export default function StandaloneLogWindow({ projectId, projectName }) {
           </div>
         </div>
 
-        {/* Window controls */}
         <div className="flex items-stretch h-full" style={{ WebkitAppRegion: 'no-drag' }}>
           <button
             onClick={() => window.electronAPI?.windowMinimize()}
             className="w-11 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Minimizar"
+            title={language === 'es' ? "Minimizar" : "Minimize"}
           >
             <Minus className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI?.windowMaximize()}
             className="w-11 h-full flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Maximizar"
+            title={language === 'es' ? "Maximizar" : "Maximize"}
           >
             <Square className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => window.electronAPI?.windowClose()}
-            className="w-12 h-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 active:bg-rose-700 transition-colors cursor-pointer"
-            title="Cerrar"
+            className="w-12 h-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 transition-colors cursor-pointer"
+            title={language === 'es' ? "Cerrar" : "Close"}
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </header>
 
-      {/* Toolbar Sub-bar in Soft Slate Palette */}
-      <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-600">
-        <div className="flex items-center space-x-2 flex-1 max-w-sm">
-          <div className="relative w-full">
-            <Search className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Filtrar mensajes de salida..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 font-sans shadow-2xs"
-            />
-          </div>
+      {/* Toolbar */}
+      <div className="px-4 py-2 border-b border-slate-800 bg-slate-950 flex items-center justify-between gap-3 text-xs">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="h-3.5 w-3.5 absolute left-3 top-2.5 text-slate-500" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={language === 'es' ? "Filtrar en consola..." : "Filter console..."}
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+          />
         </div>
 
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-[11px] font-mono text-slate-600">
-            <Activity className="h-3.5 w-3.5 text-emerald-600 animate-pulse" />
-            <span>{filteredLogs.length} líneas</span>
-          </div>
-
+        <div className="flex items-center space-x-2">
           <button
             onClick={handleCopyLogs}
-            className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:bg-slate-100 flex items-center space-x-1.5 font-bold text-xs shadow-2xs transition-colors"
+            className="px-3 py-1 rounded-lg border border-slate-800 hover:bg-slate-800 text-slate-300 flex items-center space-x-1.5 transition-colors cursor-pointer"
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
-            <span>{copied ? '¡Copiado!' : 'Copiar Logs'}</span>
+            {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+            <span>{copied ? (language === 'es' ? '¡Copiado!' : 'Copied!') : (language === 'es' ? 'Copiar Todo' : 'Copy All')}</span>
           </button>
-
           <button
             onClick={handleClearLogs}
-            className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-rose-600 hover:bg-rose-50 flex items-center space-x-1.5 font-bold text-xs shadow-2xs transition-colors"
+            className="p-1.5 rounded-lg border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+            title={language === 'es' ? 'Limpiar consola' : 'Clear console'}
           >
-            <Trash2 className="h-3.5 w-3.5 text-slate-400" />
-            <span>Limpiar</span>
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Terminal Output Body in Studio Dark Slate */}
-      <div className="flex-1 p-5 overflow-y-auto space-y-1.5 bg-[#141414] font-mono text-xs leading-relaxed">
+      {/* Logs Area */}
+      <div className="flex-1 p-4 overflow-y-auto font-mono text-xs text-slate-300 space-y-1 bg-black/90 selection:bg-blue-600 selection:text-white custom-scrollbar">
         {filteredLogs.length === 0 ? (
-          <div className="p-8 text-center text-slate-600 italic">
-            Esperando mensajes de consola para el proyecto...
+          <div className="py-20 text-center text-slate-600 italic">
+            {language === 'es' ? 'No hay registros que coincidan con el filtro...' : 'No logs matching filter...'}
           </div>
         ) : (
-          filteredLogs.map((line, index) => (
-            <div
-              key={index}
-              className="flex items-start space-x-3 hover:bg-white/5 py-1 px-2.5 rounded-lg group border-l-2 border-transparent hover:border-blue-500 transition-colors"
-            >
-              <span className="text-slate-600 text-[11px] select-none min-w-[28px] text-right pt-0.5 font-mono">{index + 1}</span>
-              <span className={`whitespace-pre-wrap font-mono ${
-                line.includes('[Lummo Error]') || line.includes('ERR') || line.includes('Error:') 
-                  ? 'text-rose-400 font-semibold' 
-                  : line.includes('[Lummo]') || line.includes('http://')
-                  ? 'text-blue-400 font-semibold'
-                  : 'text-slate-300'
-              }`}>
+          filteredLogs.map((line, idx) => (
+            <div key={idx} className="whitespace-pre-wrap leading-relaxed border-l-2 border-transparent hover:border-blue-500 px-2 py-0.5">
+              <span className={line.includes('[Lummo Error]') || line.includes('ERR') || line.includes('Error') ? 'text-rose-400 font-semibold' : 'text-slate-300'}>
                 {line}
               </span>
             </div>

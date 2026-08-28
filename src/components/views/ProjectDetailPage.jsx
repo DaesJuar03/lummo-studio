@@ -1,32 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, 
   Play, 
   Square, 
-  Globe, 
-  FolderOpen, 
+  ExternalLink, 
   Terminal, 
+  Globe, 
+  Save, 
+  RefreshCw, 
+  Trash2, 
+  Plus, 
+  FileCode2, 
   Settings2, 
-  ExternalLink,
-  Save,
-  Check,
-  Plus,
-  Trash2,
-  FileCode2,
-  Activity,
-  Cpu,
-  HardDrive,
-  RefreshCw,
-  Server,
-  Share2,
+  FolderOpen, 
+  Activity, 
+  Check, 
+  Server, 
+  HardDrive, 
+  Cpu, 
+  Share2, 
+  Eye, 
+  EyeOff, 
+  AlertTriangle,
   Zap,
   Boxes,
-  Radio,
-  AlertTriangle,
-  Eye,
-  EyeOff
+  Radio
 } from 'lucide-react';
+import { getTranslations } from '../../locales';
+
 import NetworkTunnelModal from '../modals/NetworkTunnelModal';
 import ScriptLauncherModal from '../modals/ScriptLauncherModal';
 import ExecutionConfigModal from '../modals/ExecutionConfigModal';
@@ -41,110 +43,113 @@ export default function ProjectDetailPage({
   onOpenLogs,
   onUpdatePort,
   onUpdateCommand,
-  theme
+  theme,
+  language = 'es'
 }) {
+  const isDark = theme === 'dark';
+  const t = getTranslations(language);
+
   const [portInput, setPortInput] = useState(project?.port || 3000);
   const [commandInput, setCommandInput] = useState(project?.command || 'npm run dev');
-  const [savedMessage, setSavedMessage] = useState('');
   const [isRestarting, setIsRestarting] = useState(false);
+  const [savedMessage, setSavedMessage] = useState('');
 
-  // Modals Open State
-  const [showNetworkModal, setShowNetworkModal] = useState(false);
-  const [showScriptModal, setShowScriptModal] = useState(false);
-  const [showConfigModal, setShowConfigModal] = useState(false);
-  const [showDockerModal, setShowDockerModal] = useState(false);
-  const [hasDockerCompose, setHasDockerCompose] = useState(false);
-
-  const handleOpenApiWebhookHub = () => {
-    if (!project) return;
-    if (window.electronAPI?.openApiHubWindow) {
-      window.electronAPI.openApiHubWindow({
-        projectId: project.id,
-        projectName: project.name,
-        port: project.port || 3000,
-        projectPath: project.path
-      });
-    } else {
-      window.open(
-        `#/api-hub/${project.id}?name=${encodeURIComponent(project.name)}&port=${project.port || 3000}&path=${encodeURIComponent(project.path || '')}`,
-        '_blank',
-        'width=1240,height=820'
-      );
-    }
-  };
-
-  // Port Conflict Modal State
-  const [portConflict, setPortConflict] = useState(null); // { port, pid, processName }
-  const [isResolvingPort, setIsResolvingPort] = useState(false);
-
-  // Tunnel & Local Domain State
-  const [tunnelUrl, setTunnelUrl] = useState('');
-  const [isStartingTunnel, setIsStartingTunnel] = useState(false);
-  const [tunnelCopied, setTunnelCopied] = useState(false);
-  const [localDomainInput, setLocalDomainInput] = useState(`${project?.id || 'app'}.test`);
-  const [domainSaveMsg, setDomainSaveMsg] = useState('');
-
-  // Custom Script State
-  const [isExecutingScript, setIsExecutingScript] = useState(false);
-  const [scriptMsg, setScriptMsg] = useState('');
-
-  // .env Variables & Example Comparison State
+  // .env Variables State
   const [selectedEnvFile, setSelectedEnvFile] = useState('.env');
   const [envContent, setEnvContent] = useState('');
-  const [envExampleContent, setEnvExampleContent] = useState('');
-  const [hasEnvExample, setHasEnvExample] = useState(false);
-  const [missingKeys, setMissingKeys] = useState([]);
-  const [maskSecrets, setMaskSecrets] = useState(true);
-  const [envPairs, setEnvPairs] = useState([
-    { key: 'PORT', value: String(project?.port || 3000) },
-    { key: 'NODE_ENV', value: 'development' },
-    { key: 'VITE_API_URL', value: 'http://localhost:3000/api' }
-  ]);
+  const [envPairs, setEnvPairs] = useState([]);
   const [rawEnvMode, setRawEnvMode] = useState(false);
   const [envSaveStatus, setEnvSaveStatus] = useState('');
+  const [maskSecrets, setMaskSecrets] = useState(true);
 
-  // Real Telemetry Metrics (PID from OS)
+  // .env.example Diff State
+  const [hasEnvExample, setHasEnvExample] = useState(false);
+  const [envExampleContent, setEnvExampleContent] = useState('');
+  const [missingKeys, setMissingKeys] = useState([]);
+
+  // Telemetry real process state
   const [ramUsage, setRamUsage] = useState(0);
   const [cpuUsage, setCpuUsage] = useState(0);
 
-  const isDark = theme === 'dark';
+  // Sub-modals state
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showNetworkModal, setShowNetworkModal] = useState(false);
+  const [showScriptModal, setShowScriptModal] = useState(false);
+  const [showDockerModal, setShowDockerModal] = useState(false);
+
+  // Cloudflare / Localtunnel State
+  const [tunnelUrl, setTunnelUrl] = useState('');
+  const [isStartingTunnel, setIsStartingTunnel] = useState(false);
+  const [tunnelCopied, setTunnelCopied] = useState(false);
+
+  // Local Domains .test State
+  const [localDomainInput, setLocalDomainInput] = useState('');
+  const [domainSaveMsg, setDomainSaveMsg] = useState(null);
+
+  // Script Runner State
+  const [isExecutingScript, setIsExecutingScript] = useState(false);
+  const [scriptMsg, setScriptMsg] = useState('');
+
+  // Port Conflict Resolution State
+  const [portConflict, setPortConflict] = useState(null);
+  const [isResolvingPort, setIsResolvingPort] = useState(false);
+
+  // Docker Compose detection state
+  const [hasDockerCompose, setHasDockerCompose] = useState(false);
+
   const isRunning = project?.status === 'RUNNING';
 
-  const parseEnvPairs = React.useCallback((rawText) => {
-    const lines = rawText.split('\n');
+  const parseEnvPairs = useCallback((content) => {
+    if (!content) {
+      setEnvPairs([]);
+      return;
+    }
+    const lines = content.split('\n');
     const pairs = [];
-    lines.forEach((line) => {
+    lines.forEach(line => {
       const trimmed = line.trim();
       if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
         const [k, ...v] = trimmed.split('=');
         pairs.push({ key: k.trim(), value: v.join('=').trim() });
       }
     });
-    setEnvPairs(pairs.length > 0 ? pairs : [{ key: '', value: '' }]);
+    setEnvPairs(pairs);
   }, []);
 
-  const detectMissingEnvKeys = React.useCallback((currentEnv, exampleEnv) => {
-    const extractKeys = (txt) => {
-      return txt
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => l && !l.startsWith('#') && l.includes('='))
-        .map(l => l.split('=')[0].trim());
-    };
-    const curKeys = new Set(extractKeys(currentEnv));
-    const exKeys = extractKeys(exampleEnv);
-    const missing = exKeys.filter(k => !curKeys.has(k));
+  const detectMissingEnvKeys = useCallback((actualEnvContent, exampleContent) => {
+    if (!exampleContent) {
+      setMissingKeys([]);
+      return;
+    }
+    const exampleLines = exampleContent.split('\n');
+    const exampleKeys = [];
+    exampleLines.forEach(l => {
+      const trimmed = l.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        exampleKeys.push(trimmed.split('=')[0].trim());
+      }
+    });
+
+    const actualLines = (actualEnvContent || '').split('\n');
+    const actualKeys = new Set();
+    actualLines.forEach(l => {
+      const trimmed = l.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        actualKeys.add(trimmed.split('=')[0].trim());
+      }
+    });
+
+    const missing = exampleKeys.filter(k => !actualKeys.has(k));
     setMissingKeys(missing);
   }, []);
 
-  // Update input state if project changes from props
   useEffect(() => {
     if (project) {
       setPortInput(project.port || 3000);
       setCommandInput(project.command || 'npm run dev');
-      setLocalDomainInput(`${project.id || 'app'}.test`);
+      setLocalDomainInput(project.customDomain || `${project.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.test`);
     }
-  }, [project?.port, project?.command, project?.id]);
+  }, [project]);
 
   useEffect(() => {
     if (!window.electronAPI?.onTunnelUrl || !project?.id) return;
@@ -159,7 +164,6 @@ export default function ProjectDetailPage({
     };
   }, [project?.id]);
 
-  // Real-time Process Telemetry querying via IPC
   useEffect(() => {
     if (!isRunning || !project?.id) {
       setRamUsage(0);
@@ -189,7 +193,6 @@ export default function ProjectDetailPage({
     return () => clearInterval(interval);
   }, [isRunning, project?.id]);
 
-  // Load .env and .env.example files
   useEffect(() => {
     if (window.electronAPI?.readEnvFile && project?.path) {
       window.electronAPI.readEnvFile(project.path).then((res) => {
@@ -232,7 +235,7 @@ export default function ProjectDetailPage({
     const updated = [...envPairs, ...newPairsToAdd];
     setEnvPairs(updated);
     setMissingKeys([]);
-    setEnvSaveStatus('¡Claves de .env.example añadidas!');
+    setEnvSaveStatus(language === 'es' ? '¡Claves de .env.example añadidas!' : 'Keys from .env.example added!');
     setTimeout(() => setEnvSaveStatus(''), 3000);
   };
 
@@ -245,11 +248,11 @@ export default function ProjectDetailPage({
     if (window.electronAPI?.writeEnvFile && project?.path) {
       const res = await window.electronAPI.writeEnvFile(project.path, textToSave, selectedEnvFile);
       if (res.success) {
-        setEnvSaveStatus(`¡${selectedEnvFile} guardado con éxito!`);
+        setEnvSaveStatus(language === 'es' ? `¡${selectedEnvFile} guardado con éxito!` : `${selectedEnvFile} saved successfully!`);
         setTimeout(() => setEnvSaveStatus(''), 3000);
       }
     } else {
-      setEnvSaveStatus(`¡${selectedEnvFile} guardado!`);
+      setEnvSaveStatus(language === 'es' ? `¡${selectedEnvFile} guardado!` : `${selectedEnvFile} saved!`);
       setTimeout(() => setEnvSaveStatus(''), 3000);
     }
   };
@@ -268,14 +271,12 @@ export default function ProjectDetailPage({
     setEnvPairs(updated);
   };
 
-  // Smart Server Start with Port Conflict Resolution
   const handleSmartToggleProject = async () => {
     if (isRunning) {
       onToggleProject(project);
       return;
     }
 
-    // Check if port is already occupied before starting
     if (window.electronAPI?.identifyPortProcess) {
       const portInfo = await window.electronAPI.identifyPortProcess(project.port || 3000);
       if (portInfo && portInfo.busy && portInfo.pid) {
@@ -363,13 +364,13 @@ export default function ProjectDetailPage({
       if (res.success) {
         setDomainSaveMsg({
           type: 'success',
-          text: `Dominio seguro vinculado con éxito`,
+          text: language === 'es' ? 'Dominio seguro vinculado con éxito' : 'Secure domain linked successfully',
           url: res.httpsUrl || `https://${domain}:8443`,
           httpUrl: res.httpUrl || `http://${domain}:3838`,
           sslActive: res.sslActive
         });
       } else {
-        setDomainSaveMsg({ type: 'error', text: res.error || 'Error al configurar dominio' });
+        setDomainSaveMsg({ type: 'error', text: res.error || (language === 'es' ? 'Error al configurar dominio' : 'Error configuring domain') });
       }
     }
   };
@@ -377,20 +378,26 @@ export default function ProjectDetailPage({
   const handleRunScript = async (scriptCmd) => {
     if (!scriptCmd) return;
     setIsExecutingScript(true);
-    setScriptMsg(`Ejecutando "${scriptCmd}"...`);
+    setScriptMsg(language === 'es' ? `Ejecutando "${scriptCmd}"...` : `Executing "${scriptCmd}"...`);
 
     if (window.electronAPI?.runProjectScript) {
       const res = await window.electronAPI.runProjectScript(project.id, project.path, scriptCmd);
       if (res.success) {
-        setScriptMsg(`¡Comando "${scriptCmd}" ejecutado con éxito!`);
+        setScriptMsg(language === 'es' ? `¡Comando "${scriptCmd}" ejecutado con éxito!` : `Command "${scriptCmd}" executed successfully!`);
       } else {
-        setScriptMsg(`Error al ejecutar: ${res.error}`);
+        setScriptMsg(`Error: ${res.error}`);
       }
     }
     setTimeout(() => {
       setIsExecutingScript(false);
       setTimeout(() => setScriptMsg(''), 4000);
     }, 1500);
+  };
+
+  const handleOpenApiWebhookHub = () => {
+    if (window.electronAPI?.openApiHubWindow) {
+      window.electronAPI.openApiHubWindow(project);
+    }
   };
 
   if (!project) return null;
@@ -422,18 +429,18 @@ export default function ProjectDetailPage({
 
     if (isRunning) {
       setIsRestarting(true);
-      setSavedMessage('Reiniciando servidor en nuevo puerto...');
+      setSavedMessage(language === 'es' ? 'Reiniciando servidor en nuevo puerto...' : 'Restarting server on new port...');
       await onToggleProject(project);
 
       setTimeout(async () => {
         const updatedProj = { ...project, port: newPort, command: commandInput, status: 'STOPPED' };
         await onToggleProject(updatedProj);
         setIsRestarting(false);
-        setSavedMessage(`¡Servidor activo en puerto :${newPort}!`);
+        setSavedMessage(language === 'es' ? `¡Servidor activo en puerto :${newPort}!` : `Server active on port :${newPort}!`);
         setTimeout(() => setSavedMessage(''), 3000);
       }, 700);
     } else {
-      setSavedMessage('¡Configuración guardada!');
+      setSavedMessage(language === 'es' ? '¡Configuración guardada!' : 'Configuration saved!');
       setTimeout(() => setSavedMessage(''), 2500);
     }
   };
@@ -453,7 +460,6 @@ export default function ProjectDetailPage({
         isDark ? 'bg-transparent text-[#f4f4f5]' : 'bg-transparent text-slate-900'
       }`}
     >
-      
       {/* Top Header Bar */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 ${
         isDark ? 'border-white/[0.08]' : 'border-slate-200'
@@ -466,7 +472,7 @@ export default function ProjectDetailPage({
             }`}
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Volver</span>
+            <span>{t.back || 'Back'}</span>
           </button>
 
           <div className="min-w-0">
@@ -479,7 +485,7 @@ export default function ProjectDetailPage({
                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]' 
                   : isDark ? 'bg-[#252525] text-slate-400 border-white/[0.08]' : 'bg-slate-200 text-slate-600 border-slate-300'
               }`}>
-                :{project.port} ({isRunning ? 'Activo' : 'Detenido'})
+                :{project.port} ({isRunning ? (language === 'es' ? 'Activo' : 'Active') : (language === 'es' ? 'Detenido' : 'Stopped')})
               </span>
             </div>
             <p className="text-xs text-slate-400 font-mono mt-0.5 truncate">{project.path}</p>
@@ -505,7 +511,7 @@ export default function ProjectDetailPage({
             ) : (
               <Play className="h-4 w-4 fill-white" />
             )}
-            <span>{isRestarting ? 'Reiniciando...' : isRunning ? 'Detener Servidor' : 'Arrancar Servidor'}</span>
+            <span>{isRestarting ? (language === 'es' ? 'Reiniciando...' : 'Restarting...') : isRunning ? (t.detener || 'Stop Server') : (t.arrancar || 'Start Server')}</span>
           </button>
 
           {/* Group 1: Core Target Explorers */}
@@ -517,7 +523,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all cursor-pointer ${
                 isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
-              title="Abrir en Navegador Web"
+              title={language === 'es' ? 'Abrir en Navegador Web' : 'Open in Web Browser'}
             >
               <Globe className="h-4 w-4" />
             </button>
@@ -527,7 +533,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all cursor-pointer ${
                 isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
-              title="Abrir Carpeta en VS Code / Explorador"
+              title={language === 'es' ? 'Abrir Carpeta en VS Code / Explorador' : 'Open Folder in VS Code / Explorer'}
             >
               <FolderOpen className="h-4 w-4" />
             </button>
@@ -537,7 +543,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all cursor-pointer ${
                 isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
-              title="Abrir Consola de Logs Independiente"
+              title={language === 'es' ? 'Abrir Consola de Logs Independiente' : 'Open Standalone Log Console'}
             >
               <Terminal className="h-4 w-4" />
             </button>
@@ -554,7 +560,7 @@ export default function ProjectDetailPage({
                   ? 'bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 border border-purple-500/30' 
                   : 'bg-purple-100 text-purple-800 hover:bg-purple-200 border border-purple-200'
               }`}
-              title="Abrir Ventana Independiente de API Client & Webhooks"
+              title={language === 'es' ? 'Abrir Ventana Independiente de API Client & Webhooks' : 'Open Standalone API Client & Webhook Inspector'}
             >
               <Radio className="h-3.5 w-3.5 text-purple-400" />
               <span>API & Webhooks</span>
@@ -570,7 +576,7 @@ export default function ProjectDetailPage({
                   ? 'bg-emerald-500/20 text-emerald-400' 
                   : isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
-              title="Red & Acceso Externo (Túneles Cloudflare & Localtunnel)"
+              title={language === 'es' ? 'Red & Acceso Externo (Túneles Cloudflare & Localtunnel)' : 'Network & External Access (Cloudflare & Localtunnel)'}
             >
               <Share2 className="h-4 w-4" />
               {tunnelUrl && (
@@ -585,7 +591,7 @@ export default function ProjectDetailPage({
                   ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/25' 
                   : isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
-              title="Gestor Visual de Docker Compose & Contenedores"
+              title={language === 'es' ? 'Gestor Visual de Docker Compose & Contenedores' : 'Docker Compose & Container Manager'}
             >
               <Boxes className="h-4 w-4" />
               {hasDockerCompose && (
@@ -603,7 +609,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all cursor-pointer ${
                 isDark ? 'text-amber-400 hover:bg-[#303030]' : 'text-amber-600 hover:bg-white hover:shadow-xs'
               }`}
-              title="Lanzador de Scripts & Comandos CLI"
+              title={language === 'es' ? 'Lanzador de Scripts & Comandos CLI' : 'Script & CLI Command Launcher'}
             >
               <Zap className="h-4 w-4" />
             </button>
@@ -613,7 +619,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all cursor-pointer ${
                 isDark ? 'text-blue-400 hover:bg-[#303030]' : 'text-blue-600 hover:bg-white hover:shadow-xs'
               }`}
-              title="Configuración de Ejecución (Puerto y Comando de Inicio)"
+              title={language === 'es' ? 'Configuración de Ejecución (Puerto y Comando de Inicio)' : 'Execution Configuration (Port & Start Command)'}
             >
               <Settings2 className="h-4 w-4" />
             </button>
@@ -631,16 +637,16 @@ export default function ProjectDetailPage({
               </div>
               <div>
                 <h3 className={`font-bold text-xs tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  {project.hasBackend ? 'Entorno Dual - Servidor Backend' : 'Información del Proyecto'}
+                  {project.hasBackend ? (language === 'es' ? 'Entorno Dual - Servidor Backend' : 'Dual Environment - Backend Server') : (language === 'es' ? 'Información del Proyecto' : 'Project Information')}
                 </h3>
                 <p className="text-[11px] text-slate-400">
-                  {project.hasBackend ? 'Detectado en el proyecto local' : project.techStack || 'Proyecto Local'}
+                  {project.hasBackend ? (language === 'es' ? 'Detectado en el proyecto local' : 'Detected in local project') : project.techStack || (language === 'es' ? 'Proyecto Local' : 'Local Project')}
                 </p>
               </div>
             </div>
             {project.hasBackend && (
               <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border bg-purple-500/10 text-purple-400 border-purple-500/20">
-                Backend Vinculado
+                {language === 'es' ? 'Backend Vinculado' : 'Linked Backend'}
               </span>
             )}
           </div>
@@ -648,25 +654,25 @@ export default function ProjectDetailPage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-1">
             <div className="space-y-1">
               <span className="text-slate-400 font-mono text-[10px] uppercase font-bold tracking-wider block">
-                CONFIGURACIÓN DE BACKEND
+                {language === 'es' ? 'CONFIGURACIÓN DE BACKEND' : 'BACKEND CONFIGURATION'}
               </span>
               <p className={`font-mono font-semibold text-xs ${isDark ? 'text-white' : 'text-slate-800'}`}>
-                {project.backend?.techStack || project.techStack || 'Configurado en .env'}
+                {project.backend?.techStack || project.techStack || (language === 'es' ? 'Configurado en .env' : 'Configured in .env')}
               </p>
             </div>
 
             <div className="space-y-1">
               <span className="text-slate-400 font-mono text-[10px] uppercase font-bold tracking-wider block">
-                Puerto Asignado
+                {language === 'es' ? 'Puerto Asignado' : 'Assigned Port'}
               </span>
               <p className={`font-mono font-semibold text-xs ${isDark ? 'text-white' : 'text-slate-800'}`}>
-                Puerto :{project.port || 3000}
+                {t.port || 'Port'} :{project.port || 3000}
               </p>
             </div>
 
             <div className="space-y-1">
               <span className="text-slate-400 font-mono text-[10px] uppercase font-bold tracking-wider block">
-                Ubicación / Carpeta
+                {language === 'es' ? 'Ubicación / Carpeta' : 'Location / Folder'}
               </span>
               <p className="font-mono text-[11px] text-slate-400 truncate" title={project.path}>
                 {project.path}
@@ -675,7 +681,7 @@ export default function ProjectDetailPage({
 
             <div className="space-y-1">
               <span className="text-slate-400 font-mono text-[10px] uppercase font-bold tracking-wider block">
-                Comando de Inicio
+                {language === 'es' ? 'Comando de Inicio' : 'Start Command'}
               </span>
               <p className="font-mono text-[11px] text-slate-400">
                 {project.command || 'npm run dev'}
@@ -689,7 +695,7 @@ export default function ProjectDetailPage({
           <div className="space-y-1">
             <div className="flex items-center space-x-1.5 text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider">
               <Activity className="h-3.5 w-3.5 text-blue-400" />
-              <span>ESTADO</span>
+              <span>{language === 'es' ? 'ESTADO' : 'STATUS'}</span>
             </div>
             <span className={`text-2xl font-black tracking-tight block ${isRunning ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'text-slate-500'}`}>
               {isRunning ? 'RUNNING' : 'STOPPED'}
@@ -702,7 +708,7 @@ export default function ProjectDetailPage({
           <div className="space-y-1">
             <div className="flex items-center space-x-1.5 text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider">
               <HardDrive className="h-3.5 w-3.5 text-blue-400" />
-              <span>MEMORIA RAM REAL</span>
+              <span>{language === 'es' ? 'MEMORIA RAM REAL' : 'REAL RAM USAGE'}</span>
             </div>
             <div className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
               {isRunning ? `${ramUsage} MB` : '0 MB'} <span className="text-xs font-normal text-slate-400 font-mono">RSS</span>
@@ -715,10 +721,10 @@ export default function ProjectDetailPage({
           <div className="space-y-1">
             <div className="flex items-center space-x-1.5 text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider">
               <Cpu className="h-3.5 w-3.5 text-blue-400" />
-              <span>CPU REAL</span>
+              <span>{language === 'es' ? 'CPU REAL' : 'REAL CPU'}</span>
             </div>
             <div className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              {isRunning ? `${cpuUsage}%` : '0%'} <span className="text-xs font-normal text-slate-400 font-mono">PROCESO</span>
+              {isRunning ? `${cpuUsage}%` : '0%'} <span className="text-xs font-normal text-slate-400 font-mono">{language === 'es' ? 'PROCESO' : 'PROCESS'}</span>
             </div>
           </div>
         </div>
@@ -756,10 +762,10 @@ export default function ProjectDetailPage({
                     className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2.5 px-5 rounded-xl shadow-lg hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] flex items-center space-x-2 transition-transform hover:scale-105 cursor-pointer"
                   >
                     <ExternalLink className="h-4 w-4" />
-                    <span>Abrir ({projectUrl})</span>
+                    <span>{language === 'es' ? `Abrir (${projectUrl})` : `Open (${projectUrl})`}</span>
                   </button>
                   <span className="text-[11px] text-slate-300 font-mono">
-                    Servidor en línea escuchando en puerto {project.port}
+                    {language === 'es' ? `Servidor en línea escuchando en puerto ${project.port}` : `Server online listening on port ${project.port}`}
                   </span>
                 </div>
               </>
@@ -770,22 +776,22 @@ export default function ProjectDetailPage({
                 }`}>
                   <Globe className="h-6 w-6" />
                 </div>
-                <h4 className="text-slate-300 font-bold text-sm">Servidor Detenido</h4>
+                <h4 className="text-slate-300 font-bold text-sm">{language === 'es' ? 'Servidor Detenido' : 'Server Stopped'}</h4>
                 <p className="text-slate-400 text-xs max-w-xs mx-auto">
-                  Haz clic en "Arrancar Servidor" para activar el entorno y cargar la vista previa.
+                  {language === 'es' ? 'Haz clic en "Arrancar Servidor" para activar el entorno y cargar la vista previa.' : 'Click "Start Server" to launch the environment and load live preview.'}
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Right 6: Advanced .env Manager (with .env.example diff & secret masking) */}
+        {/* Right 6: Advanced .env Manager */}
         <div className="lg:col-span-6 space-y-3">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center space-x-2">
               <FileCode2 className="h-4 w-4 text-blue-400" />
               <h3 className={`font-bold text-xs tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Variables de Entorno ({selectedEnvFile})
+                {language === 'es' ? `Variables de Entorno (${selectedEnvFile})` : `Environment Variables (${selectedEnvFile})`}
               </h3>
             </div>
 
@@ -796,7 +802,7 @@ export default function ProjectDetailPage({
                 className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
                   isDark ? 'bg-[#252525] border-white/[0.08] text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600'
                 }`}
-                title={maskSecrets ? 'Revelar valores secretos' : 'Ocultar valores secretos'}
+                title={maskSecrets ? (language === 'es' ? 'Revelar valores secretos' : 'Reveal secret values') : (language === 'es' ? 'Ocultar valores secretos' : 'Hide secret values')}
               >
                 {maskSecrets ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
@@ -807,7 +813,7 @@ export default function ProjectDetailPage({
                   isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030]' : 'bg-white border-slate-200 text-slate-700'
                 }`}
               >
-                {rawEnvMode ? 'Formulario' : 'Texto Plano'}
+                {rawEnvMode ? (language === 'es' ? 'Formulario' : 'Form Mode') : (language === 'es' ? 'Texto Plano' : 'Raw Text')}
               </button>
             </div>
           </div>
@@ -818,7 +824,7 @@ export default function ProjectDetailPage({
               <div className="flex items-center space-x-2 text-amber-400">
                 <AlertTriangle className="h-4 w-4 shrink-0" />
                 <span>
-                  Faltan <strong>{missingKeys.length}</strong> variables declaradas en <code>.env.example</code>
+                  {language === 'es' ? `Faltan ${missingKeys.length} variables declaradas en .env.example` : `Missing ${missingKeys.length} variables declared in .env.example`}
                 </span>
               </div>
               <button
@@ -826,7 +832,7 @@ export default function ProjectDetailPage({
                 onClick={handleImportMissingKeys}
                 className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-black font-bold text-[10px] rounded-lg transition-all cursor-pointer"
               >
-                Importar Claves
+                {language === 'es' ? 'Importar Claves' : 'Import Keys'}
               </button>
             </div>
           )}
@@ -839,7 +845,7 @@ export default function ProjectDetailPage({
                   <div key={idx} className="flex items-center space-x-2">
                     <input
                       type="text"
-                      placeholder="CLAVE (ej: PORT)"
+                      placeholder="KEY (e.g. PORT)"
                       value={pair.key}
                       onChange={(e) => handleEnvPairChange(idx, 'key', e.target.value)}
                       className={`w-2/5 border rounded-xl p-2 text-xs font-mono font-bold transition-all ${
@@ -849,7 +855,7 @@ export default function ProjectDetailPage({
                     <span className="text-slate-400 font-mono font-bold">=</span>
                     <input
                       type={maskSecrets && isSecret ? 'password' : 'text'}
-                      placeholder="VALOR"
+                      placeholder="VALUE"
                       value={pair.value}
                       onChange={(e) => handleEnvPairChange(idx, 'value', e.target.value)}
                       className={`flex-1 border rounded-xl p-2 text-xs font-mono transition-all ${
@@ -859,7 +865,7 @@ export default function ProjectDetailPage({
                     <button
                       onClick={() => handleRemoveEnvPair(idx)}
                       className="p-2 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
-                      title="Eliminar variable"
+                      title={language === 'es' ? 'Eliminar variable' : 'Delete variable'}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -872,7 +878,7 @@ export default function ProjectDetailPage({
                 className="text-xs text-blue-400 font-bold hover:text-blue-300 flex items-center space-x-1 pt-1 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
-                <span>Agregar Variable</span>
+                <span>{language === 'es' ? 'Agregar Variable' : 'Add Variable'}</span>
               </button>
             </div>
           ) : (
@@ -895,7 +901,7 @@ export default function ProjectDetailPage({
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer"
             >
               <Save className="h-3.5 w-3.5" />
-              <span>Guardar {selectedEnvFile}</span>
+              <span>{language === 'es' ? `Guardar ${selectedEnvFile}` : `Save ${selectedEnvFile}`}</span>
             </button>
 
             {envSaveStatus && (
@@ -924,17 +930,21 @@ export default function ProjectDetailPage({
                   <AlertTriangle className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm">Puerto en Conflicto (:{portConflict.port})</h3>
-                  <p className="text-xs text-slate-400">El puerto ya está siendo utilizado por otro proceso.</p>
+                  <h3 className="font-extrabold text-sm">
+                    {language === 'es' ? `Puerto en Conflicto (:${portConflict.port})` : `Port Conflict (:${portConflict.port})`}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    {language === 'es' ? 'El puerto ya está siendo utilizado por otro proceso.' : 'Port is already occupied by another process.'}
+                  </p>
                 </div>
               </div>
 
               <div className={`p-3.5 rounded-xl border text-xs font-mono space-y-1 ${
                 isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
               }`}>
-                <div>Proceso: <span className="text-indigo-400 font-bold">{portConflict.processName}</span></div>
+                <div>{language === 'es' ? 'Proceso:' : 'Process:'} <span className="text-indigo-400 font-bold">{portConflict.processName}</span></div>
                 <div>PID: <span className="text-amber-400 font-bold">{portConflict.pid}</span></div>
-                <div>Puerto: <span className="text-slate-300 font-bold">:{portConflict.port}</span></div>
+                <div>{language === 'es' ? 'Puerto:' : 'Port:'} <span className="text-slate-300 font-bold">:{portConflict.port}</span></div>
               </div>
 
               <div className="space-y-2 pt-2">
@@ -945,7 +955,7 @@ export default function ProjectDetailPage({
                   className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition-all flex items-center justify-center space-x-2 cursor-pointer"
                 >
                   <Square className="h-3.5 w-3.5 fill-white" />
-                  <span>Liberar Puerto (Finalizar PID {portConflict.pid}) y Arrancar</span>
+                  <span>{language === 'es' ? `Liberar Puerto (Finalizar PID ${portConflict.pid}) y Arrancar` : `Kill PID ${portConflict.pid} & Start`}</span>
                 </button>
 
                 <button
@@ -957,7 +967,7 @@ export default function ProjectDetailPage({
                   }`}
                 >
                   <Play className="h-3.5 w-3.5" />
-                  <span>Asignar Siguiente Puerto Libre y Arrancar</span>
+                  <span>{language === 'es' ? 'Asignar Siguiente Puerto Libre y Arrancar' : 'Assign Next Free Port & Start'}</span>
                 </button>
 
                 <button
@@ -965,7 +975,7 @@ export default function ProjectDetailPage({
                   onClick={() => setPortConflict(null)}
                   className="w-full py-1.5 text-xs text-slate-500 hover:text-slate-300 text-center cursor-pointer"
                 >
-                  Cancelar
+                  {t.cancel || 'Cancel'}
                 </button>
               </div>
             </motion.div>
@@ -989,6 +999,7 @@ export default function ProjectDetailPage({
         domainSaveMsg={domainSaveMsg}
         onOpenBrowser={onOpenBrowser}
         theme={theme}
+        language={language}
       />
 
       {/* Script & Command Launcher Modal */}
@@ -1001,6 +1012,7 @@ export default function ProjectDetailPage({
         scriptMsg={scriptMsg}
         onOpenLogs={onOpenLogs}
         theme={theme}
+        language={language}
       />
 
       {/* Execution Config Modal */}
@@ -1016,6 +1028,7 @@ export default function ProjectDetailPage({
         isRestarting={isRestarting}
         savedMessage={savedMessage}
         theme={theme}
+        language={language}
       />
 
       {/* Docker Compose & Containers Dashboard Modal */}
@@ -1024,6 +1037,7 @@ export default function ProjectDetailPage({
         onClose={() => setShowDockerModal(false)}
         project={project}
         theme={theme}
+        language={language}
       />
 
     </motion.div>

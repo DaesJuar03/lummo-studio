@@ -183,6 +183,8 @@ export default function App() {
         show={updater.showPostUpdateBanner}
         onDismiss={updater.dismissPostUpdateBanner}
         onOpenChangelog={updater.openChangelogSheet}
+        theme={theme}
+        language={language}
       />
 
       {/* Main Content Pane rendered according to Active Tab */}
@@ -199,8 +201,8 @@ export default function App() {
               onOpenSettings={() => setShowSettings(true)}
               onToggleProject={handleToggleProject}
               onRemoveProject={handleRemoveProject}
-              onSelectProjectDetail={(project) => openTab({ id: project.id, title: `Proyecto / ${project.name}`, type: 'project-detail', project })}
-              onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `Base de Datos / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+              onSelectProjectDetail={(project) => openTab({ id: project.id, title: `${t.projectTitlePrefix || (language === 'es' ? 'Proyecto' : 'Project')} / ${project.name}`, type: 'project-detail', project })}
+              onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
               onAddCustomDatabase={handleAddCustomDatabase}
               onRemoveDatabase={handleRemoveDatabase}
               theme={theme}
@@ -221,9 +223,10 @@ export default function App() {
                 const project = projects.find(p => p.id === id || p.path === id);
                 if (project) handleOpenLogWindow(project);
               }}
-              onSelectProjectDetail={(project) => openTab({ id: project.id, title: `Proyecto / ${project.name}`, type: 'project-detail', project })}
+              onSelectProjectDetail={(project) => openTab({ id: project.id, title: `${t.projectTitlePrefix || (language === 'es' ? 'Proyecto' : 'Project')} / ${project.name}`, type: 'project-detail', project })}
               activeLogsProject={activeLogsProject}
               theme={theme}
+              language={language}
             />
           )}
 
@@ -232,14 +235,15 @@ export default function App() {
               envStatus={envStatus}
               customDatabases={customDatabases}
               onAddCustomDatabase={handleAddCustomDatabase}
-              onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `Base de Datos / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+              onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
               theme={theme}
+              language={language}
             />
           )}
 
           <Suspense fallback={
             <div className="flex items-center justify-center p-12 text-xs font-mono text-slate-500">
-              <span className="animate-pulse">Cargando módulo de Lummo Studio...</span>
+              <span className="animate-pulse">{language === 'es' ? 'Cargando módulo de Lummo Studio...' : 'Loading Lummo Studio module...'}</span>
             </div>
           }>
             {activeTabObj?.type === 'project-detail' && activeTabObj.project && (
@@ -253,6 +257,7 @@ export default function App() {
                 onUpdatePort={handleUpdatePort}
                 onUpdateCommand={handleUpdateCommand}
                 theme={theme}
+                language={language}
               />
             )}
 
@@ -261,6 +266,7 @@ export default function App() {
                 db={activeTabObj.db}
                 onBack={() => setActiveTabId('databases')}
                 theme={theme}
+                language={language}
               />
             )}
           </Suspense>
@@ -276,12 +282,15 @@ export default function App() {
             projects={projects}
             onClose={() => setActiveLogsProject(null)}
             onClearLogs={handleClearProjectLogs}
+            language={language}
+            theme={theme}
           />
         )}
 
         {/* Settings Modal */}
         {showSettings && (
           <SettingsModal
+            updater={updater}
             onClose={() => setShowSettings(false)}
             envStatus={envStatus}
             onScanEnv={handleScanEnv}
@@ -310,8 +319,9 @@ export default function App() {
           onOpenProjects={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
           onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
           onAddProject={() => setShowImportModal(true)}
-          onOpenSQLiteWorkbench={() => openTab({ id: 'db-sqlite', title: 'Base de Datos / SQLite', type: 'database-detail', db: cleanSQLite })}
+          onOpenSQLiteWorkbench={() => openTab({ id: 'db-sqlite', title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / SQLite`, type: 'database-detail', db: cleanSQLite })}
           theme={theme}
+          language={language}
         />
 
         {/* Import Project Modal with Drag and Drop Zone */}
@@ -335,9 +345,10 @@ export default function App() {
           onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
           onOpenSettings={() => setShowSettings(true)}
           onToggleProject={handleToggleProject}
-          onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `Base de Datos / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+          onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
           onOpenOnboarding={() => setShowOnboarding(true)}
           theme={theme}
+          language={language}
         />
 
         {/* Simplified User-Friendly Error Modal */}
@@ -348,6 +359,7 @@ export default function App() {
             onClose={() => setUserError(null)}
             onOpenInstaller={() => setShowSettings(true)}
             theme={theme}
+            language={language}
           />
         )}
 
@@ -357,6 +369,8 @@ export default function App() {
           version={updater.currentVersion}
           releaseNotes={updater.updateInfo?.releaseNotes}
           onClose={updater.dismissChangelogSheet}
+          theme={theme}
+          language={language}
         />
       </Suspense>
     </div>

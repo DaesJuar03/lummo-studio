@@ -12,6 +12,7 @@ import {
   Table,
   Radio
 } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
 export default function CommandPaletteModal({
   isOpen,
@@ -24,10 +25,12 @@ export default function CommandPaletteModal({
   onOpenSettings,
   onToggleProject,
   onSelectDatabaseDetail,
-  theme
+  theme,
+  language = 'es'
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   useEffect(() => {
     if (!isOpen) {
@@ -47,7 +50,6 @@ export default function CommandPaletteModal({
         return;
       }
 
-      // Hotkeys N, P, D, S when search input is empty OR when Alt key is pressed
       const key = e.key.toLowerCase();
       const isInputEmpty = searchTerm.trim() === '';
 
@@ -83,8 +85,8 @@ export default function CommandPaletteModal({
   const actions = [
     {
       id: 'add-project',
-      label: 'Agregar Nuevo Proyecto / Servicio Web',
-      category: 'Acciones y Lanzadores',
+      label: language === 'es' ? 'Agregar Nuevo Proyecto / Servicio Web' : 'Add New Project / Web Service',
+      category: language === 'es' ? 'Acciones y Lanzadores' : 'Actions & Launchers',
       icon: Plus,
       hotkey: 'N',
       action: () => {
@@ -94,8 +96,8 @@ export default function CommandPaletteModal({
     },
     {
       id: 'open-projects-panel',
-      label: 'Abrir Panel de Proyectos',
-      category: 'Acciones y Lanzadores',
+      label: language === 'es' ? 'Abrir Panel de Proyectos' : 'Open Projects Panel',
+      category: language === 'es' ? 'Acciones y Lanzadores' : 'Actions & Launchers',
       icon: Layers,
       hotkey: 'P',
       action: () => {
@@ -105,8 +107,8 @@ export default function CommandPaletteModal({
     },
     {
       id: 'open-db-panel',
-      label: 'Abrir Panel de Bases de Datos',
-      category: 'Acciones y Lanzadores',
+      label: language === 'es' ? 'Abrir Panel de Bases de Datos' : 'Open Databases Panel',
+      category: language === 'es' ? 'Acciones y Lanzadores' : 'Actions & Launchers',
       icon: Database,
       hotkey: 'D',
       action: () => {
@@ -116,22 +118,12 @@ export default function CommandPaletteModal({
     },
     {
       id: 'open-settings-modal',
-      label: 'Abrir Ajustes y Configuración',
-      category: 'Acciones y Lanzadores',
+      label: language === 'es' ? 'Abrir Ajustes y Configuración' : 'Open Settings & Preferences',
+      category: language === 'es' ? 'Acciones y Lanzadores' : 'Actions & Launchers',
       icon: SettingsIcon,
       hotkey: 'S',
       action: () => {
         if (onOpenSettings) onOpenSettings();
-        onClose();
-      }
-    },
-    {
-      id: 'open-api-webhooks-tool',
-      label: 'Probar APIs & Inspeccionar Webhooks (v3.0)',
-      category: 'Herramientas y Utilidades',
-      icon: Radio,
-      action: () => {
-        if (onOpenProjects) onOpenProjects();
         onClose();
       }
     }
@@ -140,7 +132,7 @@ export default function CommandPaletteModal({
   const projectItems = projects.map((p) => ({
     id: `proj-${p.id}`,
     label: `${p.name} (http://localhost:${p.port})`,
-    category: 'Proyectos',
+    category: language === 'es' ? 'Proyectos' : 'Projects',
     icon: Layers,
     project: p,
     action: () => {
@@ -151,8 +143,8 @@ export default function CommandPaletteModal({
 
   const databaseItems = allDatabases.map((db) => ({
     id: `db-item-${db.id}`,
-    label: `${db.name} (${db.tech || 'Base de datos'})`,
-    category: 'Bases de Datos',
+    label: `${db.name} (${db.tech || (language === 'es' ? 'Base de datos' : 'Database')})`,
+    category: language === 'es' ? 'Bases de Datos' : 'Databases',
     icon: Database,
     dbItem: db,
     action: () => {
@@ -192,7 +184,7 @@ export default function CommandPaletteModal({
             <input
               type="text"
               autoFocus
-              placeholder="Escribe un comando o presiona N, P, D, S... (Ctrl + K)"
+              placeholder={language === 'es' ? "Escribe un comando o presiona N, P, D, S... (Ctrl + K)" : "Type a command or press N, P, D, S... (Ctrl + K)"}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full bg-transparent text-sm font-semibold focus:outline-none ${
@@ -209,23 +201,23 @@ export default function CommandPaletteModal({
             </button>
           </div>
 
-          {/* Results List with Custom Visible Scrollbar */}
+          {/* Results List */}
           <div className="max-h-96 overflow-y-auto p-3 pr-2.5 space-y-4 custom-scrollbar">
             {allItems.length === 0 ? (
               <div className="p-8 text-center text-xs text-slate-400 font-mono">
-                No se encontraron comandos, proyectos o bases de datos coincidentes.
+                {language === 'es' ? 'No se encontraron comandos, proyectos o bases de datos coincidentes.' : 'No matching commands, projects, or databases found.'}
               </div>
             ) : (
               <div className="space-y-4">
                 
                 {/* 1. Actions Section */}
-                {allItems.some(i => i.category === 'Acciones y Lanzadores') && (
+                {allItems.some(i => i.category.includes('Acciones') || i.category.includes('Actions')) && (
                   <div className="space-y-1">
                     <span className="px-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase font-mono">
-                      Acciones y Atajos
+                      {language === 'es' ? 'Acciones y Atajos' : 'Actions & Shortcuts'}
                     </span>
                     {allItems
-                      .filter(i => i.category === 'Acciones y Lanzadores')
+                      .filter(i => i.category.includes('Acciones') || i.category.includes('Actions'))
                       .map((item) => {
                         const Icon = item.icon;
                         return (
@@ -260,13 +252,13 @@ export default function CommandPaletteModal({
                 )}
 
                 {/* 2. Databases Section */}
-                {allItems.some(i => i.category === 'Bases de Datos') && (
+                {allItems.some(i => i.category.includes('Bases') || i.category.includes('Databases')) && (
                   <div className="space-y-1">
                     <span className="px-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase font-mono">
-                      Bases de Datos ({allItems.filter(i => i.category === 'Bases de Datos').length})
+                      {language === 'es' ? 'Bases de Datos' : 'Databases'} ({allItems.filter(i => i.category.includes('Bases') || i.category.includes('Databases')).length})
                     </span>
                     {allItems
-                      .filter(i => i.category === 'Bases de Datos')
+                      .filter(i => i.category.includes('Bases') || i.category.includes('Databases'))
                       .map((item) => (
                         <motion.div
                           key={item.id}
@@ -299,7 +291,7 @@ export default function CommandPaletteModal({
                             className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-xl text-[11px] shadow-md shadow-blue-600/20 hover:shadow-[0_0_12px_rgba(37,99,235,0.35)] flex items-center space-x-1 shrink-0 cursor-pointer"
                           >
                             <Table className="h-3.5 w-3.5" />
-                            <span>Abrir Tablas</span>
+                            <span>{t.abrirTablas || 'Open Tables'}</span>
                           </motion.button>
                         </motion.div>
                       ))}
@@ -307,13 +299,13 @@ export default function CommandPaletteModal({
                 )}
 
                 {/* 3. Projects Section */}
-                {allItems.some(i => i.category === 'Proyectos') && (
+                {allItems.some(i => i.category.includes('Proyectos') || i.category.includes('Projects')) && (
                   <div className="space-y-1">
                     <span className="px-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase font-mono">
-                      Proyectos ({allItems.filter(i => i.category === 'Proyectos').length})
+                      {language === 'es' ? 'Proyectos' : 'Projects'} ({allItems.filter(i => i.category.includes('Proyectos') || i.category.includes('Projects')).length})
                     </span>
                     {allItems
-                      .filter(i => i.category === 'Proyectos')
+                      .filter(i => i.category.includes('Proyectos') || i.category.includes('Projects'))
                       .map((item) => {
                         const isRunning = item.project?.status === 'RUNNING';
                         return (
@@ -344,7 +336,7 @@ export default function CommandPaletteModal({
                               }`}
                             >
                               {isRunning ? <Square className="h-3 w-3 fill-white" /> : <Play className="h-3 w-3 fill-white" />}
-                              <span>{isRunning ? 'Detener' : 'Arrancar'}</span>
+                              <span>{isRunning ? (t.detener || 'Stop') : (t.arrancar || 'Start')}</span>
                             </motion.button>
                           </motion.div>
                         );

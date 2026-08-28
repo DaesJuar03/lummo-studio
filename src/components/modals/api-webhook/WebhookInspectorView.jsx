@@ -15,18 +15,21 @@ import {
   Send 
 } from 'lucide-react';
 import useClipboard from '../../../hooks/useClipboard';
+import { getTranslations } from '../../../locales';
 
 export default function WebhookInspectorView({
   port,
   tunnelUrl,
   onStartTunnel,
   theme,
+  language = 'es',
   webhookEvents = [],
   onClearEvents,
   onReplayEvent,
   onSendMock
 }) {
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [webhookFilter, setWebhookFilter] = useState('all'); // 'all' | '2xx' | 'errors' | 'replays'
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,9 +90,9 @@ export default function WebhookInspectorView({
     if (onReplayEvent) {
       const res = await onReplayEvent(eventObj);
       if (res?.success) {
-        setReplaySuccessMsg('¡Petición reenviada con éxito al servidor local!');
+        setReplaySuccessMsg(language === 'es' ? '¡Petición reenviada con éxito al servidor local!' : 'Request replayed successfully to local server!');
       } else {
-        setReplaySuccessMsg(`Error al reenviar: ${res?.error || 'Fallo de conexión'}`);
+        setReplaySuccessMsg(language === 'es' ? `Error al reenviar: ${res?.error || 'Fallo de conexión'}` : `Replay error: ${res?.error || 'Connection failed'}`);
       }
     }
     setIsReplaying(false);
@@ -114,7 +117,7 @@ export default function WebhookInspectorView({
       parsedPayload = mockPayloadText ? JSON.parse(mockPayloadText) : {};
       parsedHeaders = mockHeadersText ? JSON.parse(mockHeadersText) : {};
     } catch (_e) {
-      alert('Error de sintaxis JSON en el Payload o Headers');
+      alert(language === 'es' ? 'Error de sintaxis JSON en el Payload o Headers' : 'JSON syntax error in Payload or Headers');
       setIsSendingMock(false);
       return;
     }
@@ -175,7 +178,7 @@ export default function WebhookInspectorView({
           {tunnelUrl ? (
             <div className="flex items-center space-x-2 px-3 py-1.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>TÚNEL ACTIVO:</span>
+              <span>{language === 'es' ? 'TÚNEL ACTIVO:' : 'ACTIVE TUNNEL:'}</span>
               <a href={tunnelUrl} target="_blank" rel="noreferrer" className="underline hover:text-white">
                 {tunnelUrl}
               </a>
@@ -183,14 +186,14 @@ export default function WebhookInspectorView({
           ) : (
             <div className="flex items-center space-x-2">
               <span className="text-xs font-mono text-amber-400 font-semibold flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4" /> Túnel público no iniciado
+                <AlertTriangle className="w-4 h-4" /> {language === 'es' ? 'Túnel público no iniciado' : 'Public tunnel not running'}
               </span>
               {onStartTunnel && (
                 <button
                   onClick={onStartTunnel}
                   className="px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer shadow-md shadow-blue-600/20"
                 >
-                  Iniciar Túnel Ahora
+                  {language === 'es' ? 'Iniciar Túnel Ahora' : 'Start Tunnel Now'}
                 </button>
               )}
             </div>
@@ -203,7 +206,7 @@ export default function WebhookInspectorView({
             className="px-4 py-2 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-purple-600/20 cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Simular Webhook Mock</span>
+            <span>{language === 'es' ? 'Simular Webhook Mock' : 'Simulate Mock Webhook'}</span>
           </button>
 
           <button
@@ -211,7 +214,7 @@ export default function WebhookInspectorView({
             className={`p-2 rounded-2xl border transition-colors cursor-pointer ${
               isDark ? 'border-[rgba(255, 255, 255, 0.08)] hover:bg-[#1E1E1E] text-slate-400 hover:text-rose-400' : 'border-slate-200 hover:bg-slate-100 text-slate-600'
             }`}
-            title="Limpiar Historial de Webhooks"
+            title={language === 'es' ? "Limpiar Historial de Webhooks" : "Clear Webhook History"}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -229,7 +232,7 @@ export default function WebhookInspectorView({
               <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
               <input
                 type="text"
-                placeholder="Buscar por ruta o payload..."
+                placeholder={language === 'es' ? "Buscar por ruta o payload..." : "Search path or payload..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-9 pr-3 py-1.5 rounded-xl border text-xs font-mono focus:outline-none ${
@@ -240,9 +243,9 @@ export default function WebhookInspectorView({
 
             <div className="flex space-x-1">
               {[
-                { id: 'all', label: `Todos (${webhookEvents.length})` },
+                { id: 'all', label: language === 'es' ? `Todos (${webhookEvents.length})` : `All (${webhookEvents.length})` },
                 { id: '2xx', label: '2xx OK' },
-                { id: 'errors', label: 'Errores' },
+                { id: 'errors', label: language === 'es' ? 'Errores' : 'Errors' },
                 { id: 'replays', label: 'Replays' }
               ].map((f) => (
                 <button
@@ -303,9 +306,9 @@ export default function WebhookInspectorView({
             ) : (
               <div className="p-8 text-center text-slate-500 space-y-2">
                 <Radio className="w-8 h-8 stroke-[1.2] mx-auto text-slate-600" />
-                <p className="text-xs">No hay webhooks registrados aún.</p>
+                <p className="text-xs">{language === 'es' ? 'No hay webhooks registrados aún.' : 'No webhooks recorded yet.'}</p>
                 <p className="text-[11px] text-slate-600">
-                  Usa el botón "Simular Webhook Mock" para probar Stripe o GitHub al instante.
+                  {language === 'es' ? 'Usa el botón "Simular Webhook Mock" para probar Stripe o GitHub al instante.' : 'Use "Simulate Mock Webhook" to test Stripe or GitHub instantly.'}
                 </p>
               </div>
             )}
@@ -328,7 +331,7 @@ export default function WebhookInspectorView({
                       {activeWebhookEvent.path || activeWebhookEvent.url}
                     </h3>
                     <span className="text-[11px] font-mono text-slate-400">
-                      Origen: {activeWebhookEvent.clientIp} • {new Date(activeWebhookEvent.timestamp).toLocaleString()}
+                      {language === 'es' ? 'Origen:' : 'Source:'} {activeWebhookEvent.clientIp} • {new Date(activeWebhookEvent.timestamp).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -340,7 +343,7 @@ export default function WebhookInspectorView({
                     className="px-4 py-2 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-purple-600/20 cursor-pointer disabled:opacity-50"
                   >
                     <RotateCw className={`w-3.5 h-3.5 ${isReplaying ? 'animate-spin' : ''}`} />
-                    <span>{isReplaying ? 'Reenviando...' : 'Replay Webhook'}</span>
+                    <span>{isReplaying ? (language === 'es' ? 'Reenviando...' : 'Replaying...') : 'Replay Webhook'}</span>
                   </button>
 
                   <button
@@ -353,7 +356,7 @@ export default function WebhookInspectorView({
                     className={`p-2 rounded-2xl border transition-colors cursor-pointer ${
                       isDark ? 'border-[rgba(255, 255, 255, 0.08)] hover:bg-[#1E1E1E] text-slate-300' : 'border-slate-200 hover:bg-slate-100'
                     }`}
-                    title="Copiar como cURL"
+                    title={language === 'es' ? "Copiar como cURL" : "Copy as cURL"}
                   >
                     <Copy className="w-4 h-4" />
                   </button>
@@ -370,7 +373,7 @@ export default function WebhookInspectorView({
                 {/* Left: Incoming Request Payload & Headers */}
                 <div className="p-4 flex flex-col min-h-0 overflow-hidden space-y-3">
                   <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-                    📥 Payload & Headers Entrantes
+                    {language === 'es' ? '📥 Payload & Headers Entrantes' : '📥 Incoming Payload & Headers'}
                   </span>
 
                   <div className="space-y-1 font-mono text-[11px] max-h-36 overflow-y-auto custom-scrollbar p-2.5 rounded-xl bg-black/20 border border-white/5">
@@ -383,11 +386,11 @@ export default function WebhookInspectorView({
                   </div>
 
                   <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-1">
-                    <span className="text-[11px] font-mono text-slate-400">Cuerpo de la Petición (Request Body)</span>
+                    <span className="text-[11px] font-mono text-slate-400">{language === 'es' ? 'Cuerpo de la Petición (Request Body)' : 'Request Body'}</span>
                     <pre className="flex-1 p-3 rounded-2xl border font-mono text-xs overflow-y-auto custom-scrollbar bg-[#181818] border-[rgba(255, 255, 255, 0.08)] text-emerald-400 select-text">
                       {typeof activeWebhookEvent.body === 'object'
                         ? JSON.stringify(activeWebhookEvent.body, null, 2)
-                        : String(activeWebhookEvent.rawBody || 'Sin cuerpo')}
+                        : String(activeWebhookEvent.rawBody || (language === 'es' ? 'Sin cuerpo' : 'No body'))}
                     </pre>
                   </div>
                 </div>
@@ -396,7 +399,7 @@ export default function WebhookInspectorView({
                 <div className="p-4 flex flex-col min-h-0 overflow-hidden space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-                      📤 Respuesta de tu Servidor
+                      {language === 'es' ? '📤 Respuesta de tu Servidor' : '📤 Local Server Response'}
                     </span>
                     {getStatusBadge(activeWebhookEvent.statusCode)}
                   </div>
@@ -411,11 +414,11 @@ export default function WebhookInspectorView({
                   </div>
 
                   <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-1">
-                    <span className="text-[11px] font-mono text-slate-400">Cuerpo de Respuesta (Response Body)</span>
+                    <span className="text-[11px] font-mono text-slate-400">{language === 'es' ? 'Cuerpo de Respuesta (Response Body)' : 'Response Body'}</span>
                     <pre className="flex-1 p-3 rounded-2xl border font-mono text-xs overflow-y-auto custom-scrollbar bg-[#181818] border-[rgba(255, 255, 255, 0.08)] text-slate-300 select-text">
                       {typeof activeWebhookEvent.responseBody === 'object'
                         ? JSON.stringify(activeWebhookEvent.responseBody, null, 2)
-                        : String(activeWebhookEvent.responseBody || 'Respuesta vacía del servidor')}
+                        : String(activeWebhookEvent.responseBody || (language === 'es' ? 'Respuesta vacía del servidor' : 'Empty server response'))}
                     </pre>
                   </div>
                 </div>
@@ -424,9 +427,11 @@ export default function WebhookInspectorView({
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500">
               <Radio className="w-12 h-12 stroke-[1.2] mb-3 text-slate-600" />
-              <h4 className="font-bold text-sm text-slate-400">Selecciona un Webhook</h4>
+              <h4 className="font-bold text-sm text-slate-400">{language === 'es' ? 'Selecciona un Webhook' : 'Select a Webhook'}</h4>
               <p className="text-xs max-w-xs mt-1">
-                Elige cualquier evento de la lista izquierda para inspeccionar sus cabeceras y hacer Replay.
+                {language === 'es' 
+                  ? 'Elige cualquier evento de la lista izquierda para inspeccionar sus cabeceras y hacer Replay.' 
+                  : 'Choose any event from the left list to inspect headers and perform Replay.'}
               </p>
             </div>
           )}
@@ -448,15 +453,15 @@ export default function WebhookInspectorView({
               <div className="flex items-center justify-between border-b pb-3 border-white/5">
                 <div className="flex items-center space-x-2">
                   <Sparkles className="w-5 h-5 text-purple-400" />
-                  <h3 className="font-extrabold text-base">Simular Webhook Mock</h3>
+                  <h3 className="font-extrabold text-base">{language === 'es' ? 'Simular Webhook Mock' : 'Simulate Mock Webhook'}</h3>
                 </div>
-                <button onClick={() => setShowMockModal(false)} className="text-slate-400 hover:text-white">
+                <button onClick={() => setShowMockModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-mono font-bold text-slate-400">Plantilla Preconfigurada</label>
+                <label className="text-xs font-mono font-bold text-slate-400">{language === 'es' ? 'Plantilla Preconfigurada' : 'Preconfigured Template'}</label>
                 <div className="grid grid-cols-2 gap-2">
                   {Object.entries(mockTemplates).map(([k, t]) => (
                     <button
@@ -476,7 +481,7 @@ export default function WebhookInspectorView({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-mono font-bold text-slate-400">Ruta de Destino (Endpoint)</label>
+                <label className="text-xs font-mono font-bold text-slate-400">{language === 'es' ? 'Ruta de Destino (Endpoint)' : 'Target Endpoint'}</label>
                 <input
                   type="text"
                   value={mockEndpoint}
@@ -502,9 +507,9 @@ export default function WebhookInspectorView({
               <div className="flex justify-end space-x-2 pt-2">
                 <button
                   onClick={() => setShowMockModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white cursor-pointer"
                 >
-                  Cancelar
+                  {t.cancel || 'Cancel'}
                 </button>
                 <button
                   onClick={handleDispatchMock}
@@ -512,7 +517,7 @@ export default function WebhookInspectorView({
                   className="px-5 py-2 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center space-x-2 shadow-lg shadow-purple-600/20 cursor-pointer"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Disparar Webhook</span>
+                  <span>{language === 'es' ? 'Disparar Webhook' : 'Dispatch Webhook'}</span>
                 </button>
               </div>
             </motion.div>

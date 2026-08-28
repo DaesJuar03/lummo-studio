@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Check, RefreshCw } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
-export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tableName, columns = [], onGenerated, theme }) {
+export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tableName, columns = [], onGenerated, theme, language = 'es' }) {
   const [rowCount, setRowCount] = useState(25);
   const [isGenerating, setIsGenerating] = useState(false);
   const [previewRows, setPreviewRows] = useState([]);
@@ -10,10 +11,10 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
   const [errorMsg, setErrorMsg] = useState(null);
 
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   if (!isOpen) return null;
 
-  // Generate fake data row based on column type heuristics
   const generateSingleMockRow = (cols, index) => {
     const row = {};
     const firstNames = ['Carlos', 'Ana', 'Mateo', 'Sofia', 'Lucas', 'Elena', 'Diego', 'Lucia', 'Gabriel', 'Valentina'];
@@ -24,7 +25,6 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
       const nameLower = (col.name || '').toLowerCase();
       const typeLower = (col.type || '').toLowerCase();
 
-      // Primary key auto-increment skipping or numeric fallback
       if (col.pk || nameLower === 'id') {
         row[col.name] = index + 1;
         return;
@@ -53,7 +53,7 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
       } else if (typeLower.includes('int') || typeLower.includes('number')) {
         row[col.name] = Math.floor(Math.random() * 1000) + 1;
       } else {
-        row[col.name] = `Dato de prueba ${index + 1}`;
+        row[col.name] = `Test data ${index + 1}`;
       }
     });
 
@@ -78,7 +78,7 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
       const colNames = colsToInsert.map(c => c.name);
 
       if (colNames.length === 0) {
-        throw new Error('No hay columnas aptas para insertar datos');
+        throw new Error(language === 'es' ? 'No hay columnas aptas para insertar datos' : 'No suitable columns to insert data');
       }
 
       let inserted = 0;
@@ -99,17 +99,20 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
           const sql = `INSERT INTO "${tableName}" (${colNames.map(c => `"${c}"`).join(', ')}) VALUES (${values.join(', ')});`;
           try {
             await window.electronAPI.db.executeQuery(dbConfig, sql);
-          } catch (e) {
-            console.warn('Error al ejecutar INSERT:', e);
-          }
+            inserted++;
+          } catch (_e) {}
+        } else {
+          inserted++;
         }
-        inserted++;
       }
 
       setSuccessCount(inserted);
-      if (onGenerated) await onGenerated(generatedMockRows);
+      if (onGenerated) onGenerated(generatedMockRows);
+      setTimeout(() => {
+        onClose();
+      }, 1800);
     } catch (err) {
-      setErrorMsg(err.message || 'Error al generar datos sintéticos');
+      setErrorMsg(err.message);
     } finally {
       setIsGenerating(false);
     }
@@ -121,130 +124,118 @@ export default function MockDataGeneratorModal({ isOpen, onClose, dbConfig, tabl
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 select-none"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 select-none"
         onClick={onClose}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
-          className={`w-full max-w-2xl rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
-            isDark ? 'bg-[#121215] border-[#27272a] text-[#f4f4f5]' : 'bg-white border-slate-200 text-slate-900'
+          className={`w-full max-w-lg rounded-3xl border shadow-2xl overflow-hidden ${
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#09090b] border-[#27272a]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#181818] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center text-white shadow-md shadow-purple-600/20">
                 <Sparkles className="h-5 w-5" />
               </div>
               <div>
                 <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Generador de Datos Sintéticos (Mock Data)
+                  {language === 'es' ? 'Generador de Datos de Prueba (Mock Data)' : 'Mock Data Generator'}
                 </h3>
-                <p className="text-xs text-slate-500">Poblar tabla <strong className="text-purple-400 font-mono">"{tableName}"</strong> con filas sintéticas</p>
+                <p className="text-xs text-slate-400">
+                  {language === 'es' ? `Llenar tabla "${tableName}" con registros sintéticos reales` : `Fill "${tableName}" table with realistic synthetic data`}
+                </p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:text-white transition-colors">
-              <X className="h-5 w-5" />
+            <button
+              onClick={onClose}
+              className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+              }`}
+            >
+              <X className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Form Content */}
-          <div className="p-6 space-y-5">
+          {/* Body */}
+          <div className="p-6 space-y-4 text-xs">
             {errorMsg && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-mono">
                 {errorMsg}
               </div>
             )}
 
             {successCount !== null && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono flex items-center space-x-2">
                 <Check className="h-4 w-4" />
-                <span>¡Se insertaron exitosamente {successCount} filas sintéticas en la tabla "{tableName}"!</span>
+                <span>{language === 'es' ? `¡${successCount} registros insertados exitosamente!` : `${successCount} records inserted successfully!`}</span>
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider block">
-                Cantidad de filas a generar:
+            <div className="space-y-1.5">
+              <label className="text-slate-400 font-bold uppercase text-[10px]">
+                {language === 'es' ? 'Cantidad de Registros a Insertar:' : 'Number of Records to Insert:'}
               </label>
-              <div className="grid grid-cols-4 gap-2">
-                {[10, 25, 50, 100].map((count) => (
-                  <button
-                    key={count}
-                    type="button"
-                    onClick={() => setRowCount(count)}
-                    className={`py-2.5 rounded-xl border text-xs font-bold font-mono transition-all ${
-                      rowCount === count
-                        ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-600/20'
-                        : isDark
-                          ? 'bg-[#18181b] border-[#27272a] text-slate-400 hover:text-white'
-                          : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    {count} Filas
-                  </button>
-                ))}
-              </div>
+              <input
+                type="number"
+                min="1"
+                max="500"
+                value={rowCount}
+                onChange={(e) => setRowCount(parseInt(e.target.value, 10) || 1)}
+                className={`w-full p-2.5 rounded-xl border font-mono font-bold focus:outline-none focus:border-purple-500 ${
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                }`}
+              />
             </div>
 
             <div className="flex items-center justify-between pt-2">
               <button
                 type="button"
                 onClick={handlePreview}
-                className={`px-4 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  isDark ? 'bg-[#18181b] border-[#27272a] text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700'
+                className={`px-3 py-1.5 rounded-xl border font-bold text-xs cursor-pointer ${
+                  isDark ? 'border-white/10 text-slate-300 hover:bg-[#252525]' : 'border-slate-300 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                <RefreshCw className="h-3.5 w-3.5" />
-                <span>Previsualizar Muestra</span>
+                {language === 'es' ? 'Previsualizar 5 Filas' : 'Preview 5 Rows'}
               </button>
 
               <button
                 type="button"
-                onClick={handleGenerateAndInsert}
                 disabled={isGenerating}
-                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-lg shadow-purple-600/25 flex items-center justify-center transition-all disabled:opacity-50"
+                onClick={handleGenerateAndInsert}
+                className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-md shadow-purple-600/20 flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
               >
-                <span>{isGenerating ? 'Generando & Insertando...' : `Insertar ${rowCount} Filas`}</span>
+                {isGenerating ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>{language === 'es' ? 'Insertando...' : 'Inserting...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    <span>{language === 'es' ? 'Generar e Insertar' : 'Generate & Insert'}</span>
+                  </>
+                )}
               </button>
             </div>
 
-            {/* Preview table */}
             {previewRows.length > 0 && (
-              <div className="space-y-2 pt-2 border-t border-slate-800">
-                <label className="text-[11px] font-bold text-slate-500 font-mono uppercase tracking-wider block">
-                  Muestra previa de datos generados:
-                </label>
-                <div className="overflow-x-auto rounded-xl border border-slate-800 max-h-40">
-                  <table className="w-full text-left text-xs font-mono">
-                    <thead className="bg-slate-900 text-slate-400 border-b border-slate-800">
-                      <tr>
-                        {Object.keys(previewRows[0] || {}).map(col => (
-                          <th key={col} className="p-2 px-3 border-r border-slate-800">{col}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/50">
-                      {previewRows.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-purple-500/5">
-                          {Object.values(row).map((val, i) => (
-                            <td key={i} className="p-2 px-3 border-r border-slate-800/50 text-slate-300 truncate max-w-[150px]">
-                              {String(val)}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase font-mono">{language === 'es' ? 'Muestra de datos:' : 'Data Sample:'}</span>
+                <div className={`p-2.5 rounded-xl border max-h-40 overflow-auto font-mono text-[11px] ${
+                  isDark ? 'bg-[#1A1A1A] border-white/[0.06] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-800'
+                }`}>
+                  <pre>{JSON.stringify(previewRows, null, 2)}</pre>
                 </div>
               </div>
             )}
-
           </div>
         </motion.div>
       </motion.div>

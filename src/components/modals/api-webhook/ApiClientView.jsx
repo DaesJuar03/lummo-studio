@@ -14,14 +14,17 @@ import {
   XCircle 
 } from 'lucide-react';
 import useClipboard from '../../../hooks/useClipboard';
+import { getTranslations } from '../../../locales';
 
 export default function ApiClientView({
   port,
   theme,
+  language = 'es',
   collections = [],
   onSaveCollectionRequest
 }) {
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   // Request state
   const [method, setMethod] = useState('GET');
@@ -277,7 +280,7 @@ export default function ApiClientView({
           ) : (
             <Send className="w-4 h-4" />
           )}
-          <span>{isSending ? 'Enviando...' : 'Enviar'}</span>
+          <span>{isSending ? (language === 'es' ? 'Enviando...' : 'Sending...') : (language === 'es' ? 'Enviar' : 'Send')}</span>
         </button>
 
         <button
@@ -285,7 +288,7 @@ export default function ApiClientView({
           className={`p-2.5 rounded-2xl border transition-colors cursor-pointer ${
             isDark ? 'border-[rgba(255, 255, 255, 0.08)] hover:bg-[#1E1E1E] text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700'
           }`}
-          title="Guardar en Colección de Proyecto (.lummo)"
+          title={language === 'es' ? "Guardar en Colección de Proyecto (.lummo)" : "Save to Project Collection (.lummo)"}
         >
           <Save className="w-4 h-4" />
         </button>
@@ -297,10 +300,10 @@ export default function ApiClientView({
           <div className={`w-full max-w-md p-6 rounded-3xl border shadow-2xl space-y-4 ${
             isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}>
-            <h3 className="font-extrabold text-sm">Guardar Petición en Colección</h3>
+            <h3 className="font-extrabold text-sm">{language === 'es' ? 'Guardar Petición en Colección' : 'Save Request to Collection'}</h3>
             <input
               type="text"
-              placeholder="Nombre descriptivo (ej: Get Users List)"
+              placeholder={language === 'es' ? "Nombre descriptivo (ej: Get Users List)" : "Descriptive name (e.g. Get Users List)"}
               value={reqSaveName}
               onChange={(e) => setReqSaveName(e.target.value)}
               className={`w-full p-3 rounded-2xl border text-xs font-mono outline-none ${
@@ -310,15 +313,15 @@ export default function ApiClientView({
             <div className="flex justify-end space-x-2">
               <button
                 onClick={() => setShowSaveModal(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white cursor-pointer"
               >
-                Cancelar
+                {t.cancel || 'Cancel'}
               </button>
               <button
                 onClick={handleSaveCollectionSubmit}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md cursor-pointer"
               >
-                Guardar
+                {language === 'es' ? 'Guardar' : 'Save'}
               </button>
             </div>
           </div>
@@ -365,7 +368,7 @@ export default function ApiClientView({
                   isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-slate-300' : 'bg-white border-slate-200'
                 }`}
               >
-                <option value="">Colecciones ({collections.length})...</option>
+                <option value="">{language === 'es' ? `Colecciones (${collections.length})...` : `Collections (${collections.length})...`}</option>
                 {collections.map((c) => (
                   <option key={c.id || c.name} value={c.name}>
                     {c.method} • {c.name}
@@ -396,7 +399,7 @@ export default function ApiClientView({
                     />
                     <input
                       type="text"
-                      placeholder="Clave (ej: page)"
+                      placeholder={language === 'es' ? "Clave (ej: page)" : "Key (e.g. page)"}
                       value={param.key}
                       onChange={(e) => {
                         const updated = [...queryParams];
@@ -409,7 +412,7 @@ export default function ApiClientView({
                     />
                     <input
                       type="text"
-                      placeholder="Valor (ej: 1)"
+                      placeholder={language === 'es' ? "Valor (ej: 1)" : "Value (e.g. 1)"}
                       value={param.value}
                       onChange={(e) => {
                         const updated = [...queryParams];
@@ -422,7 +425,7 @@ export default function ApiClientView({
                     />
                     <button
                       onClick={() => setQueryParams(queryParams.filter((_, i) => i !== idx))}
-                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -433,7 +436,7 @@ export default function ApiClientView({
                   className="text-xs text-blue-500 font-bold hover:text-blue-400 flex items-center space-x-1 pt-1 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Agregar Parámetro</span>
+                  <span>{language === 'es' ? 'Agregar Parámetro' : 'Add Parameter'}</span>
                 </button>
               </div>
             )}
@@ -442,7 +445,7 @@ export default function ApiClientView({
             {reqConfigTab === 'headers' && (
               <div className="space-y-2">
                 <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
-                  Cabeceras HTTP (Headers)
+                  {language === 'es' ? 'Cabeceras HTTP (Headers)' : 'HTTP Headers'}
                 </span>
                 {headers.map((h, idx) => (
                   <div key={idx} className="flex items-center space-x-2">
@@ -458,7 +461,7 @@ export default function ApiClientView({
                     />
                     <input
                       type="text"
-                      placeholder="Header (ej: Authorization)"
+                      placeholder="Header (e.g. Authorization)"
                       value={h.key}
                       onChange={(e) => {
                         const updated = [...headers];
@@ -471,7 +474,7 @@ export default function ApiClientView({
                     />
                     <input
                       type="text"
-                      placeholder="Valor"
+                      placeholder={language === 'es' ? "Valor" : "Value"}
                       value={h.value}
                       onChange={(e) => {
                         const updated = [...headers];
@@ -484,7 +487,7 @@ export default function ApiClientView({
                     />
                     <button
                       onClick={() => setHeaders(headers.filter((_, i) => i !== idx))}
-                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -495,7 +498,7 @@ export default function ApiClientView({
                   className="text-xs text-blue-500 font-bold hover:text-blue-400 flex items-center space-x-1 pt-1 cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Agregar Header</span>
+                  <span>{language === 'es' ? 'Agregar Header' : 'Add Header'}</span>
                 </button>
               </div>
             )}
@@ -553,7 +556,7 @@ export default function ApiClientView({
                       <div key={idx} className="flex items-center space-x-2">
                         <input
                           type="text"
-                          placeholder="Campo (Key)"
+                          placeholder={language === 'es' ? "Campo (Key)" : "Field (Key)"}
                           value={pair.key}
                           onChange={(e) => {
                             const updated = [...formPairs];
@@ -566,7 +569,7 @@ export default function ApiClientView({
                         />
                         <input
                           type="text"
-                          placeholder="Valor (Value)"
+                          placeholder={language === 'es' ? "Valor (Value)" : "Value"}
                           value={pair.value}
                           onChange={(e) => {
                             const updated = [...formPairs];
@@ -579,7 +582,7 @@ export default function ApiClientView({
                         />
                         <button
                           onClick={() => setFormPairs(formPairs.filter((_, i) => i !== idx))}
-                          className="p-1.5 text-slate-400 hover:text-rose-500"
+                          className="p-1.5 text-slate-400 hover:text-rose-500 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -590,7 +593,7 @@ export default function ApiClientView({
                       className="text-xs text-blue-500 font-bold hover:text-blue-400 flex items-center space-x-1 pt-1 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Agregar Campo Form-Data</span>
+                      <span>{language === 'es' ? 'Agregar Campo Form-Data' : 'Add Form-Data Field'}</span>
                     </button>
                   </div>
                 )}
@@ -698,7 +701,7 @@ export default function ApiClientView({
                     className="px-3 py-1 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-mono font-bold flex items-center space-x-1.5 hover:bg-blue-500/20 cursor-pointer"
                   >
                     {snippetCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{snippetCopied ? '¡Copiado!' : 'Copiar Código'}</span>
+                    <span>{snippetCopied ? (language === 'es' ? '¡Copiado!' : 'Copied!') : (language === 'es' ? 'Copiar Código' : 'Copy Code')}</span>
                   </button>
                 </div>
                 <pre className={`p-4 rounded-2xl border font-mono text-xs overflow-x-auto ${
@@ -718,7 +721,7 @@ export default function ApiClientView({
           }`}>
             <div className="flex items-center space-x-3">
               <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-                Respuesta (Response)
+                {language === 'es' ? 'Respuesta (Response)' : 'Response'}
               </span>
               {apiResponse && getStatusBadge(apiResponse.status)}
             </div>
@@ -762,7 +765,7 @@ export default function ApiClientView({
                   className="text-xs font-mono text-slate-400 hover:text-white flex items-center space-x-1 cursor-pointer"
                 >
                   {copiedResp ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedResp ? '¡Copiado!' : 'Copiar'}</span>
+                  <span>{copiedResp ? (language === 'es' ? '¡Copiado!' : 'Copied!') : (language === 'es' ? 'Copiar' : 'Copy')}</span>
                 </button>
               </div>
 
@@ -771,7 +774,7 @@ export default function ApiClientView({
                   <pre className="font-mono text-xs text-emerald-400 whitespace-pre-wrap select-text">
                     {typeof apiResponse.body === 'object'
                       ? JSON.stringify(apiResponse.body, null, 2)
-                      : String(apiResponse.rawBody || apiResponse.error || 'Respuesta vacía')}
+                      : String(apiResponse.rawBody || apiResponse.error || (language === 'es' ? 'Respuesta vacía' : 'Empty response'))}
                   </pre>
                 )}
 
@@ -795,7 +798,7 @@ export default function ApiClientView({
                         </div>
                       ))
                     ) : (
-                      <p className="text-slate-500">No se recibieron cookies en esta respuesta.</p>
+                      <p className="text-slate-500">{language === 'es' ? 'No se recibieron cookies en esta respuesta.' : 'No cookies received in this response.'}</p>
                     )}
                   </div>
                 )}
@@ -804,9 +807,11 @@ export default function ApiClientView({
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500">
               <Send className="w-12 h-12 stroke-[1.2] mb-3 text-slate-600" />
-              <h4 className="font-bold text-sm text-slate-400">Sin Respuesta Aún</h4>
+              <h4 className="font-bold text-sm text-slate-400">{language === 'es' ? 'Sin Respuesta Aún' : 'No Response Yet'}</h4>
               <p className="text-xs max-w-xs mt-1">
-                Configura los parámetros a la izquierda y presiona <strong>"Enviar"</strong> para inspeccionar la respuesta local.
+                {language === 'es' 
+                  ? 'Configura los parámetros a la izquierda y presiona "Enviar" para inspeccionar la respuesta local.' 
+                  : 'Configure request parameters on the left and click "Send" to inspect local responses.'}
               </p>
             </div>
           )}

@@ -32,7 +32,8 @@ export default function SettingsModal({
   projects = [],
   onSaveProjects,
   onRemoveProject,
-  onOpenFolder
+  onOpenFolder,
+  updater
 }) {
   const [activeCategory, setActiveCategory] = useState('services');
   const [detectedEditors, setDetectedEditors] = useState([]);
@@ -92,12 +93,12 @@ export default function SettingsModal({
     { id: 'editor', label: t.codeEditorTab, icon: Code },
     { 
       id: 'projects', 
-      label: t.projectsManagerTab || 'Gestión de Proyectos', 
+      label: t.projectsManagerTab || (language === 'es' ? 'Gestión de Proyectos' : 'Projects Manager'), 
       icon: FolderKanban, 
       badge: archivedCount > 0 ? `${archivedCount}` : null 
     },
-    { id: 'ssl', label: t.sslTab || 'Certificados SSL & HTTPS', icon: ShieldCheck },
-    { id: 'general', label: t.generalTab, icon: Sliders },
+    { id: 'ssl', label: t.sslTab || (language === 'es' ? 'Certificados SSL & HTTPS' : 'SSL Certificates & HTTPS'), icon: ShieldCheck },
+    { id: 'general', label: t.generalTab || 'General', icon: Sliders },
   ];
 
   return (
@@ -193,11 +194,12 @@ export default function SettingsModal({
                   isScanning={isScanning}
                   theme={theme}
                   t={t}
+                  language={language}
                 />
               )}
 
               {activeCategory === 'ports' && (
-                <PortsTab theme={theme} t={t} />
+                <PortsTab theme={theme} t={t} language={language} />
               )}
 
               {activeCategory === 'editor' && (
@@ -209,6 +211,7 @@ export default function SettingsModal({
                   onSelectEditorCmd={handleSelectEditorCmd}
                   theme={theme}
                   t={t}
+                  language={language}
                 />
               )}
 
@@ -220,16 +223,19 @@ export default function SettingsModal({
                   onOpenFolder={onOpenFolder}
                   theme={theme}
                   t={t}
+                  language={language}
                 />
               )}
 
               {activeCategory === 'ssl' && (
-                <SslTab theme={theme} />
+                <SslTab theme={theme} t={t} language={language} />
               )}
 
               {activeCategory === 'general' && (
                 <GeneralTab
                   language={language}
+                  updater={updater}
+                  onCloseModal={onClose}
                   onSelectLanguage={onSelectLanguage}
                   theme={theme}
                   onToggleTheme={onToggleTheme}

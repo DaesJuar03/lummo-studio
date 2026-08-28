@@ -116,7 +116,7 @@ export default function Header({
                   ? 'bg-[#1E1E1E] border border-white/[0.08] text-[#888888] hover:text-white hover:bg-[#2A2A2A] hover:border-white/[0.16]'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
-              title="Retroceder"
+              title={language === 'es' ? 'Retroceder' : 'Go Back'}
             >
               <ChevronLeft className="h-4 w-4 stroke-[2.5]" />
             </button>
@@ -129,7 +129,7 @@ export default function Header({
                   ? 'bg-[#1E1E1E] border border-white/[0.08] text-[#888888] hover:text-white hover:bg-[#2A2A2A] hover:border-white/[0.16]'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
-              title="Avanzar"
+              title={language === 'es' ? 'Avanzar' : 'Go Forward'}
             >
               <ChevronRight className="h-4 w-4 stroke-[2.5]" />
             </button>
@@ -183,6 +183,7 @@ export default function Header({
               updateInfo={updater.updateInfo}
               onRestartAndApply={updater.handleRestartAndApply}
               isDark={isDark}
+              language={language}
             />
           )}
 
@@ -203,40 +204,40 @@ export default function Header({
             <button
               onClick={handleMinimize}
               className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
-                isDark ? 'text-[#888888] hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-slate-400 hover:bg-white/5 hover:text-white' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
               }`}
-              title="Minimizar"
+              title={language === 'es' ? 'Minimizar' : 'Minimize'}
             >
               <Minus className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={handleMaximize}
               className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
-                isDark ? 'text-[#888888] hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-slate-400 hover:bg-white/5 hover:text-white' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
               }`}
-              title="Maximizar"
+              title={language === 'es' ? 'Maximizar' : 'Maximize'}
             >
               <Square className="h-3 w-3" />
             </button>
             <button
               onClick={handleClose}
-              className="w-12 h-full flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-600 active:bg-rose-700 transition-colors cursor-pointer"
-              title="Cerrar"
+              className="w-11 h-full flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+              title={language === 'es' ? 'Cerrar' : 'Close'}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Bottom Row: Dedicated Open Tabs Bar with Drag & Drop and Pin Tabs */}
+      {/* Tabs Row Bar */}
       <div 
-        className={`h-9 px-3 flex items-center space-x-1 overflow-x-auto no-scrollbar scroll-smooth w-full ${
-          isDark ? 'bg-[#141414] border-t border-white/[0.08]' : 'bg-slate-100/80 border-t border-slate-200/80'
+        className={`flex items-center px-2 py-1 space-x-1 select-none overflow-x-auto no-scrollbar ${
+          isDark ? 'bg-[#181818]' : 'bg-slate-200/90'
         }`}
-        style={{ WebkitAppRegion: 'no-drag' }}
+        style={{ WebkitAppRegion: 'drag' }}
       >
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence initial={false}>
           {sortedTabs.map((tab) => {
             const isActive = activeTabId === tab.id;
             const isPinned = tab.pinned;
@@ -245,27 +246,26 @@ export default function Header({
               <motion.div
                 key={tab.id}
                 layout
-                draggable
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                draggable={!isPinned}
                 onDragStart={(e) => handleDragStart(e, tab.id)}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, tab.id)}
-                onContextMenu={(e) => handleContextMenu(e, tab)}
-                initial={{ opacity: 0, y: 4, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.12 } }}
-                transition={{ type: "spring", stiffness: 450, damping: 30 }}
                 onClick={() => onSelectTab(tab.id)}
-                className={`group relative flex items-center space-x-2 px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer h-7 shrink-0 border ${
-                  isPinned ? 'px-2 border-cyan-500/50 bg-cyan-500/10 text-cyan-400' : ''
-                } ${
+                onContextMenu={(e) => handleContextMenu(e, tab)}
+                style={{ WebkitAppRegion: 'no-drag' }}
+                className={`h-7 rounded-md flex items-center text-xs font-semibold px-3 space-x-1.5 transition-colors cursor-pointer shrink-0 ${
                   isActive
                     ? isDark 
-                      ? 'bg-[#1E1E1E] border-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.2)] font-extrabold' 
-                      : 'bg-white border-slate-300/90 text-blue-600 shadow-2xs font-extrabold'
-                    : isDark
-                      ? 'bg-[#141414]/70 border-white/[0.06] text-[#888888] hover:text-white hover:bg-[#1E1E1E] hover:border-white/[0.12]'
-                      : 'bg-slate-200/50 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
-                }`}
+                      ? 'bg-[#282828] text-white shadow-2xs border border-white/[0.08]' 
+                      : 'bg-white text-slate-900 shadow-2xs border border-slate-300'
+                    : isDark 
+                      ? 'text-[#888888] hover:bg-[#1E1E1E] hover:text-[#CCCCCC]' 
+                      : 'text-slate-600 hover:bg-slate-300/60 hover:text-slate-900'
+                } ${isPinned ? 'px-2' : ''}`}
                 title={tab.title}
               >
                 {isPinned && <Pin className="w-3 h-3 text-cyan-400 shrink-0 rotate-45" />}
@@ -280,7 +280,7 @@ export default function Header({
                       onCloseTab(tab.id);
                     }}
                     className="p-0.5 rounded-md text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors ml-1"
-                    title="Cerrar pestaña"
+                    title={t.closeTab || 'Close tab'}
                   >
                     <X className="h-3 w-3" />
                   </motion.button>
@@ -296,7 +296,8 @@ export default function Header({
           className={`p-1 rounded-md transition-all h-7 w-7 flex items-center justify-center shrink-0 cursor-pointer ${
             isDark ? 'text-[#888888] hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
           }`}
-          title="Nueva pestaña"
+          title={t.newTab || 'New tab'}
+          style={{ WebkitAppRegion: 'no-drag' }}
         >
           <Plus className="h-4 w-4" />
         </motion.button>
@@ -319,12 +320,12 @@ export default function Header({
             {contextMenu.tab.pinned ? (
               <>
                 <PinOff className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Desfijar Pestaña</span>
+                <span>{t.unpinTab || 'Unpin Tab'}</span>
               </>
             ) : (
               <>
                 <Pin className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Fijar Pestaña (Pin)</span>
+                <span>{t.pinTab || 'Pin Tab'}</span>
               </>
             )}
           </button>
@@ -337,7 +338,7 @@ export default function Header({
             className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-[#2A2A2A] flex items-center gap-2 transition-colors"
           >
             <Copy className="w-3.5 h-3.5 text-purple-400" />
-            <span>Duplicar Pestaña</span>
+            <span>{t.duplicateTab || 'Duplicate Tab'}</span>
           </button>
 
           {contextMenu.tab.closable && (
@@ -351,7 +352,7 @@ export default function Header({
                 className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-[#2A2A2A] flex items-center gap-2 transition-colors"
               >
                 <FolderX className="w-3.5 h-3.5 text-amber-400" />
-                <span>Cerrar Otras Pestañas</span>
+                <span>{t.closeOtherTabs || 'Close Other Tabs'}</span>
               </button>
 
               <button
@@ -362,7 +363,7 @@ export default function Header({
                 className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-rose-950/60 text-rose-300 flex items-center gap-2 transition-colors"
               >
                 <X className="w-3.5 h-3.5 text-rose-400" />
-                <span>Cerrar Pestaña</span>
+                <span>{t.closeTab || 'Close Tab'}</span>
               </button>
             </>
           )}

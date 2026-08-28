@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Share2, Copy, Check, ExternalLink, Link2, RefreshCw, Square, Globe, Shield, Zap } from 'lucide-react';
+import { X, Share2, Copy, Check, ExternalLink, RefreshCw, Square, Globe, Shield, Zap } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
 export default function NetworkTunnelModal({
   isOpen,
@@ -16,10 +17,12 @@ export default function NetworkTunnelModal({
   onSaveLocalDomain,
   domainSaveMsg,
   onOpenBrowser,
-  theme
+  theme,
+  language = 'es'
 }) {
   const [provider, setProvider] = useState('cloudflare');
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   if (!isOpen || !project) return null;
 
@@ -52,9 +55,11 @@ export default function NetworkTunnelModal({
               </div>
               <div>
                 <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Red & Acceso Externo
+                  {language === 'es' ? 'Red & Acceso Externo' : 'Network & External Access'}
                 </h3>
-                <p className="text-xs text-slate-400">Túneles públicos HTTPS y Dominios Locales .test</p>
+                <p className="text-xs text-slate-400">
+                  {language === 'es' ? 'Túneles públicos HTTPS y Dominios Locales .test' : 'Public HTTPS Tunnels and Local .test Domains'}
+                </p>
               </div>
             </div>
             <button
@@ -69,28 +74,31 @@ export default function NetworkTunnelModal({
 
           {/* Modal Body */}
           <div className="p-6 space-y-6 text-xs">
-
             {/* Section 1: Public Tunnel HTTPS */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                  1. Túnel Público (HTTPS)
+                  {language === 'es' ? '1. Túnel Público (HTTPS)' : '1. Public Tunnel (HTTPS)'}
                 </span>
                 {tunnelUrl && (
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shadow-[0_0_8px_rgba(16,185,129,0.3)]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Activo
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> {language === 'es' ? 'Activo' : 'Active'}
                   </span>
                 )}
               </div>
 
               <p className="text-slate-400 leading-relaxed">
-                Genera un enlace público seguro <code className="text-emerald-400 font-bold font-mono">HTTPS</code> para probar tu servidor en teléfonos móviles, compartir avances o recibir webhooks (Stripe, WhatsApp, GitHub).
+                {language === 'es' 
+                  ? 'Genera un enlace público seguro HTTPS para probar tu servidor en teléfonos móviles, compartir avances o recibir webhooks.' 
+                  : 'Generate a secure public HTTPS link to test on mobile devices, share previews, or receive webhooks.'}
               </p>
 
               {/* Provider Selector */}
               {!tunnelUrl && (
                 <div className="space-y-1.5 pt-1">
-                  <label className="text-[11px] font-bold text-slate-300">Proveedor de Túnel:</label>
+                  <label className="text-[11px] font-bold text-slate-300">
+                    {language === 'es' ? 'Proveedor de Túnel:' : 'Tunnel Provider:'}
+                  </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
@@ -98,13 +106,13 @@ export default function NetworkTunnelModal({
                       className={`p-2.5 rounded-xl border text-left flex items-center space-x-2 transition-all cursor-pointer ${
                         provider === 'cloudflare'
                           ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 ring-1 ring-amber-500/30'
-                          : isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200'
+                          : isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
                       }`}
                     >
-                      <Shield className="h-4 w-4 text-amber-400 shrink-0" />
+                      <Zap className="h-4 w-4 text-amber-400 shrink-0" />
                       <div>
-                        <div className="font-bold text-xs">Cloudflare (Recomendado)</div>
-                        <div className="text-[10px] text-slate-500 font-mono">trycloudflare.com</div>
+                        <div className="font-bold">Cloudflare Quick</div>
+                        <div className="text-[10px] text-slate-400">{language === 'es' ? 'trycloudflare.com' : 'trycloudflare.com'}</div>
                       </div>
                     </button>
 
@@ -114,169 +122,120 @@ export default function NetworkTunnelModal({
                       className={`p-2.5 rounded-xl border text-left flex items-center space-x-2 transition-all cursor-pointer ${
                         provider === 'localtunnel'
                           ? 'bg-blue-500/15 border-blue-500/40 text-blue-300 ring-1 ring-blue-500/30'
-                          : isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200'
+                          : isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
                       }`}
                     >
                       <Globe className="h-4 w-4 text-blue-400 shrink-0" />
                       <div>
-                        <div className="font-bold text-xs">Localtunnel</div>
-                        <div className="text-[10px] text-slate-500 font-mono">loca.lt</div>
+                        <div className="font-bold">Localtunnel</div>
+                        <div className="text-[10px] text-slate-400">{language === 'es' ? 'loca.lt' : 'loca.lt'}</div>
                       </div>
                     </button>
                   </div>
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+              {/* Tunnel Active UI */}
+              {tunnelUrl ? (
+                <div className={`p-3.5 rounded-2xl border space-y-2.5 ${
+                  isDark ? 'bg-[#1E1E1E] border-emerald-500/30' : 'bg-emerald-50/50 border-emerald-200'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-mono font-bold text-emerald-400 truncate mr-2" title={tunnelUrl}>
+                      {tunnelUrl}
+                    </span>
+                    <div className="flex items-center space-x-1.5 shrink-0">
+                      <button
+                        onClick={onCopyTunnelUrl}
+                        className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 transition-colors cursor-pointer"
+                        title={language === 'es' ? 'Copiar enlace público' : 'Copy public link'}
+                      >
+                        {tunnelCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                      </button>
+                      <button
+                        onClick={() => onOpenBrowser(tunnelUrl)}
+                        className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 transition-colors cursor-pointer"
+                        title={language === 'es' ? 'Abrir en navegador' : 'Open in browser'}
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => onToggleTunnel(provider)}
+                    disabled={isStartingTunnel}
+                    className="w-full py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold flex items-center justify-center space-x-1.5 shadow-md shadow-rose-600/20 cursor-pointer"
+                  >
+                    <Square className="h-3.5 w-3.5 fill-white" />
+                    <span>{language === 'es' ? 'Detener Túnel' : 'Stop Tunnel'}</span>
+                  </button>
+                </div>
+              ) : (
                 <button
                   onClick={() => onToggleTunnel(provider)}
                   disabled={isStartingTunnel}
-                  className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-md ${
-                    tunnelUrl 
-                      ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20' 
-                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20 hover:shadow-[0_0_15px_rgba(16,185,129,0.35)]'
-                  }`}
+                  className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center space-x-2 shadow-md shadow-emerald-600/20 hover:shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isStartingTunnel ? (
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                  ) : tunnelUrl ? (
-                    <Square className="h-3.5 w-3.5 fill-current" />
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      <span>{language === 'es' ? 'Iniciando Túnel...' : 'Starting Tunnel...'}</span>
+                    </>
                   ) : (
-                    <Share2 className="h-4 w-4" />
+                    <>
+                      <Share2 className="h-4 w-4" />
+                      <span>{language === 'es' ? 'Crear Túnel Público Seguro' : 'Create Secure Public Tunnel'}</span>
+                    </>
                   )}
-                  <span>{isStartingTunnel ? 'Generando URL...' : tunnelUrl ? 'Detener Túnel' : 'Activar Túnel Público'}</span>
                 </button>
-
-                {tunnelUrl && (
-                  <div className="flex-1 flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-2 rounded-xl font-mono text-xs text-emerald-400 truncate">
-                    <span className="truncate flex-1 font-bold">{tunnelUrl}</span>
-                    <button
-                      onClick={onCopyTunnelUrl}
-                      className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-300 transition-colors cursor-pointer"
-                      title="Copiar URL"
-                    >
-                      {tunnelCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </button>
-                    <button
-                      onClick={() => onOpenBrowser(tunnelUrl)}
-                      className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-300 transition-colors cursor-pointer"
-                      title="Abrir en navegador"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {tunnelUrl && (
-                <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[11px] flex items-center justify-between">
-                  <span>🪝 <strong>Live Webhook Inspector activo:</strong> Capturando peticiones y payloads entrantes.</span>
-                </div>
               )}
             </div>
 
-            {/* Divider */}
             <div className={`border-t ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}></div>
 
-            {/* Section 2: Custom Local Domain (.test) with Trusted HTTPS SSL */}
+            {/* Section 2: Local Domain (.test) */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                  2. Dominio Local Seguro (.test / .local)
-                </span>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1 shadow-[0_0_8px_rgba(16,185,129,0.2)]">
-                  <Shield className="h-3 w-3" /> SSL Local Confiable
-                </span>
-              </div>
+              <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
+                {language === 'es' ? '2. Dominio Local Personalizado' : '2. Custom Local Domain'}
+              </span>
 
               <p className="text-slate-400 leading-relaxed">
-                Asigna un nombre de dominio limpio con <code className="text-emerald-400 font-bold font-mono">HTTPS Seguro</code> (ej: <code className="text-purple-400 font-bold font-mono">https://app.test:8443</code>). Emite certificados reconocidos por tu navegador sin pantallas rojas ni advertencias.
+                {language === 'es' 
+                  ? 'Asigna un dominio local como ' 
+                  : 'Assign a local domain like '}
+                <code className="text-blue-400 font-bold font-mono">mi-app.test</code>
+                {language === 'es' ? ' con certificado SSL automático.' : ' with automatic SSL certificates.'}
               </p>
 
-              <div className="flex items-center space-x-2 pt-1">
-                <div className="flex-1 relative">
-                  <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-xs">https://</span>
-                  <input
-                    type="text"
-                    value={localDomainInput}
-                    onChange={(e) => setLocalDomainInput(e.target.value)}
-                    placeholder="mi-proyecto.test"
-                    className={`w-full border rounded-xl py-2 pl-16 pr-3 text-xs font-mono font-bold focus:outline-none transition-all ${
-                      isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900'
-                    }`}
-                  />
-                </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={localDomainInput}
+                  onChange={(e) => setLocalDomainInput(e.target.value)}
+                  placeholder="ej: mi-tienda.test"
+                  className={`flex-1 p-2.5 rounded-xl border font-mono text-xs focus:outline-none focus:border-blue-500 ${
+                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  }`}
+                />
                 <button
+                  type="button"
                   onClick={onSaveLocalDomain}
-                  className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-md shadow-purple-600/20 hover:shadow-[0_0_15px_rgba(168,85,247,0.35)] transition-all cursor-pointer"
+                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md shadow-blue-600/20 cursor-pointer"
                 >
-                  <Link2 className="h-4 w-4" />
-                  <span>Vincular & SSL</span>
+                  {language === 'es' ? 'Vincular' : 'Link'}
                 </button>
               </div>
 
               {domainSaveMsg && (
-                <div className={`p-3.5 rounded-2xl font-mono text-xs border space-y-2 ${
-                  typeof domainSaveMsg === 'object' && domainSaveMsg.type === 'warning'
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
-                    : typeof domainSaveMsg === 'object' && domainSaveMsg.type === 'error'
-                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                <div className={`p-3 rounded-xl font-mono text-xs ${
+                  domainSaveMsg.type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
                 }`}>
-                  <div className="flex items-center space-x-2 font-bold">
-                    <Check className="h-4 w-4 text-emerald-400" />
-                    <span>{typeof domainSaveMsg === 'string' ? domainSaveMsg : domainSaveMsg.text}</span>
-                  </div>
-
-                  {typeof domainSaveMsg === 'object' && domainSaveMsg.url && (
-                    <div className="pt-2 border-t border-emerald-500/20 flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
-                          🔒 HTTPS :8443
-                        </span>
-                        <span className="font-bold text-slate-200">{domainSaveMsg.url}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (navigator.clipboard) navigator.clipboard.writeText(domainSaveMsg.url);
-                          }}
-                          className="px-2.5 py-1 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-300 transition-colors text-[11px] cursor-pointer"
-                        >
-                          Copiar Enlace
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onOpenBrowser(domainSaveMsg.url)}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow-xs"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          <span>Abrir en Navegador</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  {domainSaveMsg.text}
                 </div>
               )}
             </div>
-
           </div>
-
-          {/* Modal Footer */}
-          <div className={`px-6 py-3.5 border-t flex justify-end ${
-            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
-          }`}>
-            <button
-              onClick={onClose}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:bg-[#303030] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-              }`}
-            >
-              Cerrar
-            </button>
-          </div>
-
         </motion.div>
       </motion.div>
     </AnimatePresence>

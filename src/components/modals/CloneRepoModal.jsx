@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, GitBranch, Folder, Download, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, GitBranch, Folder, Download, AlertCircle, RefreshCw } from 'lucide-react';
 import { getTranslations } from '../../locales';
 
 export default function CloneRepoModal({
@@ -68,38 +68,38 @@ export default function CloneRepoModal({
     e.preventDefault();
     const cleanUrl = (repoUrl || '').trim();
     if (!cleanUrl) {
-      setErrorMessage('Por favor ingresa una URL válida de repositorio Git.');
+      setErrorMessage(language === 'es' ? 'Por favor ingresa una URL válida de repositorio Git.' : 'Please enter a valid Git repository URL.');
       return;
     }
     if (cleanUrl.startsWith('-')) {
-      setErrorMessage('URL inválida. No se permiten opciones o argumentos de comando en la URL.');
+      setErrorMessage(language === 'es' ? 'URL inválida. No se permiten opciones o argumentos de comando en la URL.' : 'Invalid URL. Command options or flags are not allowed in the URL.');
       return;
     }
     if (/[\x00-\x1F\x7F\r\n]/.test(cleanUrl)) {
-      setErrorMessage('La URL contiene caracteres prohibidos o saltos de línea.');
+      setErrorMessage(language === 'es' ? 'La URL contiene caracteres prohibidos o saltos de línea.' : 'URL contains forbidden characters or line breaks.');
       return;
     }
     const validGitProtocol = /^(https?:\/\/|git@|ssh:\/\/|git:\/\/)/i;
     if (!validGitProtocol.test(cleanUrl)) {
-      setErrorMessage('Formato de URL no soportado. Debe comenzar con https://, http://, git@, ssh:// o git://');
+      setErrorMessage(language === 'es' ? 'Formato de URL no soportado. Debe comenzar con https://, http://, git@, ssh:// o git://' : 'Unsupported URL format. Must start with https://, http://, git@, ssh:// or git://');
       return;
     }
     if (!destinationFolder.trim()) {
-      setErrorMessage('Por favor selecciona la carpeta de destino donde se guardará el repositorio.');
+      setErrorMessage(language === 'es' ? 'Por favor selecciona la carpeta de destino donde se guardará el repositorio.' : 'Please select the destination folder where repository will be cloned.');
       return;
     }
 
     setErrorMessage('');
     setIsCloning(true);
     setProgressPercent(10);
-    setStatusText('Iniciando conexión con el repositorio Git remoto...');
+    setStatusText(language === 'es' ? 'Iniciando conexión con el repositorio Git remoto...' : 'Connecting to remote Git repository...');
 
     try {
       if (window.electronAPI?.cloneRepository) {
         const result = await window.electronAPI.cloneRepository(repoUrl, destinationFolder);
         if (result.success && result.targetFolder) {
           setProgressPercent(100);
-          setStatusText('¡Repositorio clonado con éxito!');
+          setStatusText(language === 'es' ? '¡Repositorio clonado con éxito!' : 'Repository cloned successfully!');
           setTimeout(() => {
             setIsCloning(false);
             if (onImportFolder) onImportFolder(result.targetFolder);
@@ -107,7 +107,7 @@ export default function CloneRepoModal({
           }, 1000);
         } else {
           setIsCloning(false);
-          setErrorMessage(result.error || 'Error al clonar el repositorio.');
+          setErrorMessage(result.error || (language === 'es' ? 'Error al clonar el repositorio.' : 'Error cloning repository.'));
         }
       } else {
         // Fallback for web mode
@@ -117,7 +117,7 @@ export default function CloneRepoModal({
           if (current >= 100) {
             clearInterval(interval);
             setProgressPercent(100);
-            setStatusText('¡Repositorio clonado con éxito!');
+            setStatusText(language === 'es' ? '¡Repositorio clonado con éxito!' : 'Repository cloned successfully!');
             setTimeout(() => {
               setIsCloning(false);
               if (onImportFolder) onImportFolder(`${destinationFolder}\\mi-repo-clonado`);
@@ -125,18 +125,17 @@ export default function CloneRepoModal({
             }, 1000);
           } else {
             setProgressPercent(current);
-            setStatusText('Descargando archivos y objetos...');
+            setStatusText(language === 'es' ? 'Descargando archivos y objetos...' : 'Downloading files and objects...');
           }
         }, 400);
       }
     } catch (err) {
       setIsCloning(false);
-      setErrorMessage(err.message || 'No se pudo iniciar la clonación del repositorio.');
+      setErrorMessage(err.message || (language === 'es' ? 'No se pudo iniciar la clonación del repositorio.' : 'Could not start cloning repository.'));
     }
   };
 
-  // Clean status text by stripping any embedded percentage numbers
-  const cleanStatus = (statusText || 'Clonando...').replace(/:\s*\d+%/g, '').replace(/\s*\d+%/g, '');
+  const cleanStatus = (statusText || (language === 'es' ? 'Clonando...' : 'Cloning...')).replace(/:\s*\d+%/g, '').replace(/\s*\d+%/g, '');
 
   return (
     <AnimatePresence>
@@ -167,19 +166,20 @@ export default function CloneRepoModal({
               </div>
               <div>
                 <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Descargar / Clonar Repositorio Git
+                  {t.cloneGitRepo || 'Clone Git Repository'}
                 </h3>
-                <p className="text-xs text-slate-400">Clona repositorios de GitHub, GitLab o Bitbucket</p>
+                <p className="text-xs text-slate-400">
+                  {t.cloneGitRepoDesc || 'Clone repositories from GitHub, GitLab or Bitbucket'}
+                </p>
               </div>
             </div>
 
-            {/* Close Button is always active */}
             <button
               onClick={handleCancel}
               className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
                 isDark ? 'text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
-              title="Cancelar y Cerrar"
+              title={language === 'es' ? 'Cancelar y Cerrar' : 'Cancel and Close'}
             >
               <X className="h-4 w-4" />
             </button>
@@ -197,12 +197,12 @@ export default function CloneRepoModal({
             {/* URL Input */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider block">
-                URL del Repositorio Git (.git):
+                {language === 'es' ? 'URL del Repositorio Git (.git):' : 'Git Repository URL (.git):'}
               </label>
               <input
                 type="text"
                 disabled={isCloning}
-                placeholder="https://github.com/usuario/mi-repositorio.git"
+                placeholder="https://github.com/user/my-repo.git"
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
                 className={`w-full border rounded-2xl px-4 py-3 text-xs font-mono font-semibold focus:outline-none focus:border-blue-500 transition-all ${
@@ -214,7 +214,7 @@ export default function CloneRepoModal({
             {/* Destination Folder Selector */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-400 font-mono uppercase tracking-wider block">
-                Carpeta donde Alojar el Repositorio:
+                {language === 'es' ? 'Carpeta donde Alojar el Repositorio:' : 'Destination Folder for Repository:'}
               </label>
 
               <div className="flex items-center space-x-2">
@@ -222,7 +222,7 @@ export default function CloneRepoModal({
                   type="text"
                   readOnly
                   disabled={isCloning}
-                  placeholder="Selecciona la carpeta de tu equipo..."
+                  placeholder={language === 'es' ? 'Selecciona la carpeta de tu equipo...' : 'Select folder on your machine...'}
                   value={destinationFolder}
                   className={`flex-1 border rounded-2xl px-4 py-3 text-xs font-mono font-semibold truncate focus:outline-none transition-all ${
                     isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
@@ -240,7 +240,7 @@ export default function CloneRepoModal({
                   }`}
                 >
                   <Folder className="h-4 w-4 text-blue-400" />
-                  <span>Explorar</span>
+                  <span>{language === 'es' ? 'Explorar' : 'Browse'}</span>
                 </button>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function CloneRepoModal({
                   isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
               >
-                Cancelar
+                {t.cancel || 'Cancel'}
               </button>
 
               <button
@@ -294,12 +294,12 @@ export default function CloneRepoModal({
                 {isCloning ? (
                   <>
                     <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                    <span>Clonando...</span>
+                    <span>{language === 'es' ? 'Clonando...' : 'Cloning...'}</span>
                   </>
                 ) : (
                   <>
                     <Download className="h-3.5 w-3.5" />
-                    <span>Iniciar Descarga</span>
+                    <span>{t.downloadRepo || 'Download Repository'}</span>
                   </>
                 )}
               </button>

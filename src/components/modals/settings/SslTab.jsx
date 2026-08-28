@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import useClipboard from '../../../hooks/useClipboard';
 
-export default function SslTab({ theme }) {
+export default function SslTab({ theme, t = {}, language = 'es' }) {
   const isDark = theme === 'dark';
   const [sslStatus, setSslStatus] = useState(null);
   const [isInstallingCa, setIsInstallingCa] = useState(false);
@@ -39,7 +39,7 @@ export default function SslTab({ theme }) {
     const res = await window.electronAPI.ssl.installCa();
     setIsInstallingCa(false);
     if (res.success) {
-      setSslNotice('¡Certificado Raíz de Lummo instalado con éxito en Windows!');
+      setSslNotice(language === 'es' ? '¡Certificado Raíz de Lummo instalado con éxito en Windows!' : 'Lummo Root Certificate installed successfully in Windows!');
       loadSslStatus();
     } else {
       setSslNotice(`Error: ${res.error}`);
@@ -53,7 +53,7 @@ export default function SslTab({ theme }) {
     const res = await window.electronAPI.ssl.uninstallCa();
     setIsInstallingCa(false);
     if (res.success) {
-      setSslNotice('CA Raíz de Lummo desinstalada de Windows.');
+      setSslNotice(language === 'es' ? 'CA Raíz de Lummo desinstalada de Windows.' : 'Lummo Root CA uninstalled from Windows.');
       loadSslStatus();
     } else {
       setSslNotice(`Error: ${res.error}`);
@@ -67,10 +67,10 @@ export default function SslTab({ theme }) {
         <div className="flex items-center justify-between">
           <div>
             <h3 className={`text-base font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Certificados SSL & HTTPS Local
+              {t.sslTab || 'SSL & HTTPS Certificates'}
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Desarrolla en local con candado verde HTTPS (sin advertencias del navegador) mediante la Autoridad de Certificación de Lummo.
+              {t.sslDesc || 'Develop locally with green HTTPS padlock via Lummo Certificate Authority.'}
             </p>
           </div>
           <button
@@ -79,7 +79,7 @@ export default function SslTab({ theme }) {
             className={`p-2 rounded-xl border transition-colors cursor-pointer ${
               isDark ? 'border-white/[0.08] bg-[#252525] text-slate-400 hover:text-white' : 'border-slate-200 bg-white text-slate-600 hover:text-slate-900'
             }`}
-            title="Actualizar estado SSL"
+            title={language === 'es' ? 'Actualizar estado SSL' : 'Refresh SSL Status'}
           >
             <RefreshCw className="h-4 w-4" />
           </button>
@@ -122,13 +122,15 @@ export default function SslTab({ theme }) {
                     ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                     : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                 }`}>
-                  {sslStatus?.caInstalled ? 'CONFIABLE (INSTALADA)' : 'NO INSTALADA'}
+                  {sslStatus?.caInstalled 
+                    ? (language === 'es' ? 'CONFIABLE (INSTALADA)' : 'TRUSTED (INSTALLED)') 
+                    : (language === 'es' ? 'NO INSTALADA' : 'NOT INSTALLED')}
                 </span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
                 {sslStatus?.caInstalled
-                  ? 'Tu sistema operativo y navegadores confían en los certificados emitidos por Lummo Studio. No verás pantallas de advertencia.'
-                  : 'Instala el certificado raíz en el almacén de Windows para habilitar HTTPS automático y candado verde en todos tus proyectos.'}
+                  ? (language === 'es' ? 'Tu sistema operativo y navegadores confían en los certificados emitidos por Lummo Studio. No verás pantallas de advertencia.' : 'Your OS and web browsers trust certificates issued by Lummo Studio. No warning screens will be displayed.')
+                  : (language === 'es' ? 'Instala el certificado raíz en el almacén de Windows para habilitar HTTPS automático y candado verde en todos tus proyectos.' : 'Install root certificate into Windows trust store to enable automatic HTTPS and green padlock for all projects.')}
               </p>
             </div>
           </div>
@@ -143,7 +145,7 @@ export default function SslTab({ theme }) {
                 className={`px-4 py-2.5 rounded-xl border text-xs font-bold text-rose-400 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 transition-all flex items-center gap-1.5 cursor-pointer`}
               >
                 {isInstallingCa ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                <span>Desinstalar CA</span>
+                <span>{language === 'es' ? 'Desinstalar CA' : 'Uninstall CA'}</span>
               </button>
             ) : (
               <button
@@ -153,7 +155,7 @@ export default function SslTab({ theme }) {
                 className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-md shadow-emerald-600/20 hover:shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all cursor-pointer"
               >
                 {isInstallingCa ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                <span>Instalar CA Raíz (1-Clic)</span>
+                <span>{language === 'es' ? 'Instalar CA Raíz (1-Clic)' : 'Install Root CA (1-Click)'}</span>
               </button>
             )}
           </div>
@@ -167,7 +169,7 @@ export default function SslTab({ theme }) {
         }`}>
           <div className="flex items-center space-x-2 text-xs font-bold text-slate-400">
             <Lock className="h-4 w-4 text-emerald-400" />
-            <span>Puerto HTTPS Reverse Proxy</span>
+            <span>{language === 'es' ? 'Puerto HTTPS Reverse Proxy' : 'HTTPS Reverse Proxy Port'}</span>
           </div>
           <div className="flex items-center justify-between pt-1">
             <span className={`text-xl font-extrabold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -178,7 +180,7 @@ export default function SslTab({ theme }) {
             </span>
           </div>
           <p className="text-[11px] text-slate-400">
-            Redirige peticiones SSL transparentemente al puerto de desarrollo de tu servidor.
+            {language === 'es' ? 'Redirige peticiones SSL transparentemente al puerto de desarrollo de tu servidor.' : 'Transparently redirects SSL requests to your dev server port.'}
           </p>
         </div>
 
@@ -187,18 +189,18 @@ export default function SslTab({ theme }) {
         }`}>
           <div className="flex items-center space-x-2 text-xs font-bold text-slate-400">
             <Key className="h-4 w-4 text-purple-400" />
-            <span>Certificados de Dominio Emitidos</span>
+            <span>{language === 'es' ? 'Certificados de Dominio Emitidos' : 'Issued Domain Certificates'}</span>
           </div>
           <div className="flex items-center justify-between pt-1">
             <span className={`text-xl font-extrabold font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              {sslStatus?.generatedCertCount || 0} Certificados
+              {sslStatus?.generatedCertCount || 0} {language === 'es' ? 'Certificados' : 'Certificates'}
             </span>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">
               RSA 2048 / SHA256
             </span>
           </div>
           <p className="text-[11px] text-slate-400">
-            Válidos para *.test, *.local, localhost y dominios asignados.
+            {language === 'es' ? 'Válidos para *.test, *.local, localhost y dominios asignados.' : 'Valid for *.test, *.local, localhost, and assigned domains.'}
           </p>
         </div>
       </div>
@@ -209,7 +211,9 @@ export default function SslTab({ theme }) {
           isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
         }`}>
           <div className="min-w-0">
-            <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">Ubicación del Certificado Público (.crt)</span>
+            <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">
+              {language === 'es' ? 'Ubicación del Certificado Público (.crt)' : 'Public Certificate Location (.crt)'}
+            </span>
             <span className="block text-xs font-mono truncate text-slate-300" title={sslStatus.caCertPath}>
               {sslStatus.caCertPath}
             </span>
@@ -220,7 +224,7 @@ export default function SslTab({ theme }) {
             className={`p-2 rounded-xl border transition-colors cursor-pointer shrink-0 ${
               isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:text-white' : 'bg-white border-slate-200 text-slate-700'
             }`}
-            title="Copiar ruta"
+            title={language === 'es' ? 'Copiar ruta' : 'Copy path'}
           >
             {copiedCaPath ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
           </button>
@@ -230,7 +234,7 @@ export default function SslTab({ theme }) {
       {/* Active Registered Local Domains */}
       <div className="space-y-2.5 pt-2">
         <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
-          Dominios Locales Vinculados ({sslStatus?.domains?.length || 0})
+          {language === 'es' ? 'Dominios Locales Vinculados' : 'Linked Local Domains'} ({sslStatus?.domains?.length || 0})
         </h4>
 
         {(!sslStatus?.domains || sslStatus.domains.length === 0) ? (
@@ -238,9 +242,13 @@ export default function SslTab({ theme }) {
             isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <Globe className="h-6 w-6 text-slate-500 mx-auto" />
-            <p className="text-xs text-slate-400">No hay dominios locales vinculados aún.</p>
+            <p className="text-xs text-slate-400">
+              {language === 'es' ? 'No hay dominios locales vinculados aún.' : 'No local domains linked yet.'}
+            </p>
             <p className="text-[11px] text-slate-500">
-              Ve a la vista de un proyecto y haz clic en "Red & Acceso Externo" para asignar un dominio .test.
+              {language === 'es' 
+                ? 'Ve a la vista de un proyecto y haz clic en "Red & Acceso Externo" para asignar un dominio .test.' 
+                : 'Go to project view and click "Network & External Access" to assign a .test domain.'}
             </p>
           </div>
         ) : (
@@ -261,7 +269,7 @@ export default function SslTab({ theme }) {
                       {dom.domain}
                     </span>
                     <span className="text-[11px] text-slate-400 font-mono block">
-                      Destino: localhost:{dom.port}
+                      {language === 'es' ? 'Destino' : 'Target'}: localhost:{dom.port}
                     </span>
                   </div>
                 </div>
@@ -280,7 +288,7 @@ export default function SslTab({ theme }) {
                     className="px-2.5 py-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 transition-all cursor-pointer shadow-xs"
                   >
                     <ExternalLink className="h-3 w-3" />
-                    <span>Abrir HTTPS</span>
+                    <span>{language === 'es' ? 'Abrir HTTPS' : 'Open HTTPS'}</span>
                   </button>
                 </div>
               </div>

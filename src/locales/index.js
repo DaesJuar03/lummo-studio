@@ -36,13 +36,15 @@ const localeDictionary = {
 
 /**
  * Helper function to get translations dictionary for a language code
- * @param {string} langCode - Language code ('es', 'en', or custom)
+ * @param {string} [langCode] - Language code ('es', 'en', or custom)
  */
-export function getTranslations(langCode = 'es') {
-  if (customLocales.has(langCode)) {
-    return { ...esLocale.translations, ...customLocales.get(langCode).translations };
+export function getTranslations(langCode) {
+  const code = langCode || (typeof localStorage !== 'undefined' ? localStorage.getItem('lummo-language') : null) || 'es';
+  if (customLocales.has(code)) {
+    return { ...enLocale.translations, ...customLocales.get(code).translations };
   }
-  return localeDictionary[langCode] || localeDictionary.es;
+  const dict = localeDictionary[code] || localeDictionary.es || enLocale.translations;
+  return { ...enLocale.translations, ...dict };
 }
 
 /**

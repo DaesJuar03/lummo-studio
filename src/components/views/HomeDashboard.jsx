@@ -15,6 +15,7 @@ import {
   GitBranch,
   Download
 } from 'lucide-react';
+import { getTranslations } from '../../locales';
 import CreateDatabaseModal from '../modals/CreateDatabaseModal';
 import CloneRepoModal from '../modals/CloneRepoModal';
 import NewProjectWizardModal from '../modals/NewProjectWizardModal';
@@ -42,6 +43,7 @@ export default function HomeDashboard({
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   const allDbs = (customDatabases || []).map(d => ({ ...d, isDb: true }));
   const activeProjects = (projects || []).filter(p => !p.isArchived);
@@ -63,32 +65,32 @@ export default function HomeDashboard({
       }`}>
         <div>
           <h2 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Lanzador de Entornos Locales
+            {t.localEnvLauncher || 'Local Environment Launcher'}
           </h2>
           <p className="text-slate-500 text-xs md:text-sm mt-0.5">
-            Administra tus proyectos de desarrollo y bases de datos con un solo clic.
+            {t.localEnvLauncherDesc || 'Manage your development projects and databases with a single click.'}
           </p>
         </div>
 
-        {/* Simple Plain Telemetry (Servidores / Proyectos / BDs) */}
+        {/* Simple Plain Telemetry (Servers / Projects / DBs) */}
         <div className="flex items-center space-x-3 text-xs font-mono font-bold shrink-0 pt-1">
           <span className={`inline-flex items-center space-x-1.5 ${
             runningCount > 0 ? 'text-emerald-500 font-extrabold' : isDark ? 'text-slate-400' : 'text-slate-600'
           }`}>
             <span className={`w-2 h-2 rounded-full ${runningCount > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></span>
-            <span>{runningCount} Servidores</span>
+            <span>{runningCount} {t.serversCount || 'Servers'}</span>
           </span>
 
           <span className="text-slate-400">/</span>
 
           <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-            {activeProjects.length} Proyectos
+            {activeProjects.length} {t.projectsCount || 'Projects'}
           </span>
 
           <span className="text-slate-400">/</span>
 
           <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>
-            {allDbs.length} BDs
+            {allDbs.length} {t.bdsCount || 'DBs'}
           </span>
         </div>
       </div>
@@ -107,10 +109,10 @@ export default function HomeDashboard({
               </div>
               <div>
                 <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Crear o Importar Proyectos
+                  {t.createOrImport || 'Create or Import Projects'}
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Crea desde cero con plantillas o abre una carpeta existente.
+                  {t.createOrImportDesc || 'Create from scratch with templates or open an existing folder.'}
                 </p>
               </div>
             </div>
@@ -121,7 +123,7 @@ export default function HomeDashboard({
                 className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
-                <span>Nuevo (Wizard)</span>
+                <span>{t.newWizard || 'New (Wizard)'}</span>
               </button>
 
               <button
@@ -131,7 +133,7 @@ export default function HomeDashboard({
                 }`}
               >
                 <FolderOpen className="h-3.5 w-3.5 text-blue-400" />
-                <span>Importar Carpeta</span>
+                <span>{t.importFolder || 'Import Folder'}</span>
               </button>
             </div>
           </div>
@@ -144,10 +146,10 @@ export default function HomeDashboard({
               </div>
               <div>
                 <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Clonar Repositorio Git
+                  {t.cloneGitRepo || 'Clone Git Repository'}
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  Pega el link de GitHub/GitLab y elige la carpeta de destino.
+                  {t.cloneGitRepoDesc || 'Paste GitHub/GitLab link and choose destination folder.'}
                 </p>
               </div>
             </div>
@@ -159,7 +161,7 @@ export default function HomeDashboard({
               }`}
             >
               <Download className="h-4 w-4 text-blue-400" />
-              <span>Descargar Repositorio</span>
+              <span>{t.downloadRepo || 'Download Repository'}</span>
             </button>
           </div>
 
@@ -171,10 +173,10 @@ export default function HomeDashboard({
               </div>
               <div>
                 <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Gestor de Proyectos
+                  {t.gestorProyectos || 'Project Manager'}
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  React, Vite, Next.js, Express, Python y PHP
+                  {t.gestorProyectosDesc || 'React, Vite, Next.js, Express, Python and PHP'}
                 </p>
               </div>
             </div>
@@ -185,7 +187,7 @@ export default function HomeDashboard({
                 isDark ? 'bg-transparent border-white/[0.1] text-[#E5E5E5] hover:bg-white/[0.06] hover:border-white/[0.2]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
-              <span>Explorar Proyectos</span>
+              <span>{t.exploreProjects || 'Explore Projects'}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -198,10 +200,10 @@ export default function HomeDashboard({
               </div>
               <div>
                 <h3 className={`text-sm font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Gestor de Bases de Datos
+                  {t.gestorDatabases || 'Database Manager'}
                 </h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  SQLite, MySQL, PostgreSQL y Redis
+                  {t.gestorDatabasesDesc || 'SQLite, MySQL, PostgreSQL and Redis'}
                 </p>
               </div>
             </div>
@@ -212,7 +214,7 @@ export default function HomeDashboard({
                 isDark ? 'bg-transparent border-white/[0.1] text-[#E5E5E5] hover:bg-white/[0.06] hover:border-white/[0.2]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
-              <span>Explorar Bases de Datos</span>
+              <span>{t.exploreDatabases || 'Explore Databases'}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -226,13 +228,13 @@ export default function HomeDashboard({
           transition={{ duration: 0.3, delay: 0.05 }}
           className="lg:col-span-7 space-y-4 lg:pl-2"
         >
-          {/* Header Title with Clean Proyectos Recientes... */}
+          {/* Header Title */}
           <div className="flex items-center justify-between pb-1">
             <div>
               <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Proyectos Recientes...
+                {t.recentProjects || 'Recent Projects...'}
               </h2>
-              <p className="text-xs text-slate-400">Acceso rápido a tus entornos de desarrollo</p>
+              <p className="text-xs text-slate-400">{t.recentDesc || 'Fast access to your recent development environments'}</p>
             </div>
           </div>
 
@@ -248,9 +250,9 @@ export default function HomeDashboard({
                 <FolderOpen className="h-7 w-7" />
               </div>
               <div>
-                <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>No hay elementos recientes</h4>
+                <h4 className={`text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.noItems || 'No recent items found'}</h4>
                 <p className="text-slate-400 text-xs mt-1">
-                  Usa los lanzadores de la izquierda para agregar tus proyectos o bases de datos.
+                  {t.noItemsDesc || 'Use the launchers on the left to add your first projects or databases.'}
                 </p>
               </div>
             </motion.div>
@@ -291,7 +293,7 @@ export default function HomeDashboard({
                                   {item.name}
                                 </h4>
                                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 shrink-0">
-                                  Base de Datos
+                                  {t.baseDeDatos || 'Database'}
                                 </span>
                               </div>
                               <p className="text-xs text-slate-400 font-mono mt-0.5 truncate">{item.tech}</p>
@@ -302,7 +304,7 @@ export default function HomeDashboard({
                             <span className={`w-28 py-2 text-center text-xs font-mono font-bold px-2.5 rounded-xl ${
                               isDark ? 'text-emerald-400' : 'text-emerald-700'
                             }`}>
-                              Activo
+                              {t.active || 'Active'}
                             </span>
 
                             <motion.button
@@ -311,14 +313,14 @@ export default function HomeDashboard({
                               className="w-32 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center justify-center space-x-1.5 cursor-pointer"
                             >
                               <Table className="h-3.5 w-3.5" />
-                              <span>Abrir Tablas</span>
+                              <span>{t.abrirTablas || 'Open Tables'}</span>
                             </motion.button>
 
                             {onRemoveDatabase ? (
                               <button
                                 onClick={() => setItemToDelete({ id: item.id, name: item.name, isDb: true })}
                                 className="p-2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-colors shrink-0 cursor-pointer"
-                                title="Eliminar de la lista"
+                                title={t.delete || 'Delete'}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -368,7 +370,7 @@ export default function HomeDashboard({
                               </span>
                               {item.hasBackend && (
                                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 shrink-0">
-                                  Entorno Dual
+                                  {t.dualEnvironment || 'Dual Environment'}
                                 </span>
                               )}
                             </div>
@@ -383,7 +385,7 @@ export default function HomeDashboard({
                               : isDark ? 'text-[#888888]' : 'text-slate-600'
                           }`}>
                             <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
-                            {isRunning ? 'En Ejecución' : 'Stopped'}
+                            {isRunning ? (t.running || 'Running') : (t.stopped || 'Stopped')}
                           </span>
 
                           <motion.button
@@ -396,13 +398,13 @@ export default function HomeDashboard({
                             }`}
                           >
                             {isRunning ? <Square className="h-3.5 w-3.5 fill-white" /> : <Play className="h-3.5 w-3.5 fill-white" />}
-                            <span>{isRunning ? 'Detener' : 'Arrancar'}</span>
+                            <span>{isRunning ? (t.detener || 'Stop') : (t.arrancar || 'Start')}</span>
                           </motion.button>
 
                           <button
                             onClick={() => setItemToDelete({ id: item.id, name: item.name, isDb: false })}
                             className="p-2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
-                            title="Eliminar de la lista"
+                            title={t.delete || 'Delete'}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -414,14 +416,14 @@ export default function HomeDashboard({
                 })}
               </AnimatePresence>
 
-              {/* Hyperlink "Ver más proyectos..." if > 4 items */}
+              {/* Hyperlink "View more projects..." if > 4 items */}
               {combinedList.length > 4 && (
                 <div className="pt-2 text-right">
                   <button
                     onClick={() => setShowMoreModal(true)}
                     className="text-xs font-bold text-blue-400 hover:text-blue-300 hover:underline transition-all cursor-pointer inline-flex items-center gap-1"
                   >
-                    <span>Ver más proyectos ({combinedList.length - 4} adicionales)...</span>
+                    <span>{t.viewMoreProjects || 'View more projects'} ({combinedList.length - 4} {t.additional || 'additional'})...</span>
                   </button>
                 </div>
               )}
@@ -439,6 +441,7 @@ export default function HomeDashboard({
           if (onImportFolder) onImportFolder(folderPath);
         }}
         theme={theme}
+        language={language}
       />
 
       {/* Git Clone Repo Modal */}
@@ -476,9 +479,11 @@ export default function HomeDashboard({
               }`}>
                 <div>
                   <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    Todos los Proyectos y Bases de Datos ({combinedList.length})
+                    {language === 'es' ? 'Todos los Proyectos y Bases de Datos' : 'All Projects and Databases'} ({combinedList.length})
                   </h3>
-                  <p className="text-xs text-slate-400">Haz clic en cualquier elemento para abrir su panel de control</p>
+                  <p className="text-xs text-slate-400">
+                    {language === 'es' ? 'Haz clic en cualquier elemento para abrir su panel de control' : 'Click any item to open its control panel'}
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowMoreModal(false)}
@@ -557,6 +562,8 @@ export default function HomeDashboard({
       <CreateDatabaseModal
         isOpen={showCreateDbModal}
         onClose={() => setShowCreateDbModal(false)}
+        language={language}
+        theme={theme}
         onCreate={(newDb) => {
           setShowCreateDbModal(false);
           const createdItem = {
@@ -566,7 +573,7 @@ export default function HomeDashboard({
             type: newDb.engine || 'sqlite',
             port: newDb.engine === 'mysql' ? 3306 : newDb.engine === 'postgres' ? 5432 : newDb.engine === 'redis' ? 6379 : null,
             status: 'READY',
-            tech: `Esquema ${(newDb.engine || 'sqlite').toUpperCase()}`,
+            tech: `${newDb.engine || 'sqlite'}`.toUpperCase(),
             installed: true,
             isDb: true
           };
@@ -604,10 +611,12 @@ export default function HomeDashboard({
                 </div>
                 <div className="space-y-1">
                   <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    ¿Eliminar {itemToDelete.isDb ? 'Base de Datos' : 'Proyecto'}?
+                    {itemToDelete.isDb ? (t.confirmDeleteDb || 'Delete Database?') : (t.confirmDeleteProject || 'Delete Project?')}
                   </h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    ¿Estás seguro de que deseas eliminar <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>"{itemToDelete.name}"</span> de tu lista? No se borrarán los archivos físicos de tu disco, solo se desvinculará de Lummo Studio.
+                    {itemToDelete.isDb 
+                      ? (t.confirmDeleteDbMsg || 'Are you sure you want to delete this database configuration?') 
+                      : (t.confirmDeleteProjectMsg ? t.confirmDeleteProjectMsg.replace('{name}', itemToDelete.name) : `Are you sure you want to remove "${itemToDelete.name}" from Lummo Studio? Physical files on your hard drive will not be deleted.`)}
                   </p>
                 </div>
               </div>
@@ -619,7 +628,7 @@ export default function HomeDashboard({
                     isDark ? 'text-[#888888] hover:text-white hover:bg-white/[0.06]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Cancelar
+                  {t.cancel || 'Cancel'}
                 </button>
                 <button
                   onClick={() => {
@@ -632,7 +641,7 @@ export default function HomeDashboard({
                   }}
                   className="px-5 py-2 rounded-xl bg-transparent border border-rose-500 text-white hover:text-rose-500 hover:border-rose-500 hover:bg-rose-500/10 font-bold text-xs transition-all cursor-pointer"
                 >
-                  Sí, Eliminar
+                  {t.yesDelete || 'Yes, Delete'}
                 </button>
               </div>
             </motion.div>

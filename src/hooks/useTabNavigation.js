@@ -13,17 +13,25 @@ export function useTabNavigation(t) {
   const [navHistory, setNavHistory] = useState(['home']);
   const [navIndex, setNavIndex] = useState(0);
 
-  // Actualizar los títulos estáticos de las pestañas si cambia el idioma
+  // Actualizar los títulos estáticos y dinámicos de las pestañas si cambia el idioma
   useEffect(() => {
     setOpenTabs((prev) =>
       prev.map((tab) => {
         if (tab.id === 'home') return { ...tab, title: t.home };
         if (tab.id === 'projects') return { ...tab, title: t.projects };
         if (tab.id === 'databases') return { ...tab, title: t.databases };
+        if (tab.type === 'project-detail') {
+          const name = tab.project?.name || tab.title.replace(/^(Proyecto|Project|Base de Datos|Database)\s*\/\s*/i, '');
+          return { ...tab, title: `${t.projectTitlePrefix || 'Project'} / ${name}` };
+        }
+        if (tab.type === 'database-detail') {
+          const name = tab.db?.name || tab.title.replace(/^(Proyecto|Project|Base de Datos|Database)\s*\/\s*/i, '');
+          return { ...tab, title: `${t.databaseTitlePrefix || 'Database'} / ${name}` };
+        }
         return tab;
       })
     );
-  }, [t.home, t.projects, t.databases]);
+  }, [t.home, t.projects, t.databases, t.projectTitlePrefix, t.databaseTitlePrefix]);
 
   const openTab = (param, titleArg, typeArg = 'page', projectArg = null, dbArg = null) => {
     let id, title, type, project, db;
@@ -39,11 +47,11 @@ export function useTabNavigation(t) {
 
     let tabTitle = title;
     if (type === 'project-detail') {
-      const name = project?.name || title.replace(/^(Proyecto|Base de Datos)\s*\/\s*/, '');
-      tabTitle = `Proyecto / ${name}`;
+      const name = project?.name || title.replace(/^(Proyecto|Project|Base de Datos|Database)\s*\/\s*/i, '');
+      tabTitle = `${t.projectTitlePrefix || 'Project'} / ${name}`;
     } else if (type === 'database-detail') {
-      const name = db?.name || title.replace(/^(Proyecto|Base de Datos)\s*\/\s*/, '');
-      tabTitle = `Base de Datos / ${name}`;
+      const name = db?.name || title.replace(/^(Proyecto|Project|Base de Datos|Database)\s*\/\s*/i, '');
+      tabTitle = `${t.databaseTitlePrefix || 'Database'} / ${name}`;
     }
 
     const exists = openTabs.find((t) => t.id === id);
@@ -107,7 +115,7 @@ export function useTabNavigation(t) {
     const dupTab = {
       ...tabToDup,
       id: dupId,
-      title: `${tabToDup.title} (Copia)`,
+      title: `${tabToDup.title} ${t.copySuffix || '(Copy)'}`,
       closable: true
     };
     setOpenTabs((prev) => [...prev, dupTab]);

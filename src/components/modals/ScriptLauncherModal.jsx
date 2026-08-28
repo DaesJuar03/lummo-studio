@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, PlayCircle, Terminal, Play, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
 export default function ScriptLauncherModal({
   isOpen,
@@ -10,13 +11,13 @@ export default function ScriptLauncherModal({
   isExecutingScript,
   scriptMsg,
   onOpenLogs,
-  theme
+  theme,
+  language = 'es'
 }) {
   const isDark = theme === 'dark';
-
+  const t = getTranslations(language);
   const [customInput, setCustomInput] = useState('');
 
-  // Persisted custom script shortcuts per project
   const [customShortcuts, setCustomShortcuts] = useState(() => {
     try {
       const saved = localStorage.getItem(`lummo-shortcuts-${project?.id}`);
@@ -63,11 +64,6 @@ export default function ScriptLauncherModal({
     } catch (_e) {}
   };
 
-  const handleExecute = (cmd) => {
-    if (!cmd) return;
-    onRunScript(cmd);
-  };
-
   return (
     <AnimatePresence>
       <motion.div
@@ -97,9 +93,11 @@ export default function ScriptLauncherModal({
               </div>
               <div>
                 <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Lanzador de Scripts & Comandos
+                  {language === 'es' ? 'Lanzador de Scripts & Comandos' : 'Script & Command Launcher'}
                 </h3>
-                <p className="text-xs text-slate-400">Ejecuta comandos CLI y administra accesos directos para {project.name}</p>
+                <p className="text-xs text-slate-400">
+                  {language === 'es' ? `Ejecuta comandos CLI en ${project.name}` : `Run CLI commands in ${project.name}`}
+                </p>
               </div>
             </div>
             <button
@@ -113,223 +111,135 @@ export default function ScriptLauncherModal({
           </div>
 
           {/* Modal Body */}
-          <div className="p-6 space-y-5 text-xs">
-
-            {/* Status Feedback Banner */}
-            {scriptMsg && (
-              <div className="p-3 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl font-mono text-xs flex items-center justify-between">
-                <span>{scriptMsg}</span>
-                {isExecutingScript && <RefreshCw className="h-4 w-4 animate-spin shrink-0" />}
-              </div>
-            )}
-
-            {/* Preset Contextual Commands Grid */}
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                  Comandos Predeterminados del Stack ({project.techStack || 'CLI'})
-                </span>
+          <div className="p-6 space-y-4 text-xs">
+            {/* Direct CLI input */}
+            <div className="space-y-1.5">
+              <label className="text-slate-400 font-bold uppercase text-[10px] font-mono">
+                {language === 'es' ? 'Ejecutar Comando Directo:' : 'Execute Direct Command:'}
+              </label>
+              <div className="flex items-center space-x-2">
+                <div className="relative flex-1">
+                  <Terminal className="h-4 w-4 absolute left-3 top-3 text-slate-400" />
+                  <input
+                    type="text"
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && customInput.trim()) {
+                        onRunScript(customInput.trim());
+                        setCustomInput('');
+                      }
+                    }}
+                    placeholder={language === 'es' ? "ej: npm install axios, npx prisma migrate dev..." : "e.g. npm install axios, npx prisma migrate dev..."}
+                    className={`w-full pl-9 pr-3 py-2.5 rounded-xl border font-mono text-xs focus:outline-none focus:border-amber-500 ${
+                      isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                    }`}
+                  />
+                </div>
                 <button
-                  onClick={() => onOpenLogs(project)}
-                  className="text-emerald-400 hover:underline text-[11px] font-mono font-bold flex items-center gap-1 cursor-pointer"
+                  type="button"
+                  disabled={!customInput.trim() || isExecutingScript}
+                  onClick={() => {
+                    onRunScript(customInput.trim());
+                    setCustomInput('');
+                  }}
+                  className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                 >
-                  <Terminal className="h-3.5 w-3.5" />
-                  <span>Ver Consola Completa</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {project.icon === 'php' ? (
-                  <>
-                    <button
-                      onClick={() => handleExecute('php artisan migrate')}
-                      disabled={isExecutingScript}
-                      className="p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all hover:border-amber-500/40 bg-amber-500/10 text-amber-300 border-amber-500/20 hover:bg-amber-500/20 cursor-pointer disabled:opacity-50"
-                    >
-                      <PlayCircle className="h-4 w-4 text-amber-400 shrink-0" />
-                      <span className="truncate">php artisan migrate</span>
-                    </button>
-                    <button
-                      onClick={() => handleExecute('php artisan db:seed')}
-                      disabled={isExecutingScript}
-                      className="p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all hover:border-amber-500/40 bg-amber-500/10 text-amber-300 border-amber-500/20 hover:bg-amber-500/20 cursor-pointer disabled:opacity-50"
-                    >
-                      <PlayCircle className="h-4 w-4 text-amber-400 shrink-0" />
-                      <span className="truncate">php artisan db:seed</span>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => handleExecute('npm run build')}
-                      disabled={isExecutingScript}
-                      className="p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all hover:border-amber-500/40 bg-amber-500/10 text-amber-300 border-amber-500/20 hover:bg-amber-500/20 cursor-pointer disabled:opacity-50"
-                    >
-                      <PlayCircle className="h-4 w-4 text-amber-400 shrink-0" />
-                      <span className="truncate">npm run build</span>
-                    </button>
-                    <button
-                      onClick={() => handleExecute('npm test')}
-                      disabled={isExecutingScript}
-                      className="p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all hover:border-amber-500/40 bg-amber-500/10 text-amber-300 border-amber-500/20 hover:bg-amber-500/20 cursor-pointer disabled:opacity-50"
-                    >
-                      <PlayCircle className="h-4 w-4 text-amber-400 shrink-0" />
-                      <span className="truncate">npm test</span>
-                    </button>
-                  </>
-                )}
-
-                <button
-                  onClick={() => handleExecute('npx prisma db push')}
-                  disabled={isExecutingScript}
-                  className={`p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all cursor-pointer disabled:opacity-50 ${
-                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-300 hover:border-blue-500/40 hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
-                  }`}
-                >
-                  <PlayCircle className="h-4 w-4 text-blue-400 shrink-0" />
-                  <span className="truncate">prisma db push</span>
-                </button>
-
-                <button
-                  onClick={() => handleExecute('npx eslint . --fix')}
-                  disabled={isExecutingScript}
-                  className={`p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all cursor-pointer disabled:opacity-50 ${
-                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-300 hover:border-purple-500/40 hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
-                  }`}
-                >
-                  <PlayCircle className="h-4 w-4 text-purple-400 shrink-0" />
-                  <span className="truncate">eslint . --fix</span>
+                  <Play className="h-4 w-4 fill-black" />
                 </button>
               </div>
             </div>
 
-            {/* Custom Project Shortcuts List */}
-            {customShortcuts.length > 0 && (
-              <div className="space-y-2 pt-2 border-t border-white/[0.08]">
-                <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                  Mis Accesos Directos Guardados
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  {customShortcuts.map((sc) => (
-                    <div key={sc.id} className="flex items-center space-x-1">
-                      <button
-                        onClick={() => handleExecute(sc.cmd)}
-                        disabled={isExecutingScript}
-                        className={`flex-1 p-2.5 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all cursor-pointer truncate ${
-                          isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-amber-400 hover:border-amber-500/40 hover:bg-[#2A2A2A]' : 'bg-amber-50 border-amber-200 text-amber-900 hover:border-amber-400'
-                        }`}
-                      >
-                        <PlayCircle className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">{sc.name}</span>
-                      </button>
-                      <button
-                        onClick={() => handleRemoveShortcut(sc.id)}
-                        className="p-2 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
-                        title="Eliminar acceso directo"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+            {/* Script Status */}
+            {scriptMsg && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono text-xs">
+                {scriptMsg}
               </div>
             )}
 
-            {/* Execute & Add Custom CLI Command Form */}
-            <div className="pt-3 border-t border-white/[0.08] space-y-2.5">
+            {/* Custom Shortcuts */}
+            <div className="space-y-2 pt-2">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-mono text-[10px] font-bold uppercase tracking-wider block">
-                  Ejecutar Comando CLI Personalizado
+                <span className="text-[10px] font-bold text-slate-400 uppercase font-mono">
+                  {language === 'es' ? 'Atajos Guardados:' : 'Saved Shortcuts:'}
                 </span>
                 <button
+                  type="button"
                   onClick={() => setShowAddShortcut(!showAddShortcut)}
-                  className="text-blue-400 font-bold hover:underline text-[11px] flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] text-amber-400 font-bold hover:text-amber-300 flex items-center space-x-1 cursor-pointer"
                 >
-                  <Plus className="h-3 w-3" />
-                  <span>{showAddShortcut ? 'Cancelar' : 'Guardar como Acceso Directo'}</span>
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>{language === 'es' ? 'Crear Atajo' : 'Create Shortcut'}</span>
                 </button>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={customInput}
-                  onChange={(e) => setCustomInput(e.target.value)}
-                  placeholder="ej: npm run build:prod o python manage.py migrate"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && customInput.trim()) {
-                      handleExecute(customInput.trim());
-                    }
-                  }}
-                  className={`flex-1 border rounded-xl p-2.5 text-xs font-mono font-bold focus:outline-none transition-all ${
-                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-amber-500' : 'bg-slate-50 border-slate-200 text-slate-900'
-                  }`}
-                />
-                <button
-                  onClick={() => handleExecute(customInput.trim())}
-                  disabled={!customInput.trim() || isExecutingScript}
-                  className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-1.5 shadow-md shadow-amber-600/20 hover:shadow-[0_0_15px_rgba(245,158,11,0.35)] transition-all cursor-pointer disabled:opacity-50 shrink-0"
-                >
-                  {isExecutingScript ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                  <span>Ejecutar</span>
-                </button>
-              </div>
-
-              {/* Form to save custom shortcut */}
               {showAddShortcut && (
-                <form onSubmit={handleAddShortcut} className={`p-3 rounded-2xl border space-y-2 mt-2 ${
-                  isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-amber-50/5 border-amber-500/20'
-                }`}>
-                  <span className="font-bold text-[11px] text-amber-400 block">Guardar Nuevo Acceso Directo</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      placeholder="Nombre (ej: Build Prod)"
-                      value={newShortcutName}
-                      onChange={(e) => setNewShortcutName(e.target.value)}
-                      className={`border rounded-xl p-2 text-xs font-mono transition-all ${
-                        isDark ? 'bg-[#252525] border-white/[0.08] text-white focus:border-amber-500' : 'bg-white border-slate-200'
-                      }`}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Comando (ej: npm run build)"
-                      value={newShortcutCmd}
-                      onChange={(e) => setNewShortcutCmd(e.target.value)}
-                      className={`border rounded-xl p-2 text-xs font-mono transition-all ${
-                        isDark ? 'bg-[#252525] border-white/[0.08] text-white focus:border-amber-500' : 'bg-white border-slate-200'
-                      }`}
-                    />
-                  </div>
-                  <div className="flex justify-end pt-1">
+                <form onSubmit={handleAddShortcut} className="p-3 rounded-xl border border-white/10 bg-[#1E1E1E] space-y-2">
+                  <input
+                    type="text"
+                    placeholder={language === 'es' ? "Nombre (ej: Migrar DB)" : "Name (e.g. Migrate DB)"}
+                    value={newShortcutName}
+                    onChange={(e) => setNewShortcutName(e.target.value)}
+                    className="w-full p-2 rounded-lg bg-[#141414] border border-white/10 text-white text-xs"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Comando (ej: npx prisma migrate dev)"
+                    value={newShortcutCmd}
+                    onChange={(e) => setNewShortcutCmd(e.target.value)}
+                    className="w-full p-2 rounded-lg bg-[#141414] border border-white/10 text-white text-xs font-mono"
+                  />
+                  <div className="flex justify-end space-x-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddShortcut(false)}
+                      className="px-3 py-1 rounded-lg text-slate-400 text-xs cursor-pointer"
+                    >
+                      {t.cancel || 'Cancel'}
+                    </button>
                     <button
                       type="submit"
-                      disabled={!newShortcutCmd.trim()}
-                      className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-md shadow-amber-600/20 transition-all cursor-pointer disabled:opacity-50"
+                      className="px-3 py-1 bg-amber-500 text-black font-bold rounded-lg text-xs cursor-pointer"
                     >
-                      Guardar Acceso Directo
+                      {language === 'es' ? 'Guardar' : 'Save'}
                     </button>
                   </div>
                 </form>
               )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar">
+                {customShortcuts.map((s) => (
+                  <div
+                    key={s.id}
+                    className="p-3 rounded-xl border border-white/[0.08] bg-[#1E1E1E] flex items-center justify-between group"
+                  >
+                    <div className="truncate mr-2">
+                      <div className="font-bold text-white truncate">{s.name}</div>
+                      <div className="text-[10px] text-slate-400 font-mono truncate">{s.cmd}</div>
+                    </div>
+                    <div className="flex items-center space-x-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => onRunScript(s.cmd)}
+                        className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 cursor-pointer"
+                        title={language === 'es' ? 'Ejecutar' : 'Run'}
+                      >
+                        <Play className="h-3 w-3 fill-amber-300" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveShortcut(s.id)}
+                        className="p-1.5 text-slate-500 hover:text-rose-400 cursor-pointer"
+                        title={language === 'es' ? 'Eliminar' : 'Delete'}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-
           </div>
-
-          {/* Modal Footer */}
-          <div className={`px-6 py-3.5 border-t flex justify-end ${
-            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
-          }`}>
-            <button
-              onClick={onClose}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:bg-[#303030] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-              }`}
-            >
-              Cerrar
-            </button>
-          </div>
-
         </motion.div>
       </motion.div>
     </AnimatePresence>

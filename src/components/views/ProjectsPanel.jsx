@@ -17,6 +17,7 @@ import {
   Search,
   Code
 } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
 export default function ProjectsPanel({
   projects = [],
@@ -29,7 +30,8 @@ export default function ProjectsPanel({
   onToggleLogs,
   onSelectProjectDetail,
   activeLogsProject,
-  theme
+  theme,
+  language = 'es'
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterView, setFilterView] = useState('active'); // 'active' | 'archived' | 'all'
@@ -37,6 +39,7 @@ export default function ProjectsPanel({
   const [portStatus, setPortStatus] = useState({});
   const [projectToDelete, setProjectToDelete] = useState(null);
 
+  const t = getTranslations(language);
   const isDark = theme === 'dark';
 
   const activeCount = projects.filter(p => !p.isArchived).length;
@@ -101,10 +104,10 @@ export default function ProjectsPanel({
           <h1 className={`text-3xl font-extrabold tracking-tight ${
             isDark ? 'text-white' : 'text-slate-900'
           }`}>
-            Gestor Completo de Proyectos
+            {t.gestorProyectos || 'Project Manager'}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
-            Administra tus repositorios, comandos de arranque, puertos y vistas previas.
+            {t.gestorProyectosDesc || 'Manage your repositories, launch commands, ports, and live previews.'}
           </p>
         </div>
 
@@ -113,7 +116,7 @@ export default function ProjectsPanel({
           className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-3 rounded-2xl flex items-center space-x-2 shadow-md shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all text-xs cursor-pointer"
         >
           <Plus className="h-4 w-4" />
-          <span>Importar Carpeta de Proyecto</span>
+          <span>{t.importFolder || 'Import Project Folder'}</span>
         </button>
       </div>
 
@@ -123,7 +126,7 @@ export default function ProjectsPanel({
           <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar por nombre o ruta..."
+            placeholder={t.filterByNameOrPath || 'Search by name or path...'}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 font-sans transition-all ${
@@ -144,7 +147,7 @@ export default function ProjectsPanel({
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span>Activos</span>
+              <span>{t.activeCount || 'Active'}</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-blue-500/20 text-blue-400 font-mono">
                 {activeCount}
               </span>
@@ -158,7 +161,7 @@ export default function ProjectsPanel({
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span>Archivados</span>
+              <span>{t.archivedHidden || 'Archived'}</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-500/20 text-amber-400 font-mono font-bold">
                 {archivedCount}
               </span>
@@ -172,7 +175,7 @@ export default function ProjectsPanel({
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span>Todos ({projects.length})</span>
+              <span>{t.allCount || 'All'} ({projects.length})</span>
             </button>
           </div>
         )}
@@ -187,14 +190,18 @@ export default function ProjectsPanel({
             <FolderPlus className="h-8 w-8" />
           </div>
           <div className="space-y-1">
-            <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>No se encontraron proyectos</h3>
-            <p className="text-xs text-slate-400">Haz clic en el botón superior para importar una carpeta de tu equipo</p>
+            <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              {t.noProjects || 'No projects found'}
+            </h3>
+            <p className="text-xs text-slate-400">
+              {language === 'es' ? 'Haz clic en el botón superior para importar una carpeta de tu equipo' : 'Click the button above to import a project folder'}
+            </p>
           </div>
           <button
             onClick={onAddProject}
             className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer"
           >
-            + Importar Primer Proyecto
+            + {t.importFolder || 'Import Project'}
           </button>
         </div>
       ) : (
@@ -238,7 +245,7 @@ export default function ProjectsPanel({
                             : isDark ? 'bg-transparent text-[#888888] border-white/[0.08]' : 'bg-slate-100 text-slate-600 border-slate-200'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
-                          {isRunning ? 'RUNNING' : 'STOPPED'}
+                          {isRunning ? (t.running || 'RUNNING') : (t.stopped || 'STOPPED')}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400 font-mono mt-0.5 truncate" title={project.path}>
@@ -255,7 +262,7 @@ export default function ProjectsPanel({
 
                     {project.hasBackend && (
                       <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border bg-purple-500/10 text-purple-400 border-purple-500/20">
-                        Entorno Dual: Backend ({project.backend?.techStack || 'API'})
+                        {t.dualEnvironment || 'Dual Environment'}: Backend ({project.backend?.techStack || 'API'})
                       </span>
                     )}
 
@@ -270,7 +277,7 @@ export default function ProjectsPanel({
                       }`}
                     >
                       {isRunning ? <Square className="h-3.5 w-3.5 fill-white" /> : <Play className="h-3.5 w-3.5 fill-white" />}
-                      <span>{isRunning ? 'Detener' : 'Arrancar'}</span>
+                      <span>{isRunning ? (t.detener || 'Stop') : (t.arrancar || 'Start')}</span>
                     </motion.button>
                   </div>
                 </div>
@@ -285,7 +292,7 @@ export default function ProjectsPanel({
                       className={`text-xs py-1.5 px-3 rounded-xl border font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer ${
                         isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
-                      title="Abrir en Navegador"
+                      title={language === 'es' ? 'Abrir en Navegador' : 'Open in Browser'}
                     >
                       <Globe className="h-3.5 w-3.5 text-blue-400" />
                       <span>{projectUrl}</span>
@@ -296,10 +303,10 @@ export default function ProjectsPanel({
                       className={`text-xs py-1.5 px-3 rounded-xl border font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer ${
                         isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
-                      title="Abrir en VS Code / Editor"
+                      title={language === 'es' ? 'Abrir en Editor de Código' : 'Open in Code Editor'}
                     >
                       <FolderOpen className="h-3.5 w-3.5 text-slate-400" />
-                      <span>Abrir Editor</span>
+                      <span>{language === 'es' ? 'Abrir Editor' : 'Open Editor'}</span>
                     </button>
 
                     <button
@@ -309,7 +316,7 @@ export default function ProjectsPanel({
                           ? 'bg-blue-600 text-white border-blue-600 shadow-[0_0_12px_rgba(59,130,246,0.25)]'
                           : isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
-                      title="Ver Logs en Vivo"
+                      title={language === 'es' ? 'Ver Logs en Vivo' : 'View Live Logs'}
                     >
                       <Terminal className="h-3.5 w-3.5 text-slate-400" />
                       <span>Logs</span>
@@ -319,7 +326,7 @@ export default function ProjectsPanel({
                   {/* Port Config and Trash */}
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-1 text-xs font-mono">
-                      <span className="text-slate-500">Puerto:</span>
+                      <span className="text-slate-500">{t.port || 'Port:'}</span>
                       <input
                         type="number"
                         value={project.port}
@@ -332,7 +339,7 @@ export default function ProjectsPanel({
                         <button
                           onClick={() => handleAutoAssignFreePort(project.id, project.port)}
                           className="text-amber-500 hover:text-amber-600 p-1"
-                          title="Puerto ocupado. Haz clic para auto-asignar puerto libre"
+                          title={language === 'es' ? 'Puerto ocupado. Haz clic para auto-asignar puerto libre' : 'Port busy. Click to auto-assign a free port'}
                         >
                           <AlertTriangle className="h-3.5 w-3.5" />
                         </button>
@@ -342,7 +349,7 @@ export default function ProjectsPanel({
                     <button
                       onClick={() => setProjectToDelete(project)}
                       className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
-                      title="Eliminar de proyectos"
+                      title={t.delete || 'Delete'}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -380,10 +387,12 @@ export default function ProjectsPanel({
                 </div>
                 <div className="space-y-1">
                   <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    ¿Eliminar Proyecto?
+                    {t.confirmDeleteProject || 'Delete Project?'}
                   </h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    ¿Estás seguro de que deseas eliminar <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>"{projectToDelete.name}"</span> de Lummo Studio? No se borrarán los archivos físicos de tu disco duro.
+                    {t.confirmDeleteProjectMsg 
+                      ? t.confirmDeleteProjectMsg.replace('{name}', projectToDelete.name)
+                      : `Are you sure you want to remove "${projectToDelete.name}" from Lummo Studio? Physical files will not be deleted.`}
                   </p>
                 </div>
               </div>
@@ -395,7 +404,7 @@ export default function ProjectsPanel({
                     isDark ? 'text-[#888888] hover:text-white hover:bg-white/[0.06]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Cancelar
+                  {t.cancel || 'Cancel'}
                 </button>
                 <button
                   onClick={() => {
@@ -404,7 +413,7 @@ export default function ProjectsPanel({
                   }}
                   className="px-5 py-2 rounded-xl bg-transparent border border-rose-500 text-white hover:text-rose-500 hover:border-rose-500 hover:bg-rose-500/10 font-bold text-xs transition-all cursor-pointer"
                 >
-                  Sí, Eliminar
+                  {t.yesDelete || 'Yes, Delete'}
                 </button>
               </div>
             </motion.div>

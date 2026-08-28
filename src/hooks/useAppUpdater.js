@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import packageInfo from '../../package.json';
 
-const CURRENT_VERSION = packageInfo.version || '2.4.15';
+const CURRENT_VERSION = packageInfo.version || '2.4.30';
 const STORAGE_KEY_LAST_VERSION = 'lummo_last_seen_version';
 const STORAGE_KEY_CHANGELOG_DISMISSED = 'lummo_changelog_dismissed_version';
 
@@ -43,14 +43,12 @@ export function useAppUpdater() {
       const changelogDismissed = localStorage.getItem(STORAGE_KEY_CHANGELOG_DISMISSED);
 
       if (lastSeen && isNewer(CURRENT_VERSION, lastSeen)) {
-        // La versión actual es mayor a la última guardada -> Mostrar notificación y hoja de actualización
         setShowPostUpdateBanner(true);
         if (changelogDismissed !== CURRENT_VERSION) {
           setShowChangelogSheet(true);
         }
       }
 
-      // Guardar la versión actual como vista
       localStorage.setItem(STORAGE_KEY_LAST_VERSION, CURRENT_VERSION);
     } catch (e) {
       console.warn('[useAppUpdater] Error al comprobar versión en localStorage:', e);
@@ -61,19 +59,16 @@ export function useAppUpdater() {
   useEffect(() => {
     if (!window.electronAPI?.updater) return;
 
-    // Obtener versión real de Electron si está disponible
     window.electronAPI.updater.getVersion?.().then((ver) => {
       if (ver) setActiveVersion(ver);
     }).catch(() => {});
 
-    // Estado: comprobando
     const unsubStatus = window.electronAPI.updater.onUpdateStatus?.((data) => {
       if (data?.state === 'checking') {
         setStatus('checking');
       }
     });
 
-    // Estado: actualización disponible -> Inicia descarga
     const unsubAvailable = window.electronAPI.updater.onUpdateAvailable?.((info) => {
       setStatus('downloading');
       setProgress(5);
@@ -84,7 +79,6 @@ export function useAppUpdater() {
       });
     });
 
-    // Progreso de descarga
     const unsubProgress = window.electronAPI.updater.onDownloadProgress?.((data) => {
       setStatus('downloading');
       if (typeof data?.percent === 'number') {
@@ -92,7 +86,6 @@ export function useAppUpdater() {
       }
     });
 
-    // Descarga completada -> Listo para reiniciar
     const unsubDownloaded = window.electronAPI.updater.onUpdateDownloaded?.((info) => {
       setStatus('ready');
       setProgress(100);
@@ -105,11 +98,9 @@ export function useAppUpdater() {
       }
     });
 
-    // Error
     const unsubError = window.electronAPI.updater.onUpdateError?.((err) => {
       console.warn('[useAppUpdater] Error recibido:', err);
       setErrorMessage(err?.message || 'Error en la actualización');
-      // Si falla la descarga, volver a reposo después de unos segundos
       setTimeout(() => setStatus('idle'), 4000);
     });
 
@@ -122,14 +113,12 @@ export function useAppUpdater() {
     };
   }, []);
 
-  // Handler para reiniciar y aplicar la actualización
   const handleRestartAndApply = useCallback(async () => {
     if (window.electronAPI?.updater?.restartAndApply) {
       await window.electronAPI.updater.restartAndApply();
     }
   }, []);
 
-  // Handler para buscar actualizaciones manualmente
   const handleCheckForUpdates = useCallback(async () => {
     setStatus('checking');
     if (window.electronAPI?.updater?.checkForUpdates) {
@@ -137,12 +126,10 @@ export function useAppUpdater() {
     }
   }, []);
 
-  // Simulador para pruebas rápidas de interfaz (Debug / Dev)
-  const handleSimulateUpdate = useCallback((targetVer = '2.4.0') => {
+  const handleSimulateUpdate = useCallback((targetVer = '2.4.15') => {
     if (window.electronAPI?.updater?.simulateFlow) {
       window.electronAPI.updater.simulateFlow({ targetVersion: targetVer });
     } else {
-      // Simulación local en React si no corre en Electron
       setStatus('downloading');
       setProgress(10);
       setUpdateInfo({
@@ -180,6 +167,15 @@ export function useAppUpdater() {
     setShowChangelogSheet(true);
   }, []);
 
+  const triggerTestPostUpdate = useCallback((targetVer = CURRENT_VERSION) => {
+    setShowPostUpdateBanner(true);
+    setShowChangelogSheet(true);
+    setUpdateInfo({
+      version: targetVer,
+      releaseNotes: '⚡ Sistema de Auto-Update Integrado y fluidez mejorada.\n🚀 Arranque acelerado de proyectos React y Vite.\n🛡️ Aislamiento de procesos y telemetría en tiempo real.\n🎨 Interfaz 100% traducida en Español e Inglés.'
+    });
+  }, []);
+
   return {
     status,
     progress,
@@ -194,6 +190,8 @@ export function useAppUpdater() {
     dismissPostUpdateBanner,
     dismissChangelogSheet,
     openChangelogSheet,
-    setShowPostUpdateBanner
+    setShowPostUpdateBanner,
+    setShowChangelogSheet,
+    triggerTestPostUpdate
   };
 }

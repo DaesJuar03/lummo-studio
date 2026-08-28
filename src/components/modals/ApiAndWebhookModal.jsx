@@ -9,6 +9,7 @@ import {
   Minimize2, 
   X 
 } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
 import ApiClientView from './api-webhook/ApiClientView';
 import WebhookInspectorView from './api-webhook/WebhookInspectorView';
@@ -19,9 +20,11 @@ export default function ApiAndWebhookModal({
   project,
   tunnelUrl,
   onStartTunnel,
-  theme = 'dark'
+  theme = 'dark',
+  language = 'es'
 }) {
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
   const port = project?.port || 3000;
 
   // Active Main Tab: 'api-client' | 'webhook-inspector'
@@ -142,7 +145,7 @@ export default function ApiAndWebhookModal({
             )}
           </div>
           <span className="text-[10px] font-mono text-slate-400">
-            {project?.name || 'Local'} (:{port}) • {activeMainTab === 'api-client' ? 'API Client' : `${webhookEvents.length} eventos`}
+            {project?.name || 'Local'} (:{port}) • {activeMainTab === 'api-client' ? 'API Client' : `${webhookEvents.length} ${language === 'es' ? 'eventos' : 'events'}`}
           </span>
         </div>
 
@@ -150,14 +153,14 @@ export default function ApiAndWebhookModal({
           <button
             onClick={() => setIsMinimized(false)}
             className="p-1 text-slate-400 hover:text-white"
-            title="Maximizar"
+            title={language === 'es' ? "Maximizar" : "Maximize"}
           >
             <Maximize2 className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onClose}
             className="p-1 text-slate-400 hover:text-rose-400"
-            title="Cerrar"
+            title={language === 'es' ? "Cerrar" : "Close"}
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -189,14 +192,14 @@ export default function ApiAndWebhookModal({
               <div className="flex items-center space-x-2">
                 <h2 className="font-extrabold text-base tracking-tight">API & Webhook Hub</h2>
                 <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                  v3.0 Preview
+                  v3.0
                 </span>
                 <span className="font-mono text-xs text-slate-400 font-semibold">
                   • {project?.name} (:{port})
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Cliente de pruebas HTTP integrado & monitor de tráfico en vivo con Replay
+                {language === 'es' ? 'Cliente de pruebas HTTP integrado & monitor de tráfico en vivo con Replay' : 'Integrated HTTP test client & live traffic monitor with Replay'}
               </p>
             </div>
           </div>
@@ -238,7 +241,7 @@ export default function ApiAndWebhookModal({
               className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                 isDark ? 'border-[#262a36] hover:bg-[#1a1d27] text-slate-400 hover:text-white' : 'border-slate-200 hover:bg-slate-100 text-slate-600'
               }`}
-              title="Minimizar (Widget flotante)"
+              title={language === 'es' ? "Minimizar (Widget flotante)" : "Minimize (Floating widget)"}
             >
               <Minus className="w-4 h-4" />
             </button>
@@ -248,7 +251,7 @@ export default function ApiAndWebhookModal({
               className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                 isDark ? 'border-[#262a36] hover:bg-[#1a1d27] text-slate-400 hover:text-white' : 'border-slate-200 hover:bg-slate-100 text-slate-600'
               }`}
-              title={isMaximized ? "Restaurar tamaño normal" : "Maximizar"}
+              title={isMaximized ? (language === 'es' ? "Restaurar tamaño normal" : "Restore normal size") : (language === 'es' ? "Maximizar" : "Maximize")}
             >
               {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
@@ -258,7 +261,7 @@ export default function ApiAndWebhookModal({
               className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                 isDark ? 'border-[#262a36] hover:bg-[#1a1d27] text-slate-400 hover:text-white' : 'border-slate-200 hover:bg-slate-100 text-slate-600'
               }`}
-              title="Cerrar"
+              title={language === 'es' ? "Cerrar" : "Close"}
             >
               <X className="w-5 h-5" />
             </button>
@@ -271,6 +274,7 @@ export default function ApiAndWebhookModal({
             project={project}
             port={port}
             theme={theme}
+            language={language}
             collections={collections}
             onSaveCollectionRequest={handleSaveCollectionRequest}
           />
@@ -284,6 +288,7 @@ export default function ApiAndWebhookModal({
             tunnelUrl={tunnelUrl}
             onStartTunnel={onStartTunnel}
             theme={theme}
+            language={language}
             webhookEvents={webhookEvents}
             onClearEvents={handleClearWebhookEvents}
             onReplayEvent={handleReplayWebhook}

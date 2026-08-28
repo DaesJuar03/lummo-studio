@@ -1,19 +1,41 @@
 import React, { useState } from 'react';
-import { Download, FileSpreadsheet, FileJson, FileText, Database, X, Check, Loader2 } from 'lucide-react';
+import { Download, FileSpreadsheet, FileJson, FileText, Database, X, Check } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { getTranslations } from '../../locales';
 
-export default function DataExportModal({ isOpen, onClose, tableName, rows = [], columns = [] }) {
+export default function DataExportModal({ isOpen, onClose, tableName, rows = [], columns = [], language = 'es' }) {
   const [format, setFormat] = useState('csv');
   const [exporting, setExporting] = useState(false);
   const toast = useToast();
+  const t = getTranslations(language);
 
   if (!isOpen) return null;
 
   const formats = [
-    { id: 'csv', name: 'CSV (Valores por Coma)', icon: FileText, desc: 'Ideal para procesar en scripts o Excel' },
-    { id: 'excel', name: 'TSV / Excel', icon: FileSpreadsheet, desc: 'Delimitado por tabulaciones para Hojas de Cálculo' },
-    { id: 'json', name: 'JSON (Objeto Estructurado)', icon: FileJson, desc: 'Formato estándar para APIs y almacenamiento NoSQL' },
-    { id: 'sql', name: 'SQL Dump (Sentencias INSERT)', icon: Database, desc: 'Volcado de datos en sentencias SQL listas para ejecutar' }
+    { 
+      id: 'csv', 
+      name: language === 'es' ? 'CSV (Valores por Coma)' : 'CSV (Comma-Separated Values)', 
+      icon: FileText, 
+      desc: language === 'es' ? 'Ideal para procesar en scripts o Excel' : 'Ideal for scripting or Excel processing' 
+    },
+    { 
+      id: 'excel', 
+      name: language === 'es' ? 'TSV / Excel' : 'TSV / Excel', 
+      icon: FileSpreadsheet, 
+      desc: language === 'es' ? 'Delimitado por tabulaciones para Hojas de Cálculo' : 'Tab-delimited for Spreadsheets' 
+    },
+    { 
+      id: 'json', 
+      name: language === 'es' ? 'JSON (Objeto Estructurado)' : 'JSON (Structured Objects)', 
+      icon: FileJson, 
+      desc: language === 'es' ? 'Formato estándar para APIs y almacenamiento NoSQL' : 'Standard format for APIs and NoSQL stores' 
+    },
+    { 
+      id: 'sql', 
+      name: language === 'es' ? 'SQL Dump (Sentencias INSERT)' : 'SQL Dump (INSERT Statements)', 
+      icon: Database, 
+      desc: language === 'es' ? 'Volcado de datos en sentencias SQL listas para ejecutar' : 'Data dump in ready-to-run SQL INSERTs' 
+    }
   ];
 
   const handleExport = async () => {
@@ -28,17 +50,17 @@ export default function DataExportModal({ isOpen, onClose, tableName, rows = [],
         });
 
         if (res && res.success) {
-          toast.showSuccess('Exportación Completa', `Archivo guardado en: ${res.filePath}`);
+          toast.showSuccess(language === 'es' ? 'Exportación Completa' : 'Export Complete', `${language === 'es' ? 'Archivo guardado en:' : 'File saved at:'} ${res.filePath}`);
           onClose();
         } else if (res && !res.canceled) {
-          toast.showError('Error al Exportar', res.error || 'Ocurrió un problema guardando el archivo');
+          toast.showError(language === 'es' ? 'Error al Exportar' : 'Export Error', res.error || (language === 'es' ? 'Ocurrió un problema guardando el archivo' : 'A problem occurred saving the file'));
         }
       } else {
-        toast.showInfo('Exportador Simulado', `Simulación de exportación en formato ${format.toUpperCase()}`);
+        toast.showInfo(language === 'es' ? 'Exportador Simulado' : 'Simulated Export', `${language === 'es' ? 'Simulación de exportación en formato' : 'Export simulation in format'} ${format.toUpperCase()}`);
         onClose();
       }
     } catch (err) {
-      toast.showError('Error en Exportación', err.message);
+      toast.showError(language === 'es' ? 'Error en Exportación' : 'Export Error', err.message);
     } finally {
       setExporting(false);
     }
@@ -54,15 +76,15 @@ export default function DataExportModal({ isOpen, onClose, tableName, rows = [],
               <Download className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-100">Exportación Avanzada de Datos</h3>
+              <h3 className="font-semibold text-slate-100">{language === 'es' ? 'Exportación Avanzada de Datos' : 'Advanced Data Export'}</h3>
               <p className="text-xs text-slate-400 font-mono">
-                {tableName || 'Tabla / Consulta'} ({rows.length} registros)
+                {tableName || (language === 'es' ? 'Tabla / Consulta' : 'Table / Query')} ({rows.length} {language === 'es' ? 'registros' : 'records'})
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -71,7 +93,7 @@ export default function DataExportModal({ isOpen, onClose, tableName, rows = [],
         {/* Formats list */}
         <div className="p-6 space-y-3">
           <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-            Seleccionar Formato de Archivo
+            {language === 'es' ? 'Seleccionar Formato de Archivo' : 'Select File Format'}
           </label>
           <div className="grid grid-cols-1 gap-2.5">
             {formats.map((fmt) => {
@@ -108,27 +130,17 @@ export default function DataExportModal({ isOpen, onClose, tableName, rows = [],
         <div className="px-6 py-4 border-t border-slate-800 bg-slate-900/60 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            disabled={exporting}
-            className="px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 rounded-xl transition-colors"
+            className="px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
           >
-            Cancelar
+            {t.cancel || 'Cancel'}
           </button>
           <button
             onClick={handleExport}
-            disabled={exporting || rows.length === 0}
-            className="px-5 py-2 text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+            disabled={exporting}
+            className="px-5 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            {exporting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Exportando...</span>
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4" />
-                <span>Guardar Archivo</span>
-              </>
-            )}
+            <Download className="w-4 h-4" />
+            <span>{exporting ? (language === 'es' ? 'Exportando...' : 'Exporting...') : (language === 'es' ? 'Guardar Archivo' : 'Save File')}</span>
           </button>
         </div>
       </div>

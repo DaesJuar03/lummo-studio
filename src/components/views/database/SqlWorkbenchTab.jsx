@@ -9,10 +9,12 @@ import {
   ChevronLeft, 
   ChevronRight 
 } from 'lucide-react';
+import { getTranslations } from '../../../locales';
 
 export default function SqlWorkbenchTab({
   db,
   theme,
+  language = 'es',
   tablesList = [],
   selectedTable,
   onSelectTable,
@@ -20,7 +22,8 @@ export default function SqlWorkbenchTab({
   onNotice
 }) {
   const isDark = theme === 'dark';
-  const [activeSubTab, setActiveSubTab] = useState('tables'); // 'tables' | 'query'
+  const t = getTranslations(language);
+  const [activeSubTab, setActiveSubTab] = useState('tables');
 
   // Pagination & rows
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,7 +77,7 @@ export default function SqlWorkbenchTab({
     // Demo fallback
     const demoRows = [
       { id: 1, name: 'Admin Lummo', email: 'admin@lummo.local', role: 'Administrator', status: 'Active' },
-      { id: 2, name: 'Desarrollador', email: 'dev@lummo.local', role: 'Developer', status: 'Active' },
+      { id: 2, name: 'Developer', email: 'dev@lummo.local', role: 'Developer', status: 'Active' },
       { id: 3, name: 'Tester QA', email: 'qa@lummo.local', role: 'QA Engineer', status: 'Active' }
     ];
     setTableRows(demoRows);
@@ -115,7 +118,7 @@ export default function SqlWorkbenchTab({
       const updated = [...tableRows];
       updated[rowIndex] = { ...updated[rowIndex], [colName]: newVal };
       setTableRows(updated);
-      if (onNotice) onNotice(`Celda [${colName}] actualizada.`);
+      if (onNotice) onNotice(language === 'es' ? `Celda [${colName}] actualizada.` : `Cell [${colName}] updated.`);
     }
     setEditingCell(null);
   };
@@ -125,7 +128,7 @@ export default function SqlWorkbenchTab({
     if (window.electronAPI?.db?.executeQuery) {
       const res = await window.electronAPI.db.executeQuery(db, query);
       if (res && res.success) {
-        setQueryMessage(`Consulta ejecutada con éxito (${res.count} filas / ${res.executionTimeMs || 0} ms)`);
+        setQueryMessage(language === 'es' ? `Consulta ejecutada con éxito (${res.count} filas / ${res.executionTimeMs || 0} ms)` : `Query executed successfully (${res.count} rows / ${res.executionTimeMs || 0} ms)`);
         if (res.rows) {
           setTableRows(res.rows);
           setTableColumns(res.columns || Object.keys(res.rows[0] || {}));
@@ -149,7 +152,7 @@ export default function SqlWorkbenchTab({
           }`}
         >
           <Table className="h-3.5 w-3.5" />
-          <span>Visor de Tablas & Datos</span>
+          <span>{language === 'es' ? 'Visor de Tablas & Datos' : 'Table & Data Viewer'}</span>
         </button>
 
         <button
@@ -161,7 +164,7 @@ export default function SqlWorkbenchTab({
           }`}
         >
           <Code className="h-3.5 w-3.5" />
-          <span>Editor de Consultas SQL</span>
+          <span>{language === 'es' ? 'Editor de Consultas SQL' : 'SQL Query Editor'}</span>
         </button>
       </div>
 
@@ -170,11 +173,11 @@ export default function SqlWorkbenchTab({
           {/* Tables Sidebar */}
           <div className="lg:col-span-3 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold text-slate-400 uppercase">Tablas ({tablesList.length})</span>
+              <span className="text-xs font-mono font-bold text-slate-400 uppercase">{language === 'es' ? 'Tablas' : 'Tables'} ({tablesList.length})</span>
               <button
                 onClick={onOpenSchemaDesigner}
                 className="p-1 text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
-                title="Diseñar nueva tabla"
+                title={language === 'es' ? 'Diseñar nueva tabla' : 'Design new table'}
               >
                 <Plus className="h-4 w-4" />
               </button>
@@ -183,20 +186,20 @@ export default function SqlWorkbenchTab({
             <div className={`border rounded-2xl p-2 max-h-[500px] overflow-y-auto space-y-1 custom-scrollbar ${
               isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
             }`}>
-              {tablesList.map(t => (
+              {tablesList.map(tName => (
                 <div
-                  key={t}
+                  key={tName}
                   onClick={() => {
-                    if (onSelectTable) onSelectTable(t);
+                    if (onSelectTable) onSelectTable(tName);
                     setCurrentPage(1);
                   }}
                   className={`p-2.5 rounded-xl border text-xs font-mono font-bold cursor-pointer transition-all flex items-center justify-between ${
-                    selectedTable === t
+                    selectedTable === tName
                       ? 'bg-blue-600/15 border-blue-500 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.15)]'
                       : isDark ? 'bg-[#252525] border-white/[0.06] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.12]' : 'bg-slate-50 border-slate-200 text-slate-700'
                   }`}
                 >
-                  <span className="truncate">{t}</span>
+                  <span className="truncate">{tName}</span>
                   <Table className="h-3.5 w-3.5 opacity-60 shrink-0 ml-2" />
                 </div>
               ))}
@@ -212,13 +215,13 @@ export default function SqlWorkbenchTab({
             }`}>
               <div className="flex items-center space-x-2">
                 <Table className="h-4 w-4 text-blue-400" />
-                <span className="font-mono font-bold text-xs text-white">{selectedTable || 'Selecciona una tabla'}</span>
-                <span className="text-[11px] text-slate-400 font-mono">({totalRows} registros)</span>
+                <span className="font-mono font-bold text-xs text-white">{selectedTable || (language === 'es' ? 'Selecciona una tabla' : 'Select a table')}</span>
+                <span className="text-[11px] text-slate-400 font-mono">({totalRows} {language === 'es' ? 'registros' : 'records'})</span>
               </div>
 
               <div className="text-[11px] text-slate-400 font-mono flex items-center space-x-1">
                 <Edit2 className="h-3 w-3 text-blue-400" />
-                <span>Doble clic en una celda para editar</span>
+                <span>{language === 'es' ? 'Doble clic en una celda para editar' : 'Double click on a cell to edit'}</span>
               </div>
             </div>
 
@@ -226,11 +229,11 @@ export default function SqlWorkbenchTab({
               {isLoadingRows ? (
                 <div className="py-20 text-center text-xs font-mono text-slate-400">
                   <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-blue-500" />
-                  <span>Cargando filas de la base de datos...</span>
+                  <span>{language === 'es' ? 'Cargando filas de la base de datos...' : 'Loading rows from database...'}</span>
                 </div>
               ) : tableRows.length === 0 ? (
                 <div className="py-20 text-center text-xs font-mono text-slate-400">
-                  Esta tabla no contiene registros.
+                  {language === 'es' ? 'Esta tabla no contiene registros.' : 'This table contains no records.'}
                 </div>
               ) : (
                 <table className="w-full text-xs font-mono text-left border-collapse">
@@ -249,28 +252,30 @@ export default function SqlWorkbenchTab({
                           }}
                           className="p-3 font-bold border-r border-slate-700/20 cursor-pointer hover:text-blue-400 select-none"
                         >
-                          {col} {sortColumn === col ? (sortDirection === 'ASC' ? '↑' : '↓') : ''}
+                          <div className="flex items-center justify-between">
+                            <span>{col}</span>
+                            {sortColumn === col && (
+                              <span className="text-[10px] text-blue-400 ml-1">{sortDirection === 'ASC' ? '▲' : '▼'}</span>
+                            )}
+                          </div>
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {tableRows.map((row, rIdx) => (
-                      <tr
-                        key={rIdx}
-                        className={`border-b transition-colors ${
-                          isDark ? 'border-white/[0.06] hover:bg-[#252525]' : 'border-slate-200 hover:bg-slate-50'
-                        }`}
-                      >
+                      <tr key={rIdx} className={`border-b transition-colors ${
+                        isDark ? 'border-white/[0.04] hover:bg-[#252525]' : 'border-slate-100 hover:bg-slate-50'
+                      }`}>
                         {tableColumns.map(col => {
                           const val = row[col];
-                          const isEditing = editingCell && editingCell.rowIndex === rIdx && editingCell.colName === col;
+                          const isEditing = editingCell?.rowIndex === rIdx && editingCell?.colName === col;
 
                           return (
                             <td
                               key={col}
                               onDoubleClick={() => setEditingCell({ rowIndex: rIdx, colName: col, value: val ?? '' })}
-                              className="p-2.5 border-r border-slate-700/20 truncate max-w-xs cursor-pointer"
+                              className="p-3 border-r border-slate-700/10 truncate max-w-xs"
                             >
                               {isEditing ? (
                                 <input
@@ -283,11 +288,11 @@ export default function SqlWorkbenchTab({
                                     if (e.key === 'Enter') handleSaveCellEdit(rIdx, col, val);
                                     if (e.key === 'Escape') setEditingCell(null);
                                   }}
-                                  className="w-full px-1.5 py-0.5 rounded bg-[#141414] border border-blue-500 text-white font-mono text-xs focus:outline-none shadow-[0_0_10px_rgba(59,130,246,0.25)]"
+                                  className="w-full bg-blue-500/20 border border-blue-400 rounded px-1.5 py-0.5 text-white font-mono text-xs focus:outline-none"
                                 />
                               ) : (
-                                <span className={val === null ? 'text-slate-600 italic' : ''}>
-                                  {val === null ? 'NULL' : typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                                <span className={val === null || val === undefined ? 'text-slate-500 italic' : ''}>
+                                  {val === null || val === undefined ? 'NULL' : String(val)}
                                 </span>
                               )}
                             </td>
@@ -300,53 +305,30 @@ export default function SqlWorkbenchTab({
               )}
             </div>
 
-            {/* Pagination Footer */}
-            <div className={`p-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono ${
-              isDark ? 'bg-[#141414] border-white/[0.08] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+            {/* Pagination Controls */}
+            <div className={`p-3 border-t flex items-center justify-between text-xs font-mono ${
+              isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
             }`}>
-              <div className="flex items-center space-x-2">
-                <span>Filas por página:</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                  className={`px-2 py-1 rounded-lg border font-mono font-bold focus:outline-none transition-all ${
-                    isDark ? 'bg-[#252525] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300'
-                  }`}
-                >
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
+              <div className="flex items-center space-x-2 text-slate-400">
+                <span>{language === 'es' ? 'Página' : 'Page'} {currentPage} {language === 'es' ? 'de' : 'of'} {totalPages}</span>
+                <span>({totalRows} {language === 'es' ? 'filas totales' : 'total rows'})</span>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <span>
-                  Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong> (Total: {totalRows})
-                </span>
-
-                <div className="flex items-center space-x-1">
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage <= 1}
-                    className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors cursor-pointer ${
-                      isDark ? 'bg-[#252525] border-white/[0.08] text-white hover:bg-[#303030]' : 'bg-white border-slate-300'
-                    }`}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage >= totalPages}
-                    className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors cursor-pointer ${
-                      isDark ? 'bg-[#252525] border-white/[0.08] text-white hover:bg-[#303030]' : 'bg-white border-slate-300'
-                    }`}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className="p-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-white disabled:opacity-30 cursor-pointer"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  className="p-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-white disabled:opacity-30 cursor-pointer"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -354,35 +336,34 @@ export default function SqlWorkbenchTab({
       )}
 
       {activeSubTab === 'query' && (
-        <div className={`p-6 border rounded-2xl space-y-4 ${
+        <div className={`border rounded-2xl p-4 space-y-3 ${
           isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-300">Editor SQL:</label>
-              <button
-                onClick={handleExecuteSql}
-                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all flex items-center space-x-1.5 cursor-pointer"
-              >
-                <Play className="h-3.5 w-3.5 fill-white" />
-                <span>Ejecutar SQL</span>
-              </button>
-            </div>
-            <textarea
-              rows={8}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="SELECT * FROM users;"
-              className={`w-full p-3.5 font-mono text-xs rounded-xl border focus:outline-none transition-all ${
-                isDark ? 'bg-[#141414] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
-              }`}
-            />
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-bold text-slate-400 uppercase">{language === 'es' ? 'Escribe tu consulta SQL:' : 'Write your SQL query:'}</span>
+            <button
+              onClick={handleExecuteSql}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md shadow-blue-600/20 cursor-pointer"
+            >
+              <Play className="h-3.5 w-3.5 fill-white" />
+              <span>{language === 'es' ? 'Ejecutar Consulta' : 'Run Query'}</span>
+            </button>
           </div>
 
+          <textarea
+            rows={4}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="SELECT * FROM users WHERE status = 'active';"
+            className={`w-full p-3 font-mono text-xs rounded-xl border focus:outline-none focus:border-blue-500 ${
+              isDark ? 'bg-[#141414] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+            }`}
+          />
+
           {queryMessage && (
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono text-xs">
+            <p className="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-xl">
               {queryMessage}
-            </div>
+            </p>
           )}
         </div>
       )}

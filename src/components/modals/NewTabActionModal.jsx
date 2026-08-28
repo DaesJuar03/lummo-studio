@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, FolderKanban, Plus, Database, Table, ChevronRight } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
 export default function NewTabActionModal({
   isOpen,
@@ -9,17 +10,19 @@ export default function NewTabActionModal({
   onOpenDatabases,
   onAddProject,
   onOpenSQLiteWorkbench,
-  theme
+  theme,
+  language = 'es'
 }) {
   if (!isOpen) return null;
 
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   const actions = [
     {
       id: 'projects',
-      title: 'Abrir Pestaña de Proyectos',
-      subtitle: 'Ver y gestionar todos tus repositorios locales',
+      title: language === 'es' ? 'Abrir Pestaña de Proyectos' : 'Open Projects Tab',
+      subtitle: language === 'es' ? 'Ver y gestionar todos tus repositorios locales' : 'View and manage all your local repositories',
       icon: FolderKanban,
       action: () => {
         onOpenProjects();
@@ -28,8 +31,8 @@ export default function NewTabActionModal({
     },
     {
       id: 'import',
-      title: 'Importar Nueva Carpeta de Proyecto',
-      subtitle: 'Seleccionar carpeta local de Vite, React, Node o PHP',
+      title: language === 'es' ? 'Importar Nueva Carpeta de Proyecto' : 'Import New Project Folder',
+      subtitle: language === 'es' ? 'Seleccionar carpeta local de Vite, React, Node o PHP' : 'Select local folder of Vite, React, Node or PHP',
       icon: Plus,
       action: () => {
         onAddProject();
@@ -38,8 +41,8 @@ export default function NewTabActionModal({
     },
     {
       id: 'databases',
-      title: 'Abrir Pestaña de Bases de Datos',
-      subtitle: 'Gestor completo de instancias SQLite, MySQL, Postgres y MongoDB',
+      title: language === 'es' ? 'Abrir Pestaña de Bases de Datos' : 'Open Databases Tab',
+      subtitle: language === 'es' ? 'Gestor completo de instancias SQLite, MySQL, Postgres y MongoDB' : 'Complete manager for SQLite, MySQL, Postgres and Redis',
       icon: Database,
       action: () => {
         onOpenDatabases();
@@ -48,8 +51,8 @@ export default function NewTabActionModal({
     },
     {
       id: 'sqlite-workbench',
-      title: 'Ver Base de Datos SQLite (Workbench SQL)',
-      subtitle: 'Explorar tablas y ejecutar consultas SQL en tiempo real',
+      title: language === 'es' ? 'Ver Base de Datos SQLite (Workbench SQL)' : 'View SQLite Database (SQL Workbench)',
+      subtitle: language === 'es' ? 'Explorar tablas y ejecutar consultas SQL en tiempo real' : 'Explore tables and run SQL queries in real-time',
       icon: Table,
       action: () => {
         onOpenSQLiteWorkbench();
@@ -83,9 +86,11 @@ export default function NewTabActionModal({
           }`}>
             <div>
               <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Nueva Pestaña o Acción
+                {language === 'es' ? 'Nueva Pestaña o Acción' : 'New Tab or Action'}
               </h3>
-              <p className="text-xs text-slate-400">¿Qué te gustaría hacer a continuación?</p>
+              <p className="text-xs text-slate-400">
+                {language === 'es' ? '¿Qué te gustaría hacer a continuación?' : 'What would you like to do next?'}
+              </p>
             </div>
             <button
               onClick={onClose}

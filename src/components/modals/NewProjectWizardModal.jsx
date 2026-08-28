@@ -8,81 +8,20 @@ import {
   Check, 
   AlertCircle, 
   Layers, 
-  Code, 
-  Play, 
   Zap,
-  ArrowRight,
-  Server,
-  FileCode,
-  Globe,
-  Plus
+  ArrowRight
 } from 'lucide-react';
-
-const TEMPLATES = [
-  {
-    id: 'vite-react',
-    name: 'Vite + React',
-    category: 'Frontend',
-    desc: 'Aplicación React 19 ultra-rápida con Vite y hot module reloading.',
-    badge: 'Popular',
-    icon: 'react',
-    defaultPort: 5173
-  },
-  {
-    id: 'vite-react-ts',
-    name: 'Vite + React (TypeScript)',
-    category: 'Frontend',
-    desc: 'React con tipado estricto TypeScript y configuración moderna.',
-    badge: 'TypeScript',
-    icon: 'react',
-    defaultPort: 5173
-  },
-  {
-    id: 'nextjs',
-    name: 'Next.js (App Router)',
-    category: 'Fullstack',
-    desc: 'Framework React con Server Components y renderizado híbrido.',
-    badge: 'Fullstack',
-    icon: 'next',
-    defaultPort: 3000
-  },
-  {
-    id: 'express-api',
-    name: 'Node.js + Express REST API',
-    category: 'Backend',
-    desc: 'Servidor API REST liviano con Express, CORS y soporte para variables .env.',
-    badge: 'Backend',
-    icon: 'node',
-    defaultPort: 5000
-  },
-  {
-    id: 'python-fastapi',
-    name: 'Python FastAPI',
-    category: 'Backend',
-    desc: 'Microservicio API en Python de alto rendimiento con Uvicorn.',
-    badge: 'Python',
-    icon: 'python',
-    defaultPort: 8000
-  },
-  {
-    id: 'html-static',
-    name: 'Sitio Web HTML5 + CSS3',
-    category: 'Estático',
-    desc: 'Estructura web estática clásica sin dependencias pesadas.',
-    badge: 'Ligero',
-    icon: 'html',
-    defaultPort: 8080
-  }
-];
+import { getTranslations } from '../../locales';
 
 export default function NewProjectWizardModal({
   isOpen,
   onClose,
   onProjectCreated,
-  theme = 'dark'
+  theme = 'dark',
+  language = 'es'
 }) {
   const [selectedTemplate, setSelectedTemplate] = useState('vite-react');
-  const [projectName, setProjectName] = useState('mi-nuevo-proyecto');
+  const [projectName, setProjectName] = useState('my-new-project');
   const [destinationFolder, setDestinationFolder] = useState('');
   const [packageManager, setPackageManager] = useState('npm');
   const [isCreating, setIsCreating] = useState(false);
@@ -92,6 +31,64 @@ export default function NewProjectWizardModal({
   const [createdPath, setCreatedPath] = useState('');
 
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
+
+  const templates = [
+    {
+      id: 'vite-react',
+      name: 'Vite + React',
+      category: 'Frontend',
+      desc: language === 'es' ? 'Aplicación React 19 ultra-rápida con Vite y hot module reloading.' : 'Ultra-fast React 19 app with Vite and hot module reloading.',
+      badge: 'Popular',
+      icon: 'react',
+      defaultPort: 5173
+    },
+    {
+      id: 'vite-react-ts',
+      name: 'Vite + React (TypeScript)',
+      category: 'Frontend',
+      desc: language === 'es' ? 'React con tipado estricto TypeScript y configuración moderna.' : 'React with strict TypeScript typings and modern config.',
+      badge: 'TypeScript',
+      icon: 'react',
+      defaultPort: 5173
+    },
+    {
+      id: 'nextjs',
+      name: 'Next.js (App Router)',
+      category: 'Fullstack',
+      desc: language === 'es' ? 'Framework React con Server Components y renderizado híbrido.' : 'React framework with Server Components and hybrid rendering.',
+      badge: 'Fullstack',
+      icon: 'next',
+      defaultPort: 3000
+    },
+    {
+      id: 'express-api',
+      name: 'Node.js + Express REST API',
+      category: 'Backend',
+      desc: language === 'es' ? 'Servidor API REST liviano con Express, CORS y soporte para variables .env.' : 'Lightweight REST API server with Express, CORS, and .env support.',
+      badge: 'Backend',
+      icon: 'node',
+      defaultPort: 5000
+    },
+    {
+      id: 'python-fastapi',
+      name: 'Python FastAPI',
+      category: 'Backend',
+      desc: language === 'es' ? 'Microservicio API en Python de alto rendimiento con Uvicorn.' : 'High-performance Python API microservice with Uvicorn.',
+      badge: 'Python',
+      icon: 'python',
+      defaultPort: 8000
+    },
+    {
+      id: 'html-static',
+      name: language === 'es' ? 'Sitio Web HTML5 + CSS3' : 'HTML5 + CSS3 Static Web',
+      category: language === 'es' ? 'Estático' : 'Static',
+      desc: language === 'es' ? 'Estructura web estática clásica sin dependencias pesadas.' : 'Classic static web structure with zero heavy dependencies.',
+      badge: language === 'es' ? 'Ligero' : 'Lightweight',
+      icon: 'html',
+      defaultPort: 8080
+    }
+  ];
 
   useEffect(() => {
     if (!isOpen) {
@@ -125,17 +122,17 @@ export default function NewProjectWizardModal({
 
   const handleCreate = async () => {
     if (!projectName.trim()) {
-      setErrorMsg('Por favor especifica un nombre para el proyecto.');
+      setErrorMsg(language === 'es' ? 'Por favor especifica un nombre para el proyecto.' : 'Please specify a project name.');
       return;
     }
     if (!destinationFolder.trim()) {
-      setErrorMsg('Por favor selecciona una carpeta de destino para el proyecto.');
+      setErrorMsg(language === 'es' ? 'Por favor selecciona una carpeta de destino para el proyecto.' : 'Please select a destination folder for the project.');
       return;
     }
 
     setErrorMsg('');
     setIsCreating(true);
-    setLogs([`[Lummo Wizard] Iniciando creación de proyecto...`]);
+    setLogs([language === 'es' ? `[Lummo Wizard] Iniciando creación de proyecto...` : `[Lummo Wizard] Starting project scaffolding...`]);
 
     try {
       if (window.electronAPI?.scaffoldProject) {
@@ -149,19 +146,19 @@ export default function NewProjectWizardModal({
         if (res && res.success) {
           setIsSuccess(true);
           setCreatedPath(res.projectPath);
-          setLogs(prev => [...prev, `\n✨ ¡Proyecto creado exitosamente en: ${res.projectPath}!`]);
+          setLogs(prev => [...prev, language === 'es' ? `\n✨ ¡Proyecto creado exitosamente en: ${res.projectPath}!` : `\n✨ Project created successfully at: ${res.projectPath}!`]);
         } else {
-          setErrorMsg(res?.error || 'No se pudo crear el proyecto.');
+          setErrorMsg(res?.error || (language === 'es' ? 'No se pudo crear el proyecto.' : 'Could not create project.'));
         }
       } else {
         setTimeout(() => {
           setIsSuccess(true);
           setCreatedPath(`${destinationFolder}/${projectName}`);
-          setLogs(prev => [...prev, '✨ ¡Proyecto simulado con éxito!']);
+          setLogs(prev => [...prev, language === 'es' ? '✨ ¡Proyecto simulado con éxito!' : '✨ Project scaffolded successfully!']);
         }, 1500);
       }
     } catch (err) {
-      setErrorMsg(err.message || 'Error inesperado al crear el proyecto.');
+      setErrorMsg(err.message || (language === 'es' ? 'Error inesperado al crear el proyecto.' : 'Unexpected error creating project.'));
     } finally {
       setIsCreating(false);
     }
@@ -194,10 +191,10 @@ export default function NewProjectWizardModal({
             </div>
             <div>
               <h2 className="text-lg font-extrabold tracking-tight">
-                Asistente de Nuevos Proyectos (Scaffolding Wizard)
+                {language === 'es' ? 'Asistente de Nuevos Proyectos (Scaffolding Wizard)' : 'New Project Wizard (Scaffolding)'}
               </h2>
               <p className="text-xs text-slate-400">
-                Crea un proyecto moderno desde cero con plantillas oficiales listas para desarrollo.
+                {language === 'es' ? 'Crea un proyecto moderno desde cero con plantillas oficiales listas para desarrollo.' : 'Create a modern project from scratch with official development-ready templates.'}
               </p>
             </div>
           </div>
@@ -220,11 +217,11 @@ export default function NewProjectWizardModal({
               <div className="space-y-3">
                 <label className="text-xs font-extrabold uppercase tracking-wider text-blue-500 flex items-center space-x-2">
                   <Layers className="h-4 w-4" />
-                  <span>1. Selecciona la Plantilla del Proyecto</span>
+                  <span>{language === 'es' ? '1. Selecciona la Plantilla del Proyecto' : '1. Select Project Template'}</span>
                 </label>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {TEMPLATES.map((tmpl) => {
+                  {templates.map((tmpl) => {
                     const isSelected = selectedTemplate === tmpl.id;
                     return (
                       <div
@@ -255,7 +252,7 @@ export default function NewProjectWizardModal({
                           <p className="text-[11px] text-slate-400 leading-relaxed">{tmpl.desc}</p>
                         </div>
                         <div className="mt-3 pt-2 border-t border-slate-700/40 text-[10px] font-mono text-slate-500 flex items-center justify-between">
-                          <span>Puerto: :{tmpl.defaultPort}</span>
+                          <span>{t.port || 'Port:'} :{tmpl.defaultPort}</span>
                           <span>{tmpl.category}</span>
                         </div>
                       </div>
@@ -268,18 +265,20 @@ export default function NewProjectWizardModal({
               <div className="space-y-4 pt-2">
                 <label className="text-xs font-extrabold uppercase tracking-wider text-blue-500 flex items-center space-x-2">
                   <Terminal className="h-4 w-4" />
-                  <span>2. Configuración y Directorio Destino</span>
+                  <span>{language === 'es' ? '2. Configuración y Directorio Destino' : '2. Configuration & Destination Directory'}</span>
                 </label>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Project Name */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Nombre del Proyecto / Carpeta</label>
+                    <label className="text-xs font-bold text-slate-300">
+                      {language === 'es' ? 'Nombre del Proyecto / Carpeta' : 'Project Name / Folder'}
+                    </label>
                     <input
                       type="text"
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
-                      placeholder="mi-proyecto"
+                      placeholder="my-project"
                       disabled={isCreating}
                       className={`w-full px-3 py-2 text-xs font-mono rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                         isDark ? 'bg-[#202024] border-[#27272a] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
@@ -289,7 +288,9 @@ export default function NewProjectWizardModal({
 
                   {/* Package Manager */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-300">Gestor de Paquetes</label>
+                    <label className="text-xs font-bold text-slate-300">
+                      {language === 'es' ? 'Gestor de Paquetes' : 'Package Manager'}
+                    </label>
                     <div className="flex items-center space-x-2">
                       {['npm', 'pnpm', 'yarn', 'bun'].map((pm) => (
                         <button
@@ -314,13 +315,15 @@ export default function NewProjectWizardModal({
 
                 {/* Destination Parent Folder */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300">Carpeta Contenedora de Destino</label>
+                  <label className="text-xs font-bold text-slate-300">
+                    {language === 'es' ? 'Carpeta Contenedora de Destino' : 'Destination Parent Folder'}
+                  </label>
                   <div className="flex items-center space-x-2">
                     <input
                       type="text"
                       value={destinationFolder}
                       readOnly
-                      placeholder="Selecciona la carpeta donde se creará el proyecto..."
+                      placeholder={language === 'es' ? 'Selecciona la carpeta donde se creará el proyecto...' : 'Select folder where project will be created...'}
                       className={`flex-1 px-3 py-2 text-xs font-mono rounded-xl border focus:outline-none ${
                         isDark ? 'bg-[#202024] border-[#27272a] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
                       }`}
@@ -336,12 +339,12 @@ export default function NewProjectWizardModal({
                       }`}
                     >
                       <Folder className="h-4 w-4 text-blue-400" />
-                      <span>Examinar...</span>
+                      <span>{language === 'es' ? 'Examinar...' : 'Browse...'}</span>
                     </button>
                   </div>
                   {destinationFolder && projectName && (
                     <p className="text-[11px] font-mono text-slate-500 pt-0.5">
-                      Ruta final: <span className="text-blue-400">{destinationFolder}\{projectName.replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase()}</span>
+                      {language === 'es' ? 'Ruta final:' : 'Final path:'} <span className="text-blue-400">{destinationFolder}\{projectName.replace(/[^a-zA-Z0-9_-]/g, '-').toLowerCase()}</span>
                     </p>
                   )}
                 </div>
@@ -360,7 +363,7 @@ export default function NewProjectWizardModal({
                 <div className="space-y-2 pt-2">
                   <label className="text-xs font-bold text-slate-300 flex items-center space-x-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-                    <span>Progreso de Creación en Tiempo Real</span>
+                    <span>{language === 'es' ? 'Progreso de Creación en Tiempo Real' : 'Real-time Creation Progress'}</span>
                   </label>
                   <div className="h-40 bg-black/90 text-emerald-400 font-mono text-[11px] p-3.5 rounded-xl border border-slate-800 overflow-y-auto custom-scrollbar whitespace-pre-wrap leading-relaxed">
                     {logs.map((l, idx) => (
@@ -377,9 +380,11 @@ export default function NewProjectWizardModal({
                 <Check className="h-8 w-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xl font-extrabold text-white">¡Proyecto Creado con Éxito!</h3>
+                <h3 className="text-xl font-extrabold text-white">
+                  {language === 'es' ? '¡Proyecto Creado con Éxito!' : 'Project Created Successfully!'}
+                </h3>
                 <p className="text-xs text-slate-400 max-w-md">
-                  El proyecto se ha generado y configurado correctamente en tu equipo.
+                  {language === 'es' ? 'El proyecto se ha generado y configurado correctamente en tu equipo.' : 'Project was scaffolded and configured successfully on your system.'}
                 </p>
                 <div className="mt-3 p-2.5 rounded-xl bg-[#202024] border border-[#27272a] text-xs font-mono text-blue-400 break-all max-w-lg">
                   {createdPath}
@@ -400,7 +405,7 @@ export default function NewProjectWizardModal({
               isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            {isSuccess ? 'Cerrar' : 'Cancelar'}
+            {isSuccess ? (t.cancel || 'Close') : (t.cancel || 'Cancel')}
           </button>
 
           {!isSuccess ? (
@@ -412,11 +417,11 @@ export default function NewProjectWizardModal({
               {isCreating ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  <span>Creando Proyecto...</span>
+                  <span>{language === 'es' ? 'Creando Proyecto...' : 'Scaffolding Project...'}</span>
                 </>
               ) : (
                 <>
-                  <span>Crear e Importar Proyecto</span>
+                  <span>{language === 'es' ? 'Crear e Importar Proyecto' : 'Create & Import Project'}</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -427,7 +432,7 @@ export default function NewProjectWizardModal({
               className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center space-x-2 cursor-pointer"
             >
               <Zap className="h-4 w-4" />
-              <span>Abrir en Lummo Studio</span>
+              <span>{language === 'es' ? 'Abrir en Lummo Studio' : 'Open in Lummo Studio'}</span>
             </button>
           )}
         </div>

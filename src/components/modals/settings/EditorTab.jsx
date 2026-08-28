@@ -22,7 +22,8 @@ export default function EditorTab({
   selectedEditorCmd = 'code',
   onSelectEditorCmd,
   theme,
-  t
+  t,
+  language = 'es'
 }) {
   const isDark = theme === 'dark';
   const editors = Array.isArray(detectedEditors) && detectedEditors.length > 0
@@ -37,7 +38,7 @@ export default function EditorTab({
       <div className={`border-b pb-3 flex items-center justify-between ${isDark ? 'border-white/[0.08]' : 'border-slate-100'}`}>
         <div>
           <h4 className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.codeEditorTab || 'Code Editor'}</h4>
-          <p className="text-xs text-slate-400">Selecciona el editor o IDE para abrir tus proyectos</p>
+          <p className="text-xs text-slate-400">{t.codeEditorDesc || 'Select the editor or IDE to open your projects'}</p>
         </div>
 
         <button
@@ -51,14 +52,14 @@ export default function EditorTab({
           } ${isScanningEditors ? 'opacity-80' : ''}`}
         >
           <RefreshCw className={`h-3.5 w-3.5 ${isScanningEditors ? 'animate-spin text-blue-400' : 'text-slate-400'}`} />
-          <span>{isScanningEditors ? 'Escaneando...' : 'Re-escanear'}</span>
+          <span>{isScanningEditors ? (language === 'es' ? 'Escaneando...' : 'Scanning...') : (t.rescanShort || t.rescan || 'Rescan')}</span>
         </button>
       </div>
 
       {/* Selector Dropdown Principal */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-400 uppercase font-mono tracking-wider block">
-          Editor Predeterminado Seleccionado:
+          {t.defaultEditorSelected || 'DEFAULT EDITOR SELECTED:'}
         </label>
         <select
           value={selectedEditorCmd}
@@ -70,7 +71,7 @@ export default function EditorTab({
           }`}
         >
           {installedEditors.length > 0 && (
-            <optgroup label="Editores Detectados en el Sistema">
+            <optgroup label={language === 'es' ? 'Editores Detectados en el Sistema' : 'Editors Detected on System'}>
               {installedEditors.map((ed) => (
                 <option key={ed.id} value={ed.cmd}>
                   {ed.name} ({ed.cmd})
@@ -80,7 +81,7 @@ export default function EditorTab({
           )}
 
           {otherEditors.length > 0 && (
-            <optgroup label="Otros Editores e IDEs Compatibles">
+            <optgroup label={language === 'es' ? 'Otros Editores e IDEs Compatibles' : 'Other Compatible Editors & IDEs'}>
               {otherEditors.map((ed) => (
                 <option key={ed.id} value={ed.cmd}>
                   {ed.name} ({ed.cmd})
@@ -94,7 +95,7 @@ export default function EditorTab({
       {/* Catálogo de Editores e IDEs */}
       <div className="space-y-2 pt-1">
         <label className="text-xs font-bold text-slate-400 uppercase font-mono tracking-wider block">
-          Catálogo de Editores e IDEs Compatibles:
+          {language === 'es' ? 'Catálogo de Editores e IDEs Compatibles:' : 'Compatible Editors & IDEs Catalog:'}
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -125,7 +126,7 @@ export default function EditorTab({
                           : 'bg-blue-100 text-blue-700 border border-blue-200'
                         : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
                     }`}>
-                      {ed.installed ? 'Disponible' : 'No en PATH'}
+                      {ed.installed ? (language === 'es' ? 'Disponible' : 'Available') : (language === 'es' ? 'No en PATH' : 'Not in PATH')}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-400 font-mono font-semibold truncate">{ed.cmd}</p>

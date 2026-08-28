@@ -9,6 +9,7 @@ import {
   Search,
   Table
 } from 'lucide-react';
+import { getTranslations } from '../../locales';
 import CreateDatabaseModal from '../modals/CreateDatabaseModal';
 import ImportExportSqlModal from '../modals/ImportExportSqlModal';
 
@@ -17,13 +18,15 @@ export default function DatabasesPanel({
   customDatabases = [], 
   onAddCustomDatabase, 
   onSelectDatabaseDetail, 
-  theme 
+  theme,
+  language = 'es'
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [importExportDb, setImportExportDb] = useState(null);
 
+  const t = getTranslations(language);
   const isDark = theme === 'dark';
 
   const databases = customDatabases.map(db => ({
@@ -39,7 +42,7 @@ export default function DatabasesPanel({
       type: newDb.engine || 'sqlite',
       port: newDb.engine === 'mysql' ? 3306 : newDb.engine === 'postgres' ? 5432 : newDb.engine === 'redis' ? 6379 : null,
       status: 'READY',
-      tech: `Esquema ${(newDb.engine || 'sqlite').toUpperCase()}`,
+      tech: `${(newDb.engine || 'sqlite').toUpperCase()}`,
       installed: true,
       size: '0.0 MB',
       tables: 0,
@@ -80,10 +83,10 @@ export default function DatabasesPanel({
       }`}>
         <div>
           <h2 className={`text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Gestor de Bases de Datos
+            {t.gestorDatabases || 'Database Manager'}
           </h2>
           <p className="text-slate-400 text-sm mt-1">
-            Arranca, detén y administra SQLite, MySQL, PostgreSQL y Redis.
+            {t.gestorDatabasesDesc || 'Start, stop, and manage SQLite, MySQL, PostgreSQL, and Redis.'}
           </p>
         </div>
 
@@ -93,7 +96,7 @@ export default function DatabasesPanel({
           className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-3 rounded-2xl flex items-center space-x-2 shadow-md shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all text-xs cursor-pointer"
         >
           <Plus className="h-4 w-4" />
-          <span>Conectar / Crear BD</span>
+          <span>{t.connectOrNewDatabase || 'Connect / Create DB'}</span>
         </motion.button>
       </div>
 
@@ -103,7 +106,7 @@ export default function DatabasesPanel({
           <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Buscar base de datos..."
+            placeholder={language === 'es' ? 'Buscar base de datos...' : 'Search database...'}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 font-sans transition-all ${
@@ -116,7 +119,7 @@ export default function DatabasesPanel({
       {/* INSTALLED & CUSTOM DATABASES */}
       <div className="space-y-4">
         <span className="text-xs font-bold font-mono text-slate-400 uppercase tracking-wider">
-          Instancias Activas y Disponibles ({installedDatabases.length})
+          {language === 'es' ? 'Instancias Activas y Disponibles' : 'Active and Available Instances'} ({installedDatabases.length})
         </span>
         {installedDatabases.length === 0 ? (
           <div className={`p-12 text-center rounded-2xl border space-y-4 ${
@@ -127,10 +130,10 @@ export default function DatabasesPanel({
             </div>
             <div className="space-y-1">
               <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Sin bases de datos configuradas
+                {t.noDatabasesConfigured || 'No databases configured'}
               </h3>
               <p className="text-xs text-slate-400 max-w-sm mx-auto font-sans">
-                El panel está limpio. Puedes conectar o crear tu primera instancia local de SQLite, MySQL, PostgreSQL o Redis.
+                {t.noDatabasesDesc || 'The panel is clean. You can connect or create your first local instance of SQLite, MySQL, PostgreSQL or Redis.'}
               </p>
             </div>
             <button
@@ -138,7 +141,7 @@ export default function DatabasesPanel({
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl inline-flex items-center gap-2 shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Conectar / Crear Primera BD</span>
+              <span>{t.connectOrNewDatabase || 'Connect / Create First DB'}</span>
             </button>
           </div>
         ) : (
@@ -159,7 +162,7 @@ export default function DatabasesPanel({
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   {/* Info Block */}
-                  <div className="flex items-center space-x-3.5 min-w-0">
+                  <div className="flex items-center space-x-3.5 min-w-0 flex-1">
                     <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center font-bold shrink-0 ${
                       isRedis
                         ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.2)]'
@@ -180,7 +183,7 @@ export default function DatabasesPanel({
                             : isDark ? 'bg-transparent text-[#888888] border-white/[0.08]' : 'bg-slate-100 text-slate-600 border-slate-200'
                         }`}>
                           <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
-                          {isRunning ? 'EJECUTANDO (ACTIVO)' : 'APAGADO (STOPPED)'}
+                          {isRunning ? (t.active || 'ACTIVE') : (t.stopped || 'STOPPED')}
                         </span>
                       </div>
                       <p className="text-xs text-slate-400 font-mono mt-0.5">{db.tech || db.type || 'SQLite'}</p>
@@ -199,7 +202,7 @@ export default function DatabasesPanel({
                       }`}
                     >
                       {copiedId === db.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
-                      <span>{copiedId === db.id ? '¡Copiado!' : 'Copiar URL'}</span>
+                      <span>{copiedId === db.id ? (language === 'es' ? '¡Copiado!' : 'Copied!') : (language === 'es' ? 'Copiar URL' : 'Copy URL')}</span>
                     </button>
 
                     {!isRedis && (
@@ -211,7 +214,7 @@ export default function DatabasesPanel({
                         className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors cursor-pointer ${
                           isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
-                        title="Importar o Exportar respaldos SQL"
+                        title={language === 'es' ? 'Importar o Exportar respaldos SQL' : 'Import or Export SQL dumps'}
                       >
                         <Upload className="h-3.5 w-3.5 text-blue-400" />
                         <span>Dump SQL</span>
@@ -226,7 +229,7 @@ export default function DatabasesPanel({
                       className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-1.5 px-3.5 rounded-xl transition-all shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] flex items-center space-x-1.5 cursor-pointer"
                     >
                       <Table className="h-3.5 w-3.5" />
-                      <span>{isRedis ? 'Explorar Claves Redis' : 'Abrir Tablas & Consultas'}</span>
+                      <span>{isRedis ? (language === 'es' ? 'Explorar Claves Redis' : 'Explore Redis Keys') : (language === 'es' ? 'Abrir Tablas & Consultas' : 'Open Tables & Queries')}</span>
                     </button>
                   </div>
                 </div>
@@ -242,7 +245,7 @@ export default function DatabasesPanel({
           isDark ? 'bg-[#1E1E1E]/80 border-white/[0.08]' : 'bg-slate-100/60 border-slate-200/80'
         }`}>
           <div className="text-slate-400 font-bold font-mono">
-            Motores no detectados en el sistema local:
+            {language === 'es' ? 'Motores no detectados en el sistema local:' : 'Engines not detected on local system:'}
           </div>
 
           <div className="flex flex-wrap items-center gap-3 font-mono text-slate-400">
@@ -252,7 +255,7 @@ export default function DatabasesPanel({
               }`}>
                 <span className="w-2 h-2 rounded-full bg-slate-500"></span>
                 <span className={`font-bold ${isDark ? 'text-[#E5E5E5]' : 'text-slate-700'}`}>{db.name}</span>
-                <span className="text-slate-400 text-[11px]">(No detectado)</span>
+                <span className="text-slate-400 text-[11px]">({t.notInstalled || 'Not detected'})</span>
               </div>
             ))}
           </div>
@@ -265,12 +268,15 @@ export default function DatabasesPanel({
         onClose={() => setShowCreateModal(false)}
         onCreate={handleCreateDB}
         theme={theme}
+        language={language}
       />
 
       <ImportExportSqlModal
         isOpen={!!importExportDb}
         onClose={() => setImportExportDb(null)}
         dbEngine={importExportDb}
+        theme={theme}
+        language={language}
       />
     </div>
   );

@@ -9,6 +9,7 @@ import {
   Download 
 } from 'lucide-react';
 import useClipboard from '../../hooks/useClipboard';
+import { getTranslations } from '../../locales';
 
 import ImportExportSqlModal from '../modals/ImportExportSqlModal';
 import ErDiagramModal from '../modals/ErDiagramModal';
@@ -21,10 +22,12 @@ import RedisWorkbenchTab from './database/RedisWorkbenchTab';
 export default function DatabaseDetailPage({
   db,
   onBack,
-  theme
+  theme,
+  language = 'es'
 }) {
   const isDark = theme === 'dark';
   const isRedis = db?.engine === 'redis' || db?.type === 'redis';
+  const t = getTranslations(language);
 
   const { copied, copyToClipboard } = useClipboard();
   const [notice, setNotice] = useState('');
@@ -59,7 +62,7 @@ export default function DatabaseDetailPage({
           }
         }
       } catch (err) {
-        console.error('Error al cargar esquema:', err);
+        console.error('Error loading schema:', err);
       }
     } else {
       if (db?.id === 'sqlite') {
@@ -104,7 +107,7 @@ export default function DatabaseDetailPage({
             }`}
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Volver</span>
+            <span>{t.back || 'Back'}</span>
           </button>
 
           <div className="min-w-0">
@@ -113,7 +116,7 @@ export default function DatabaseDetailPage({
                 {db.name}
               </h2>
               <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border bg-blue-500/10 text-blue-400 border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.15)]">
-                {isRedis ? 'Redis Key-Value Cache' : db.tech || 'Base de Datos Relacional'}
+                {isRedis ? 'Redis Key-Value Cache' : db.tech || (language === 'es' ? 'Base de Datos Relacional' : 'Relational Database')}
               </span>
             </div>
             <div className="flex items-center space-x-2 text-xs text-slate-400 font-mono mt-0.5">
@@ -121,7 +124,7 @@ export default function DatabaseDetailPage({
               <button
                 onClick={() => copyToClipboard(connectionString)}
                 className="hover:text-blue-400 transition-colors cursor-pointer"
-                title="Copiar string de conexión"
+                title={language === 'es' ? 'Copiar string de conexión' : 'Copy connection string'}
               >
                 {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
@@ -138,8 +141,8 @@ export default function DatabaseDetailPage({
                 isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              <Network className="h-4 w-4 text-purple-400" />
-              <span>Diagrama ER</span>
+              <Network className="h-3.5 w-3.5 text-blue-400" />
+              <span>{t.erDiagram || 'ER Diagram'}</span>
             </button>
 
             <button
@@ -148,8 +151,8 @@ export default function DatabaseDetailPage({
                 isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              <Download className="h-4 w-4 text-emerald-400" />
-              <span>Exportar Datos</span>
+              <Download className="h-3.5 w-3.5 text-emerald-400" />
+              <span>{t.exportData || 'Export Data'}</span>
             </button>
 
             <button
@@ -158,70 +161,76 @@ export default function DatabaseDetailPage({
                 isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              <Upload className="h-4 w-4 text-blue-400" />
-              <span>SQL Dump</span>
+              <Upload className="h-3.5 w-3.5 text-amber-400" />
+              <span>{t.dumpSql || 'SQL Dump'}</span>
             </button>
           </div>
         )}
       </div>
 
       {notice && (
-        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-bold flex items-center space-x-2">
-          <Check className="h-4 w-4" />
-          <span>{notice}</span>
+        <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-mono">
+          {notice}
         </div>
       )}
 
-      {/* Main View: Redis or SQL */}
+      {/* Main Content Area */}
       {isRedis ? (
         <RedisWorkbenchTab
           db={db}
           theme={theme}
+          language={language}
           onNotice={showNoticeToast}
         />
       ) : (
         <SqlWorkbenchTab
           db={db}
           theme={theme}
+          language={language}
           tablesList={tablesList}
           selectedTable={selectedTable}
-          onSelectTable={(t) => setSelectedTable(t)}
+          onSelectTable={setSelectedTable}
           onOpenSchemaDesigner={() => setShowSchemaDesigner(true)}
           onNotice={showNoticeToast}
         />
       )}
 
-      {/* Modals */}
-      <SchemaDesignerModal
-        isOpen={showSchemaDesigner}
-        onClose={() => setShowSchemaDesigner(false)}
+      {/* Database Modals */}
+      <ImportExportSqlModal
+        isOpen={showImportExport}
+        onClose={() => setShowImportExport(false)}
+        dbEngine={db}
         db={db}
-        onTableCreated={() => loadSchema()}
         theme={theme}
+        language={language}
       />
 
       <ErDiagramModal
         isOpen={showErModal}
         onClose={() => setShowErModal(false)}
+        dbConfig={db}
         db={db}
         theme={theme}
+        language={language}
       />
 
       <DataExportModal
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
-        db={db}
-        selectedTable={selectedTable}
-        rows={[]}
-        columns={[]}
+        tableName={selectedTable}
         theme={theme}
+        language={language}
       />
 
-      <ImportExportSqlModal
-        isOpen={showImportExport}
-        onClose={() => setShowImportExport(false)}
-        db={db}
+      <SchemaDesignerModal
+        isOpen={showSchemaDesigner}
+        onClose={() => {
+          setShowSchemaDesigner(false);
+          loadSchema();
+        }}
+        tableName="new_table"
         theme={theme}
+        language={language}
       />
     </motion.div>
   );

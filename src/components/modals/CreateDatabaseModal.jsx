@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Database, Plus, Check, Server } from 'lucide-react';
+import { X, Database, Plus, Check } from 'lucide-react';
+import { getTranslations } from '../../locales';
 
-export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme = 'dark' }) {
+export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme = 'dark', language = 'es' }) {
   const [dbName, setDbName] = useState('');
   const [engine, setEngine] = useState('sqlite');
   const [charset, setCharset] = useState('utf8mb4');
@@ -11,6 +12,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
   const [created, setCreated] = useState(false);
 
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   if (!isOpen) return null;
 
@@ -71,9 +73,9 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
               </div>
               <div>
                 <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Conectar o Crear Base de Datos
+                  {t.connectOrNewDatabase || 'Connect or Create Database'}
                 </h3>
-                <p className="text-xs text-slate-400">SQLite, MySQL, PostgreSQL o Redis</p>
+                <p className="text-xs text-slate-400">SQLite, MySQL, PostgreSQL or Redis</p>
               </div>
             </div>
             <button
@@ -90,7 +92,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
           <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
             <div>
               <label className={`font-bold block mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                Motor de Base de Datos:
+                {language === 'es' ? 'Motor de Base de Datos:' : 'Database Engine:'}
               </label>
               <select
                 value={engine}
@@ -99,21 +101,21 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
                   isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
                 }`}
               >
-                <option value="sqlite" className="bg-[#1E1E1E] text-white">SQLite (archivo local .sqlite en Documentos)</option>
-                <option value="mysql" className="bg-[#1E1E1E] text-white">MySQL / MariaDB (Puerto estándar :3306)</option>
-                <option value="postgres" className="bg-[#1E1E1E] text-white">PostgreSQL (Puerto estándar :5432)</option>
-                <option value="redis" className="bg-[#1E1E1E] text-white">Redis Key-Value Cache (Puerto :6379)</option>
+                <option value="sqlite" className="bg-[#1E1E1E] text-white">SQLite ({language === 'es' ? 'archivo local en Documentos' : 'local file in Documents'})</option>
+                <option value="mysql" className="bg-[#1E1E1E] text-white">MySQL / MariaDB ({language === 'es' ? 'Puerto estándar' : 'Default Port'} :3306)</option>
+                <option value="postgres" className="bg-[#1E1E1E] text-white">PostgreSQL ({language === 'es' ? 'Puerto estándar' : 'Default Port'} :5432)</option>
+                <option value="redis" className="bg-[#1E1E1E] text-white">Redis Key-Value Cache ({language === 'es' ? 'Puerto' : 'Port'} :6379)</option>
               </select>
             </div>
 
             <div>
               <label className={`font-bold block mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                Nombre o Identificador:
+                {language === 'es' ? 'Nombre o Identificador:' : 'Name or Identifier:'}
               </label>
               <input
                 type="text"
                 required
-                placeholder="ej: mi_tienda_db, cache_redis, users_db"
+                placeholder="ej: my_app_db, cache_redis, users_db"
                 value={dbName}
                 onChange={(e) => setDbName(e.target.value)}
                 className={`w-full rounded-xl p-2.5 font-mono font-bold border focus:outline-none focus:border-blue-500 transition-all ${
@@ -138,15 +140,16 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
                     }`}
                   />
                 </div>
+
                 <div>
                   <label className={`font-bold block mb-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    Puerto:
+                    {language === 'es' ? 'Puerto:' : 'Port:'}
                   </label>
                   <input
                     type="number"
                     value={port || ''}
-                    onChange={(e) => setPort(Number(e.target.value))}
-                    placeholder={engine === 'mysql' ? '3306' : engine === 'postgres' ? '5432' : '6379'}
+                    onChange={(e) => setPort(parseInt(e.target.value, 10))}
+                    placeholder="3306"
                     className={`w-full rounded-xl p-2.5 font-mono border focus:outline-none transition-all ${
                       isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                     }`}
@@ -155,27 +158,34 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
               </div>
             )}
 
-            <div className="pt-3 flex justify-end space-x-2">
+            <div className="flex items-center justify-end space-x-2 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className={`px-4 py-2.5 rounded-xl border font-bold transition-all cursor-pointer ${
-                  isDark
-                    ? 'border-white/[0.08] bg-[#252525] text-slate-300 hover:bg-[#303030] hover:text-white'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                Cancelar
+                {t.cancel || 'Cancel'}
               </button>
 
-              <motion.button
-                whileTap={{ scale: 0.96 }}
+              <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all flex items-center space-x-1.5 cursor-pointer"
+                disabled={!dbName.trim() || created}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_15px_rgba(37,99,235,0.35)] transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
               >
-                {created ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                <span>{created ? '¡Conectada con Éxito!' : 'Crear / Conectar'}</span>
-              </motion.button>
+                {created ? (
+                  <>
+                    <Check className="h-4 w-4 text-white" />
+                    <span>{language === 'es' ? '¡Conectada!' : 'Connected!'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    <span>{language === 'es' ? 'Vincular Base de Datos' : 'Link Database'}</span>
+                  </>
+                )}
+              </button>
             </div>
           </form>
         </motion.div>

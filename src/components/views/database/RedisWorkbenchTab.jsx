@@ -13,13 +13,16 @@ import {
   X, 
   AlertTriangle 
 } from 'lucide-react';
+import { getTranslations } from '../../../locales';
 
 export default function RedisWorkbenchTab({
   db,
   theme,
+  language = 'es',
   onNotice
 }) {
   const isDark = theme === 'dark';
+  const t = getTranslations(language);
 
   const [redisPattern, setRedisPattern] = useState('*');
   const [redisKeys, setRedisKeys] = useState([]);
@@ -71,8 +74,8 @@ export default function RedisWorkbenchTab({
         setRedisEditVal(typeof res.value === 'object' ? JSON.stringify(res.value, null, 2) : String(res.value));
       }
     } else {
-      setRedisKeyDetail({ key: keyName, type: 'string', ttl: 3600, value: 'valor demo' });
-      setRedisEditVal('valor demo');
+      setRedisKeyDetail({ key: keyName, type: 'string', ttl: 3600, value: 'demo value' });
+      setRedisEditVal('demo value');
     }
   };
 
@@ -92,304 +95,168 @@ export default function RedisWorkbenchTab({
         type: redisKeyDetail?.type || 'string'
       });
       if (res && res.success) {
-        if (onNotice) onNotice('¡Clave Redis actualizada!');
+        if (onNotice) onNotice(language === 'es' ? '¡Clave Redis actualizada!' : 'Redis key updated!');
         fetchRedisKeys(redisPattern);
       }
     }
   };
 
-  const handleDeleteRedisKey = async (keyName) => {
-    if (!keyName) return;
+  const handleDeleteRedisKey = async (kName) => {
+    if (!kName) return;
     if (window.electronAPI?.db?.redis?.deleteKey) {
-      await window.electronAPI.db.redis.deleteKey(db, keyName);
-      if (onNotice) onNotice(`Clave "${keyName}" eliminada.`);
+      await window.electronAPI.db.redis.deleteKey(db, kName);
+      if (onNotice) onNotice(language === 'es' ? `Clave ${kName} eliminada.` : `Key ${kName} deleted.`);
       setSelectedRedisKey(null);
       setRedisKeyDetail(null);
       fetchRedisKeys(redisPattern);
     }
   };
 
-  const handleFlushDb = async () => {
-    if (!confirm('¿Estás seguro de vaciar toda la base de datos Redis (FLUSHDB)?')) return;
-    if (window.electronAPI?.db?.redis?.flush) {
-      const res = await window.electronAPI.db.redis.flush(db);
-      if (res && res.success) {
-        if (onNotice) onNotice('Base de datos Redis vaciada.');
-        setSelectedRedisKey(null);
-        setRedisKeyDetail(null);
-        fetchRedisKeys('*');
-      }
-    }
-  };
-
-  const handleCreateNewKey = async () => {
+  const handleCreateNewKey = async (e) => {
+    e.preventDefault();
     if (!newKeyName.trim()) return;
     if (window.electronAPI?.db?.redis?.setValue) {
-      let valToSave = newKeyVal;
-      try {
-        if (newKeyType === 'hash' && newKeyVal.startsWith('{')) {
-          valToSave = JSON.parse(newKeyVal);
-        }
-      } catch (e) {}
-
       await window.electronAPI.db.redis.setValue(db, {
         key: newKeyName.trim(),
-        value: valToSave,
+        value: newKeyVal,
         type: newKeyType,
-        ttl: Number(newKeyTtl)
+        ttl: parseInt(newKeyTtl, 10) || -1
       });
       setShowAddModal(false);
       setNewKeyName('');
       setNewKeyVal('');
       fetchRedisKeys(redisPattern);
-      handleSelectKey(newKeyName.trim());
-      if (onNotice) onNotice(`Clave "${newKeyName}" creada con éxito.`);
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-      {/* Top Controls Bar */}
-      <div className={`p-4 border-b flex items-center justify-between gap-3 shrink-0 ${
-        isDark ? 'border-white/[0.08] bg-[#0c0d12]' : 'border-slate-200 bg-white'
+    <div className="space-y-4">
+      {/* Top Search & Filter Bar */}
+      <div className={`p-4 rounded-2xl border flex flex-col md:flex-row items-center justify-between gap-3 ${
+        isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
       }`}>
-        <div className="flex items-center space-x-3 flex-1 max-w-md">
+        <div className="flex items-center space-x-2 w-full md:w-auto flex-1">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="h-4 w-4 absolute left-3 top-3 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar patrón (ej: user:* o *)..."
               value={redisPattern}
               onChange={(e) => setRedisPattern(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && fetchRedisKeys(redisPattern)}
-              className={`w-full pl-9 pr-3 py-2 rounded-xl border text-xs font-mono outline-none ${
-                isDark ? 'bg-[#151822] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
+              placeholder={language === 'es' ? "Filtrar por patrón (ej: session:*, cache:*, *)..." : "Filter by pattern (e.g. session:*, cache:*, *)..."}
+              className={`w-full pl-9 pr-4 py-2 text-xs font-mono rounded-xl border focus:outline-none focus:border-red-500 ${
+                isDark ? 'bg-[#141414] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
               }`}
             />
           </div>
           <button
             onClick={() => fetchRedisKeys(redisPattern)}
-            disabled={isLoadingRedis}
-            className={`p-2 rounded-xl border transition-colors cursor-pointer ${
-              isDark ? 'bg-[#151822] border-white/10 text-slate-300 hover:text-white' : 'bg-slate-50 border-slate-200 text-slate-700'
-            }`}
-            title="Actualizar claves"
+            className="p-2 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-colors cursor-pointer"
+            title={language === 'es' ? 'Recargar claves' : 'Reload keys'}
           >
-            <RefreshCw className={`w-4 h-4 ${isLoadingRedis ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${isLoadingRedis ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nueva Clave</span>
-          </button>
-          <button
-            onClick={handleFlushDb}
-            className="px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 font-bold text-xs flex items-center gap-1.5 cursor-pointer"
-            title="Vaciar base de datos Redis"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>FLUSHDB</span>
-          </button>
-        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="w-full md:w-auto px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-md shadow-red-600/20 cursor-pointer"
+        >
+          <Plus className="h-4 w-4" />
+          <span>{language === 'es' ? 'Nueva Clave' : 'New Key'}</span>
+        </button>
       </div>
 
-      {/* Main Split Content: Keys List (Left) & Key Inspector (Right) */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 min-h-0 overflow-hidden divide-y md:divide-y-0 md:divide-x divide-white/[0.08]">
-        {/* Left: Keys list */}
-        <div className="md:col-span-4 flex flex-col min-h-0 overflow-hidden">
-          <div className="p-3 border-b border-white/[0.08] flex items-center justify-between shrink-0">
-            <span className="text-xs font-mono font-bold text-slate-400 uppercase">
-              Claves ({redisKeys.length})
-            </span>
-            <span className="text-[10px] font-mono text-slate-500">Patrón: {redisPattern}</span>
+      {/* Main Grid: Keys List + Detail Viewer */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Keys Sidebar */}
+        <div className={`lg:col-span-4 border rounded-2xl p-2 max-h-[550px] overflow-y-auto space-y-1.5 custom-scrollbar ${
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
+        }`}>
+          <div className="p-2 flex items-center justify-between text-xs font-mono font-bold text-slate-400 border-b border-white/[0.06] mb-1">
+            <span>{language === 'es' ? 'Claves Redis' : 'Redis Keys'} ({redisKeys.length})</span>
+            <span>Type / TTL</span>
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
-            {redisKeys.map((item) => {
-              const isSelected = item.key === selectedRedisKey;
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => handleSelectKey(item.key)}
-                  className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
-                    isSelected
-                      ? isDark ? 'bg-red-500/15 border-red-500/50 text-white' : 'bg-red-50 border-red-300 text-red-900 font-bold'
-                      : isDark ? 'bg-[#1E1E1E] border-white/[0.06] text-slate-300 hover:text-white hover:bg-[#252525]' : 'bg-white border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="min-w-0 pr-2">
-                    <span className="block text-xs font-mono truncate font-semibold">{item.key}</span>
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {item.ttl > 0 ? `TTL: ${item.ttl}s` : 'Sin expiración'}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-white/10 shrink-0 font-bold">
-                    {item.type}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          {redisKeys.map((k) => (
+            <div
+              key={k.key}
+              onClick={() => handleSelectKey(k.key)}
+              className={`p-3 rounded-xl border text-xs font-mono font-bold cursor-pointer transition-all flex items-center justify-between ${
+                selectedRedisKey === k.key
+                  ? 'bg-red-600/15 border-red-500 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.15)]'
+                  : isDark ? 'bg-[#252525] border-white/[0.06] text-[#E5E5E5] hover:bg-[#303030]' : 'bg-slate-50 border-slate-200 text-slate-700'
+              }`}
+            >
+              <div className="flex items-center space-x-2 truncate">
+                <Key className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                <span className="truncate">{k.key}</span>
+              </div>
+              <div className="flex items-center space-x-1.5 shrink-0 text-[10px]">
+                <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-extrabold uppercase">{k.type || 'str'}</span>
+                <span className="text-slate-400">{k.ttl === -1 ? '∞' : `${k.ttl}s`}</span>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Right: Key Inspector */}
-        <div className="md:col-span-8 flex flex-col min-h-0 overflow-hidden p-5 space-y-4">
-          {redisKeyDetail ? (
-            <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] pb-3 shrink-0">
+        {/* Key Detail Inspector */}
+        <div className={`lg:col-span-8 border rounded-2xl overflow-hidden shadow-sm ${
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
+        }`}>
+          {selectedRedisKey && redisKeyDetail ? (
+            <div className="p-6 space-y-4 text-xs font-mono">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
                 <div>
-                  <div className="flex items-center space-x-2">
-                    <Key className="w-4 h-4 text-red-400" />
-                    <h3 className="font-mono text-sm font-extrabold text-white">{redisKeyDetail.key}</h3>
-                  </div>
-                  <div className="flex items-center space-x-3 text-[11px] font-mono text-slate-400 pt-1">
-                    <span>Tipo: <strong className="uppercase text-slate-200">{redisKeyDetail.type}</strong></span>
-                    <span>TTL: <strong className="text-slate-200">{redisKeyDetail.ttl > 0 ? `${redisKeyDetail.ttl} segundos` : 'Permanente (-1)'}</strong></span>
-                  </div>
+                  <h3 className="text-sm font-extrabold text-white flex items-center space-x-2">
+                    <Key className="h-4 w-4 text-red-400" />
+                    <span>{selectedRedisKey}</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Type: <span className="text-red-400 font-bold uppercase">{redisKeyDetail.type}</span> | TTL: <span className="text-amber-400 font-bold">{redisKeyDetail.ttl === -1 ? 'Persistente (No expira)' : `${redisKeyDetail.ttl} segundos`}</span>
+                  </p>
                 </div>
 
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={handleSaveRedisVal}
-                    className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-600/20 cursor-pointer"
+                    onClick={() => handleDeleteRedisKey(selectedRedisKey)}
+                    className="p-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 cursor-pointer"
+                    title={language === 'es' ? 'Eliminar clave' : 'Delete key'}
                   >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>Guardar Valor</span>
+                    <Trash2 className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => handleDeleteRedisKey(redisKeyDetail.key)}
-                    className="p-1.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 cursor-pointer"
-                    title="Eliminar clave"
+                    onClick={handleSaveRedisVal}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl flex items-center space-x-1.5 shadow-md shadow-red-600/20 cursor-pointer"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Save className="h-3.5 w-3.5" />
+                    <span>{language === 'es' ? 'Guardar Cambios' : 'Save Changes'}</span>
                   </button>
                 </div>
               </div>
 
-              {/* Value Editor */}
-              <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-1.5">
-                <label className="text-xs font-mono font-bold text-slate-400 uppercase">
-                  Contenido / Valor Almacenado:
+              <div className="space-y-1.5">
+                <label className="text-slate-400 font-bold uppercase text-[10px]">
+                  {language === 'es' ? 'Valor almacenado (Payload):' : 'Stored Value (Payload):'}
                 </label>
                 <textarea
+                  rows={10}
                   value={redisEditVal}
                   onChange={(e) => setRedisEditVal(e.target.value)}
-                  className={`flex-1 w-full p-4 rounded-2xl border font-mono text-xs outline-none resize-none ${
-                    isDark ? 'bg-[#1E1E1E] border-white/10 text-emerald-400' : 'bg-slate-50 border-slate-200 text-slate-800'
+                  className={`w-full p-3.5 font-mono text-xs rounded-xl border focus:outline-none focus:border-red-500 custom-scrollbar ${
+                    isDark ? 'bg-[#141414] border-white/[0.08] text-emerald-400' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 />
               </div>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500">
-              <Key className="w-12 h-12 stroke-[1.2] mb-3 text-slate-600" />
-              <h4 className="font-bold text-sm text-slate-400">Selecciona una Clave de Redis</h4>
-              <p className="text-xs max-w-xs mt-1">
-                Explora las claves a la izquierda o utiliza el buscador para inspeccionar y editar sus datos en tiempo real.
-              </p>
+            <div className="py-32 text-center text-xs font-mono text-slate-400">
+              <Key className="h-8 w-8 mx-auto mb-2 text-slate-600" />
+              <span>{language === 'es' ? 'Selecciona una clave de la lista para inspeccionar y editar su contenido' : 'Select a key from the list to inspect and edit its content'}</span>
             </div>
           )}
         </div>
       </div>
-
-      {/* Add Key Modal Dialog */}
-      <AnimatePresence>
-        {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className={`w-full max-w-md p-6 rounded-3xl border shadow-2xl space-y-4 ${
-                isDark ? 'bg-[#151822] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
-              }`}
-            >
-              <div className="flex items-center justify-between border-b pb-3 border-white/5">
-                <h3 className="font-extrabold text-sm">Nueva Clave en Redis</h3>
-                <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-3 font-mono text-xs">
-                <div className="space-y-1">
-                  <label className="text-slate-400 font-bold block">Nombre de Clave (Key):</label>
-                  <input
-                    type="text"
-                    placeholder="ej: cache:usuario_100"
-                    value={newKeyName}
-                    onChange={(e) => setNewKeyName(e.target.value)}
-                    className={`w-full p-2.5 rounded-xl border ${
-                      isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
-                    }`}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-slate-400 font-bold block">Tipo:</label>
-                    <select
-                      value={newKeyType}
-                      onChange={(e) => setNewKeyType(e.target.value)}
-                      className={`w-full p-2.5 rounded-xl border ${
-                        isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
-                      }`}
-                    >
-                      <option value="string">String</option>
-                      <option value="hash">Hash (JSON)</option>
-                    </select>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-slate-400 font-bold block">TTL (segundos):</label>
-                    <input
-                      type="number"
-                      placeholder="-1 (permanente)"
-                      value={newKeyTtl}
-                      onChange={(e) => setNewKeyTtl(e.target.value)}
-                      className={`w-full p-2.5 rounded-xl border ${
-                        isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-slate-400 font-bold block">Valor (Value):</label>
-                  <textarea
-                    rows={4}
-                    placeholder="Valor o JSON..."
-                    value={newKeyVal}
-                    onChange={(e) => setNewKeyVal(e.target.value)}
-                    className={`w-full p-2.5 rounded-xl border text-emerald-400 ${
-                      isDark ? 'bg-[#1E1E1E] border-white/10' : 'bg-slate-50 border-slate-200'
-                    }`}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-2 pt-2">
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleCreateNewKey}
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md"
-                >
-                  Crear Clave
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

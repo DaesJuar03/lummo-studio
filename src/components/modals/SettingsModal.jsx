@@ -49,11 +49,14 @@ export default function SettingsModal({
   });
 
   const handleScanEditors = async () => {
-    if (window.electronAPI?.getDetectedEditors) {
+    const scanFn = window.electronAPI?.detectEditors || window.electronAPI?.getDetectedEditors;
+    if (scanFn) {
       setIsScanningEditors(true);
       try {
-        const editors = await window.electronAPI.getDetectedEditors();
-        setDetectedEditors(editors);
+        const editors = await scanFn();
+        if (Array.isArray(editors)) {
+          setDetectedEditors(editors);
+        }
       } catch (err) {
         console.error('Error al detectar editores:', err);
       } finally {
@@ -182,7 +185,7 @@ export default function SettingsModal({
             </div>
 
             {/* Right Category Details View */}
-            <div className={`flex-1 p-6 overflow-y-auto no-scrollbar space-y-6 ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
+            <div className={`flex-1 p-6 pb-16 overflow-y-auto custom-scrollbar space-y-6 ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
               {activeCategory === 'services' && (
                 <ServicesTab
                   envStatus={envStatus}

@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openInBrowser: (url) => ipcRenderer.invoke('open-in-browser', url),
   openInEditor: (folderPath, editorCmd) => ipcRenderer.invoke('open-in-editor', { folderPath, editorCmd }),
   detectEditors: () => ipcRenderer.invoke('detect-editors'),
+  getDetectedEditors: () => ipcRenderer.invoke('detect-editors'),
   
   // Real Process Telemetry (PID based CPU % and RAM MB)
   getProcessMetrics: (payload) => ipcRenderer.invoke('get-process-metrics', payload),

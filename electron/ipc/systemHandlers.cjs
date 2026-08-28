@@ -4,7 +4,32 @@ const path = require('path');
 const { exec, spawn } = require('child_process');
 const { safeHandle } = require('./ipcUtils.cjs');
 
-const ALLOWED_EDITORS = new Set(['code', 'cursor', 'vscodium', 'subl', 'atom', 'idea', 'webstorm', 'phpstorm', 'notepad', 'explorer']);
+const ALLOWED_EDITORS = new Set(['code', 'cursor', 'windsurf', 'vscodium', 'subl', 'atom', 'idea', 'webstorm', 'phpstorm', 'notepad', 'notepad++', 'explorer']);
+
+const EDITORS_CATALOG = [
+  { id: 'vscode', name: 'Visual Studio Code', cmd: 'code' },
+  { id: 'cursor', name: 'Cursor AI Editor', cmd: 'cursor' },
+  { id: 'windsurf', name: 'Windsurf IDE', cmd: 'windsurf' },
+  { id: 'vscodium', name: 'VSCodium', cmd: 'vscodium' },
+  { id: 'subl', name: 'Sublime Text', cmd: 'subl' },
+  { id: 'webstorm', name: 'JetBrains WebStorm', cmd: 'webstorm' },
+  { id: 'phpstorm', name: 'JetBrains PhpStorm', cmd: 'phpstorm' },
+  { id: 'idea', name: 'JetBrains IntelliJ IDEA', cmd: 'idea' },
+  { id: 'notepad', name: 'Bloc de Notas (Notepad)', cmd: 'notepad' },
+  { id: 'explorer', name: 'Explorador de Archivos', cmd: 'explorer' }
+];
+
+function checkCommandAvailable(cmd) {
+  return new Promise((resolve) => {
+    if (cmd === 'explorer' || cmd === 'notepad') {
+      return resolve(true);
+    }
+    const checkCmd = process.platform === 'win32' ? `where ${cmd}` : `which ${cmd}`;
+    exec(checkCmd, { timeout: 1500 }, (err) => {
+      resolve(!err);
+    });
+  });
+}
 
 function registerSystemHandlers(getMainWindow, appIconPath) {
   safeHandle('window-minimize', (event) => {
@@ -60,22 +85,19 @@ function registerSystemHandlers(getMainWindow, appIconPath) {
   });
 
   safeHandle('detect-editors', async () => {
-    const editors = [];
-    return new Promise((resolve) => {
-      exec('code --version', (err) => {
-        if (!err) editors.push({ id: 'vscode', name: 'Visual Studio Code', command: 'code' });
-        exec('cursor --version', (errCursor) => {
-          if (!errCursor) editors.push({ id: 'cursor', name: 'Cursor', command: 'cursor' });
-          exec('vscodium --version', (errCodium) => {
-            if (!errCodium) editors.push({ id: 'vscodium', name: 'VSCodium', command: 'vscodium' });
-            if (editors.length === 0) {
-              editors.push({ id: 'explorer', name: 'Explorador de Archivos', command: 'explorer' });
-            }
-            resolve(editors);
-          });
-        });
-      });
-    });
+    const results = await Promise.all(
+      EDITORS_CATALOG.map(async (item) => {
+        const isInstalled = await checkCommandAvailable(item.cmd);
+        return {
+          id: item.id,
+          name: item.name,
+          cmd: item.cmd,
+          command: item.cmd,
+          installed: isInstalled
+        };
+      })
+    );
+    return results;
   });
 
   safeHandle('open-in-editor', (event, { folderPath, editorCmd }) => {

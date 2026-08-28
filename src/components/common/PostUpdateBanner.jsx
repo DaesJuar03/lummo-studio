@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, FileText, X, CheckCircle2 } from 'lucide-react';
 
 export default function PostUpdateBanner({
-  version = '2.4.7',
+  version = '2.4.15',
   show,
   onDismiss,
   onOpenChangelog

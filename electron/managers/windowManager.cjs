@@ -155,10 +155,29 @@ function createMainWindow(appIconPath, getIsQuitting, splashWindow = null) {
     Menu.setApplicationMenu(null);
   }
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+  const devUrl = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
+  const htmlPath = getAppHtmlPath();
+
+  if (!app.isPackaged) {
+    // En desarrollo: Conectar a Vite Dev Server con reintento automático
+    mainWindow.loadURL(devUrl).catch(() => {
+      setTimeout(() => {
+        if (!mainWindow.isDestroyed()) {
+          mainWindow.loadURL(devUrl).catch(() => {
+            if (fs.existsSync(htmlPath)) {
+              mainWindow.loadFile(htmlPath);
+            }
+          });
+        }
+      }, 800);
+    });
   } else {
-    mainWindow.loadFile(getAppHtmlPath());
+    // En producción empaquetada: Cargar HTML compilado
+    if (fs.existsSync(htmlPath)) {
+      mainWindow.loadFile(htmlPath);
+    } else if (process.env.VITE_DEV_SERVER_URL) {
+      mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+    }
   }
 
   // Manejo de Splash Screen y revelado fluido de la ventana principal

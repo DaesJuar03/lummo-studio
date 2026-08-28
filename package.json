@@ -8,8 +8,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "electron:dev": "concurrently -k \"vite\" \"electron .\"",
-    "electron:start": "electron .",
+    "electron:dev": "concurrently -k \"vite\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "electron:start": "npm run build && electron .",
     "version:set": "node ./scripts/sync-version.cjs",
     "version:sync": "node ./scripts/sync-version.cjs --sync",
     "prebuild": "node ./scripts/sync-version.cjs --sync",

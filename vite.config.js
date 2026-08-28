@@ -46,7 +46,17 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: true
+    strictPort: true,
+    watch: {
+      ignored: [
+        '**/lummo_databases.json',
+        '**/lummo_projects.json',
+        '**/lummo_local.db*',
+        '**/release/**',
+        '**/dist/**',
+        '**/.git/**'
+      ]
+    }
   },
   test: {
     globals: true,

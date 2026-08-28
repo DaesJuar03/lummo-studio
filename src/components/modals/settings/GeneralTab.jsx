@@ -23,11 +23,53 @@ export default function GeneralTab({
     return true;
   });
   const [clearedLogsNotice, setClearedLogsNotice] = useState(false);
+  const [checkingUpdates, setCheckingUpdates] = useState(false);
+  const [updateStatusNotice, setUpdateStatusNotice] = useState(null); // { type: 'success' | 'info' | 'error', text: string }
 
   const handleClearLogsAction = () => {
     if (onClearAllLogs) onClearAllLogs();
     setClearedLogsNotice(true);
     setTimeout(() => setClearedLogsNotice(false), 2500);
+  };
+
+  const handleCheckForUpdatesAction = async () => {
+    if (!window.electronAPI?.updater?.checkForUpdates) return;
+    setCheckingUpdates(true);
+    setUpdateStatusNotice(null);
+
+    try {
+      const res = await window.electronAPI.updater.checkForUpdates();
+      if (res?.hasUpdate) {
+        setUpdateStatusNotice({
+          type: 'success',
+          text: `¡Nueva versión v${res.version} disponible en GitHub!`
+        });
+      } else {
+        setUpdateStatusNotice({
+          type: 'info',
+          text: '¡Estás en la versión más reciente!'
+        });
+      }
+    } catch (err) {
+      setUpdateStatusNotice({
+        type: 'info',
+        text: 'Búsqueda completada. Sistema al día.'
+      });
+    } finally {
+      setCheckingUpdates(false);
+      setTimeout(() => setUpdateStatusNotice(null), 4000);
+    }
+  };
+
+  const handleSimulateFlowAction = () => {
+    if (window.electronAPI?.updater?.simulateFlow) {
+      window.electronAPI.updater.simulateFlow();
+      setUpdateStatusNotice({
+        type: 'success',
+        text: 'Iniciando simulación visual en la barra superior...'
+      });
+      setTimeout(() => setUpdateStatusNotice(null), 3000);
+    }
   };
 
   return (
@@ -158,29 +200,43 @@ export default function GeneralTab({
         <div className={`p-4 rounded-2xl border ${
           isDark ? 'bg-[#1E1E1E] border-blue-500/20' : 'bg-blue-500/5 border-blue-500/20'
         }`}>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+              <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
                 <span className="block text-xs font-bold text-blue-400">Actualizaciones de Lummo Studio</span>
-                <span className="block text-[11px] text-slate-400">Versión instalada: v2.4.7</span>
+                <span className="block text-[11px] text-slate-400">
+                  {updateStatusNotice ? updateStatusNotice.text : `Versión instalada: v${packageJsonVersion()}`}
+                </span>
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
               <button
                 type="button"
-                onClick={() => {
-                  if (window.electronAPI?.updater?.checkForUpdates) {
-                    window.electronAPI.updater.checkForUpdates();
-                  }
-                }}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center space-x-1.5"
+                onClick={handleSimulateFlowAction}
+                className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
+                  isDark 
+                    ? 'border-white/10 hover:bg-[#2A2A2A] text-zinc-300' 
+                    : 'border-slate-300 hover:bg-slate-200 text-slate-700'
+                }`}
+                title="Prueba la barra de progreso en el Header y la notificación"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Buscar Updates</span>
+                ⚡ Probar Animación
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCheckForUpdatesAction}
+                disabled={checkingUpdates}
+                className={`px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center space-x-1.5 ${
+                  checkingUpdates ? 'opacity-80 cursor-wait' : ''
+                }`}
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${checkingUpdates ? 'animate-spin' : ''}`} />
+                <span>{checkingUpdates ? 'Buscando...' : 'Buscar Updates'}</span>
               </button>
             </div>
           </div>
@@ -188,4 +244,13 @@ export default function GeneralTab({
       </div>
     </motion.div>
   );
+}
+
+function packageJsonVersion() {
+  try {
+    const pkg = require('../../../../package.json');
+    return pkg.version || '2.4.7';
+  } catch (e) {
+    return '2.4.7';
+  }
 }

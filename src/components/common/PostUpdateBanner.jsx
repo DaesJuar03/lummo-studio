@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, FileText, X, CheckCircle2 } from 'lucide-react';
+import { Check, FileText, X, CheckCircle2 } from 'lucide-react';
 
 export default function PostUpdateBanner({
   version = '2.4.7',
@@ -28,7 +28,7 @@ export default function PostUpdateBanner({
           {/* Izquierda: Icono + Mensaje */}
           <div className="relative z-10 flex items-center space-x-3 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0 shadow-inner">
-              <Sparkles className="w-5 h-5 text-blue-400 animate-pulse" />
+              <Check className="w-5 h-5 text-blue-400 stroke-[2.5]" />
             </div>
             
             <div className="truncate">

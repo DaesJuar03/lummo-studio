@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getTranslations, detectSystemLanguage } from '../locales';
 import { useTabNavigation } from '../hooks/useTabNavigation';
 
 export function useLummoState() {
+  const isInitialDbMount = useRef(true);
   // Initialize projects immediately from localStorage
   const [projects, setProjects] = useState(() => {
     try {
@@ -98,6 +99,10 @@ export function useLummoState() {
 
   // Persist custom databases to localStorage and Electron JSON file
   useEffect(() => {
+    if (isInitialDbMount.current) {
+      isInitialDbMount.current = false;
+      return;
+    }
     try {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('lummo-custom-databases', JSON.stringify(customDatabases));

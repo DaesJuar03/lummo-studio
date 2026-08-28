@@ -14,10 +14,12 @@ const { registerDockerHandlers } = require('./ipc/dockerHandlers.cjs');
 const { registerSslHandlers } = require('./ipc/sslHandlers.cjs');
 
 // Modular Window and Tray Managers
-const { createMainWindow, applySecurityPolicies } = require('./managers/windowManager.cjs');
+const { createMainWindow, createSplashScreen, applySecurityPolicies } = require('./managers/windowManager.cjs');
 const { createSystemTray: initSystemTray } = require('./managers/trayManager.cjs');
+const { initUpdateManager } = require('./managers/updateManager.cjs');
 
 let mainWindow = null;
+let splashWindow = null;
 let tray = null;
 let isQuitting = false;
 
@@ -50,7 +52,8 @@ app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
 app.commandLine.appendSwitch('disable-http-cache');
 
 function createWindow() {
-  mainWindow = createMainWindow(appIconPath, () => isQuitting);
+  splashWindow = createSplashScreen(appIconPath);
+  mainWindow = createMainWindow(appIconPath, () => isQuitting, splashWindow);
 }
 
 let updateTrayContextMenu = () => {};
@@ -209,6 +212,7 @@ app.whenReady().then(() => {
   registerDbHandlers(() => mainWindow);
   registerDockerHandlers();
   registerSslHandlers();
+  initUpdateManager(() => mainWindow);
   proxyManager.initProxyServers();
 
   registerApiWebhookHandlers(

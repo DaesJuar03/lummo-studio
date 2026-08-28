@@ -6,7 +6,10 @@ import DatabasesPanel from './components/views/DatabasesPanel';
 import LogsConsole from './components/common/LogsConsole';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import UserErrorModal from './components/modals/UserErrorModal';
+import PostUpdateBanner from './components/common/PostUpdateBanner';
+import ChangelogSheet from './components/common/ChangelogSheet';
 import { useLummoState } from './context/useLummoState';
+import { useAppUpdater } from './hooks/useAppUpdater';
 
 // Code Splitting with React.lazy for heavy modals and detail pages
 const SettingsModal = lazy(() => import('./components/modals/SettingsModal'));
@@ -63,6 +66,8 @@ export default function App() {
     handleUpdatePort,
     handleUpdateCommand
   } = useLummoState();
+
+  const updater = useAppUpdater();
 
   const {
     openTabs,
@@ -151,6 +156,7 @@ export default function App() {
     }`}>
       {/* Header */}
       <Header
+        updater={updater}
         openTabs={openTabs}
         activeTabId={activeTabId}
         onSelectTab={(id) => setActiveTabId(id)}
@@ -169,6 +175,14 @@ export default function App() {
         onDuplicateTab={duplicateTab}
         theme={theme}
         language={language}
+      />
+
+      {/* Notificación Superior al actualizar la versión (Zona Círculo Negro) */}
+      <PostUpdateBanner
+        version={updater.currentVersion}
+        show={updater.showPostUpdateBanner}
+        onDismiss={updater.dismissPostUpdateBanner}
+        onOpenChangelog={updater.openChangelogSheet}
       />
 
       {/* Main Content Pane rendered according to Active Tab */}
@@ -336,6 +350,14 @@ export default function App() {
             theme={theme}
           />
         )}
+
+        {/* Hoja Flotante de Actualización / Novedades (Zona Círculo Rojo) */}
+        <ChangelogSheet
+          show={updater.showChangelogSheet}
+          version={updater.currentVersion}
+          releaseNotes={updater.updateInfo?.releaseNotes}
+          onClose={updater.dismissChangelogSheet}
+        />
       </Suspense>
     </div>
   );

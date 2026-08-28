@@ -27,6 +27,7 @@ esbuild.buildSync({
   outfile: tempBundle,
   external: [
     'electron',
+    'electron-updater',
     'bytenode',
     'mysql2',
     'pg',

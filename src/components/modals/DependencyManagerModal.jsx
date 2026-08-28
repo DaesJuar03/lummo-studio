@@ -78,7 +78,7 @@ export default function DependencyManagerModal({ isOpen, onClose, project }) {
             </div>
           </div>
 
-          <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 h-40 overflow-y-auto space-y-1">
+          <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 h-40 overflow-y-auto custom-scrollbar space-y-1">
             <div className="flex items-center gap-2 text-slate-500 border-b border-slate-800/60 pb-2 mb-2">
               <Terminal className="w-3.5 h-3.5" />
               <span>Consola de Ejecución ({selectedManager})</span>

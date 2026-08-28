@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciando Lummo Studio...</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    body {
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-app-region: drag;
+    }
+
+    .splash-card {
+      width: 440px;
+      height: 290px;
+      background: #141414;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.8), 0 0 40px rgba(59, 130, 246, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Ambient background glow */
+    .glow-sphere {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0) 70%);
+      pointer-events: none;
+    }
+
+    .top-badge {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      padding: 2px 8px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-container {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-glow {
+      position: absolute;
+      inset: -6px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(37, 99, 235, 0.15));
+      filter: blur(12px);
+      animation: pulseGlow 2.5s ease-in-out infinite alternate;
+    }
+
+    .logo-img {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      object-fit: contain;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-section {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-title span {
+      color: #3b82f6;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: #888888;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+
+    .footer-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: #666666;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+      animation: blink 1.4s infinite ease-in-out;
+    }
+
+    /* Minimal Indeterminate Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 3.5px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 45%;
+      background: linear-gradient(90deg, transparent, #3b82f6, #60a5fa, transparent);
+      border-radius: 999px;
+      animation: progressMove 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        opacity: 0.4;
+        transform: scale(0.96);
+      }
+      100% {
+        opacity: 0.9;
+        transform: scale(1.08);
+      }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes progressMove {
+      0% {
+        left: -45%;
+      }
+      100% {
+        left: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-card">
+    <div class="glow-sphere"></div>
+    <div class="top-badge">v2.3.11</div>
+
+    <div class="logo-container">
+      <div class="logo-glow"></div>
+      <img src="Lummo.png" alt="Lummo Studio" class="logo-img" />
+    </div>
+
+    <div class="brand-section">
+      <h1 class="brand-title">Lummo <span>Studio</span></h1>
+      <p class="brand-subtitle">Dev Server & Database Control Panel</p>
+    </div>
+
+    <div class="footer-section">
+      <div class="status-text">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>Iniciando entorno...</span>
+        </div>
+        <span>Listo</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

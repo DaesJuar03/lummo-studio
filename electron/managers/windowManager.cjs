@@ -73,7 +73,56 @@ function getAppHtmlPath() {
   return path.join(app.getAppPath(), 'dist/index.html');
 }
 
-function createMainWindow(appIconPath, getIsQuitting) {
+function getSplashHtmlPath() {
+  const candidates = [
+    path.join(__dirname, '../../public/splash.html'),
+    path.join(__dirname, '../public/splash.html'),
+    path.join(__dirname, '../../dist/splash.html'),
+    path.join(__dirname, '../dist/splash.html'),
+    path.join(app.getAppPath(), 'public/splash.html'),
+    path.join(app.getAppPath(), 'dist/splash.html')
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return path.join(__dirname, '../public/splash.html');
+}
+
+function createSplashScreen(appIconPath) {
+  const resolvedIcon = (appIconPath && fs.existsSync(appIconPath))
+    ? appIconPath
+    : (fs.existsSync(path.join(__dirname, '../public/Lummo.png'))
+        ? path.join(__dirname, '../public/Lummo.png')
+        : path.join(__dirname, '../../public/Lummo.png'));
+
+  const splashWindow = new BrowserWindow({
+    width: 440,
+    height: 290,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    alwaysOnTop: true,
+    center: true,
+    show: true,
+    skipTaskbar: false,
+    icon: resolvedIcon,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      devTools: false
+    }
+  });
+
+  const splashHtml = getSplashHtmlPath();
+  if (fs.existsSync(splashHtml)) {
+    splashWindow.loadFile(splashHtml);
+  }
+
+  return splashWindow;
+}
+
+function createMainWindow(appIconPath, getIsQuitting, splashWindow = null) {
   const resolvedIcon = (appIconPath && fs.existsSync(appIconPath))
     ? appIconPath
     : (fs.existsSync(path.join(__dirname, '../public/Lummo.png'))
@@ -88,6 +137,8 @@ function createMainWindow(appIconPath, getIsQuitting) {
     title: 'Lummo Studio',
     icon: resolvedIcon,
     frame: false,
+    show: false, // Iniciar oculta mientras el Splash Screen está activo
+    backgroundColor: '#141414',
     webPreferences: {
       preload: getPreloadPath(),
       contextIsolation: true,
@@ -110,6 +161,38 @@ function createMainWindow(appIconPath, getIsQuitting) {
     mainWindow.loadFile(getAppHtmlPath());
   }
 
+  // Manejo de Splash Screen y revelado fluido de la ventana principal
+  const startTime = Date.now();
+  const MIN_SPLASH_TIME = 1300; // 1.3s para experiencia visual limpia sin congelar la app
+
+  let hasRevealed = false;
+  const revealMainWindow = () => {
+    if (hasRevealed) return;
+    hasRevealed = true;
+
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
+
+    setTimeout(() => {
+      if (splashWindow && !splashWindow.isDestroyed()) {
+        splashWindow.close();
+      }
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }, remaining);
+  };
+
+  mainWindow.once('ready-to-show', revealMainWindow);
+
+  // Fallback de seguridad por si ready-to-show tarda
+  setTimeout(() => {
+    if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) {
+      revealMainWindow();
+    }
+  }, 4000);
+
   // Minimize to System Tray when closing the main window
   mainWindow.on('close', (event) => {
     if (!getIsQuitting()) {
@@ -124,6 +207,7 @@ function createMainWindow(appIconPath, getIsQuitting) {
 
 module.exports = {
   createMainWindow,
+  createSplashScreen,
   applySecurityPolicies
 };
 

@@ -143,7 +143,7 @@ export default function SettingsModal({
           {/* Modal Body */}
           <div className="flex-1 flex overflow-hidden">
             {/* Left Sidebar Categories */}
-            <div className={`w-64 border-r p-4 space-y-1 shrink-0 ${
+            <div className={`w-64 border-r p-4 space-y-1 shrink-0 overflow-y-auto no-scrollbar ${
               isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50/80 border-slate-200'
             }`}>
               {categories.map((cat) => {
@@ -182,7 +182,7 @@ export default function SettingsModal({
             </div>
 
             {/* Right Category Details View */}
-            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
+            <div className={`flex-1 p-6 overflow-y-auto no-scrollbar space-y-6 ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
               {activeCategory === 'services' && (
                 <ServicesTab
                   envStatus={envStatus}

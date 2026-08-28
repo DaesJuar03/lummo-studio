@@ -169,5 +169,44 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const subscription = (event, value) => callback(value);
     ipcRenderer.on('logs-cleared', subscription);
     return () => ipcRenderer.removeListener('logs-cleared', subscription);
+  },
+
+  // Auto-Updater API
+  updater: {
+    getVersion: () => ipcRenderer.invoke('updater-get-version'),
+    checkForUpdates: () => ipcRenderer.invoke('updater-check-for-updates'),
+    startDownload: () => ipcRenderer.invoke('updater-start-download'),
+    restartAndApply: () => ipcRenderer.invoke('updater-restart-and-apply'),
+    simulateFlow: (payload) => ipcRenderer.invoke('updater-simulate-flow', payload),
+    onUpdateStatus: (callback) => {
+      const subscription = (event, value) => callback(value);
+      ipcRenderer.on('update-status', subscription);
+      return () => ipcRenderer.removeListener('update-status', subscription);
+    },
+    onUpdateAvailable: (callback) => {
+      const subscription = (event, value) => callback(value);
+      ipcRenderer.on('update-available', subscription);
+      return () => ipcRenderer.removeListener('update-available', subscription);
+    },
+    onUpdateNotAvailable: (callback) => {
+      const subscription = (event) => callback();
+      ipcRenderer.on('update-not-available', subscription);
+      return () => ipcRenderer.removeListener('update-not-available', subscription);
+    },
+    onDownloadProgress: (callback) => {
+      const subscription = (event, value) => callback(value);
+      ipcRenderer.on('update-download-progress', subscription);
+      return () => ipcRenderer.removeListener('update-download-progress', subscription);
+    },
+    onUpdateDownloaded: (callback) => {
+      const subscription = (event, value) => callback(value);
+      ipcRenderer.on('update-downloaded', subscription);
+      return () => ipcRenderer.removeListener('update-downloaded', subscription);
+    },
+    onUpdateError: (callback) => {
+      const subscription = (event, value) => callback(value);
+      ipcRenderer.on('update-error', subscription);
+      return () => ipcRenderer.removeListener('update-error', subscription);
+    }
   }
 });

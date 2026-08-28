@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Languages, Moon, Sun, ChevronDown, Trash2, Check } from 'lucide-react';
+import { Languages, Moon, Sun, ChevronDown, Trash2, Check, Sparkles, RefreshCw } from 'lucide-react';
 import { availableLocales } from '../../../locales';
 
 export default function GeneralTab({
@@ -152,6 +152,38 @@ export default function GeneralTab({
           >
             {clearedLogsNotice ? <Check className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
           </button>
+        </div>
+
+        {/* Sección de Actualizaciones del Sistema */}
+        <div className={`p-4 rounded-2xl border ${
+          isDark ? 'bg-[#1E1E1E] border-blue-500/20' : 'bg-blue-500/5 border-blue-500/20'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="block text-xs font-bold text-blue-400">Actualizaciones de Lummo Studio</span>
+                <span className="block text-[11px] text-slate-400">Versión instalada: v2.3.11</span>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.electronAPI?.updater?.checkForUpdates) {
+                    window.electronAPI.updater.checkForUpdates();
+                  }
+                }}
+                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center space-x-1.5"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Buscar Updates</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>

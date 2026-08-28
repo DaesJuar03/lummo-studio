@@ -15,8 +15,10 @@ import {
   FolderX
 } from 'lucide-react';
 import { getTranslations } from '../../locales';
+import HeaderUpdateWidget from './HeaderUpdateWidget';
 
 export default function Header({
+  updater,
   openTabs = [],
   activeTabId = 'home',
   onSelectTab,
@@ -173,6 +175,17 @@ export default function Header({
 
         {/* Right Controls */}
         <div className="flex items-center shrink-0 h-full" style={{ WebkitAppRegion: 'no-drag' }}>
+          {/* Widget / Botón de Actualización (Descargando o Listo para reiniciar) */}
+          {updater && (
+            <HeaderUpdateWidget
+              status={updater.status}
+              progress={updater.progress}
+              updateInfo={updater.updateInfo}
+              onRestartAndApply={updater.handleRestartAndApply}
+              isDark={isDark}
+            />
+          )}
+
           <button
             onClick={onOpenSettings}
             className={`mr-2 px-2.5 py-1 rounded-lg border border-transparent transition-all flex items-center space-x-1.5 text-xs font-bold cursor-pointer ${

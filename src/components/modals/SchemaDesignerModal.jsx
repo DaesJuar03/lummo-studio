@@ -144,7 +144,7 @@ export default function SchemaDesignerModal({ isOpen, onClose, tableName: initia
           {/* Layout Content */}
           <div className="flex-1 flex overflow-hidden">
             {/* Left: Column Builder */}
-            <div className={`w-1/2 p-5 space-y-4 overflow-y-auto border-r ${
+            <div className={`w-1/2 p-5 space-y-4 overflow-y-auto custom-scrollbar border-r ${
               isDark ? 'border-[#27272a]' : 'border-slate-200'
             }`}>
               <div className="space-y-1">

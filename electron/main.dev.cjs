@@ -204,16 +204,12 @@ function openApiHubWindow({ projectId, projectName, port = 3000, projectPath = '
 }
 
 app.whenReady().then(() => {
-  createWindow();
-  createSystemTray();
-
-  // Register Modular IPC Handlers
+  // 1. Register Modular IPC Handlers FIRST before window loads
   registerSystemHandlers(() => mainWindow, appIconPath);
   registerDbHandlers(() => mainWindow);
   registerDockerHandlers();
   registerSslHandlers();
   initUpdateManager(() => mainWindow);
-  proxyManager.initProxyServers();
 
   registerApiWebhookHandlers(
     () => mainWindow,
@@ -278,6 +274,12 @@ app.whenReady().then(() => {
     openLogWindow,
     openApiHubWindow
   });
+
+  proxyManager.initProxyServers();
+  createSystemTray();
+
+  // 2. Create Window once all handlers are listening
+  createWindow();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

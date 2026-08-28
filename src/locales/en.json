@@ -6,7 +6,7 @@
     "badge": "EN"
   },
   "translations": {
-    "appVersion": "v2.3.12",
+    "appVersion": "v2.4.7",
     "home": "Home",
     "projects": "Projects",
     "databases": "Databases",
@@ -34,7 +34,7 @@
     "noItemsDesc": "Use the launchers on the left to add your first projects or databases.",
     "baseDeDatos": "Database",
     "settingsTitle": "Settings & Preferences",
-    "settingsDesc": "Global configuration for Lummo Studio v2.3.12",
+    "settingsDesc": "Global configuration for Lummo Studio v2.4.7",
     "systemServices": "System Services",
     "defaultPorts": "Default Ports",
     "codeEditorTab": "Code Editor",

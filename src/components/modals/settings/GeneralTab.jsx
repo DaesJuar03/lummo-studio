@@ -165,7 +165,7 @@ export default function GeneralTab({
               </div>
               <div>
                 <span className="block text-xs font-bold text-blue-400">Actualizaciones de Lummo Studio</span>
-                <span className="block text-[11px] text-slate-400">Versión instalada: v2.3.12</span>
+                <span className="block text-[11px] text-slate-400">Versión instalada: v2.4.7</span>
               </div>
             </div>
 

@@ -1,4 +1,4 @@
-const { Tray, Menu, shell } = require('electron');
+const { app, Tray, Menu, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 

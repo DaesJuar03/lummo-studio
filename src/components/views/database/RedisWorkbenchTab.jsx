@@ -219,7 +219,7 @@ export default function RedisWorkbenchTab({
                   className={`w-full p-2.5 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
                     isSelected
                       ? isDark ? 'bg-red-500/15 border-red-500/50 text-white' : 'bg-red-50 border-red-300 text-red-900 font-bold'
-                      : isDark ? 'bg-[#12141F] border-white/[0.06] text-slate-300 hover:text-white hover:bg-[#181B28]' : 'bg-white border-slate-200 hover:bg-slate-50'
+                      : isDark ? 'bg-[#1E1E1E] border-white/[0.06] text-slate-300 hover:text-white hover:bg-[#252525]' : 'bg-white border-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   <div className="min-w-0 pr-2">
@@ -280,7 +280,7 @@ export default function RedisWorkbenchTab({
                   value={redisEditVal}
                   onChange={(e) => setRedisEditVal(e.target.value)}
                   className={`flex-1 w-full p-4 rounded-2xl border font-mono text-xs outline-none resize-none ${
-                    isDark ? 'bg-[#12141F] border-white/10 text-emerald-400' : 'bg-slate-50 border-slate-200 text-slate-800'
+                    isDark ? 'bg-[#1E1E1E] border-white/10 text-emerald-400' : 'bg-slate-50 border-slate-200 text-slate-800'
                   }`}
                 />
               </div>
@@ -325,7 +325,7 @@ export default function RedisWorkbenchTab({
                     value={newKeyName}
                     onChange={(e) => setNewKeyName(e.target.value)}
                     className={`w-full p-2.5 rounded-xl border ${
-                      isDark ? 'bg-[#12141F] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
+                      isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
                     }`}
                   />
                 </div>
@@ -337,7 +337,7 @@ export default function RedisWorkbenchTab({
                       value={newKeyType}
                       onChange={(e) => setNewKeyType(e.target.value)}
                       className={`w-full p-2.5 rounded-xl border ${
-                        isDark ? 'bg-[#12141F] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     >
                       <option value="string">String</option>
@@ -352,7 +352,7 @@ export default function RedisWorkbenchTab({
                       value={newKeyTtl}
                       onChange={(e) => setNewKeyTtl(e.target.value)}
                       className={`w-full p-2.5 rounded-xl border ${
-                        isDark ? 'bg-[#12141F] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     />
                   </div>
@@ -366,7 +366,7 @@ export default function RedisWorkbenchTab({
                     value={newKeyVal}
                     onChange={(e) => setNewKeyVal(e.target.value)}
                     className={`w-full p-2.5 rounded-xl border text-emerald-400 ${
-                      isDark ? 'bg-[#12141F] border-white/10' : 'bg-slate-50 border-slate-200'
+                      isDark ? 'bg-[#1E1E1E] border-white/10' : 'bg-slate-50 border-slate-200'
                     }`}
                   />
                 </div>

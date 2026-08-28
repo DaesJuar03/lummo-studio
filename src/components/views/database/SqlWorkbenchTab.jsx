@@ -145,7 +145,7 @@ export default function SqlWorkbenchTab({
           className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
             activeSubTab === 'tables'
               ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.25)]'
-              : isDark ? 'text-slate-400 hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900'
+              : isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Table className="h-3.5 w-3.5" />
@@ -157,7 +157,7 @@ export default function SqlWorkbenchTab({
           className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
             activeSubTab === 'query'
               ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(59,130,246,0.25)]'
-              : isDark ? 'text-slate-400 hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900'
+              : isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           <Code className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ export default function SqlWorkbenchTab({
             </div>
 
             <div className={`border rounded-2xl p-2 max-h-[500px] overflow-y-auto space-y-1 custom-scrollbar ${
-              isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+              isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
             }`}>
               {tablesList.map(t => (
                 <div
@@ -193,7 +193,7 @@ export default function SqlWorkbenchTab({
                   className={`p-2.5 rounded-xl border text-xs font-mono font-bold cursor-pointer transition-all flex items-center justify-between ${
                     selectedTable === t
                       ? 'bg-blue-600/15 border-blue-500 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.15)]'
-                      : isDark ? 'bg-[#181B28] border-white/[0.06] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.12]' : 'bg-slate-50 border-slate-200 text-slate-700'
+                      : isDark ? 'bg-[#252525] border-white/[0.06] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.12]' : 'bg-slate-50 border-slate-200 text-slate-700'
                   }`}
                 >
                   <span className="truncate">{t}</span>
@@ -205,10 +205,10 @@ export default function SqlWorkbenchTab({
 
           {/* Table Data Grid */}
           <div className={`lg:col-span-9 border rounded-2xl overflow-hidden shadow-sm ${
-            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
           }`}>
             <div className={`p-4 border-b flex items-center justify-between ${
-              isDark ? 'bg-[#0D0E15] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+              isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
             }`}>
               <div className="flex items-center space-x-2">
                 <Table className="h-4 w-4 text-blue-400" />
@@ -235,7 +235,7 @@ export default function SqlWorkbenchTab({
               ) : (
                 <table className="w-full text-xs font-mono text-left border-collapse">
                   <thead>
-                    <tr className={`border-b ${isDark ? 'bg-[#090A0F] border-white/[0.08] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'}`}>
+                    <tr className={`border-b ${isDark ? 'bg-[#141414] border-white/[0.08] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'}`}>
                       {tableColumns.map(col => (
                         <th
                           key={col}
@@ -259,7 +259,7 @@ export default function SqlWorkbenchTab({
                       <tr
                         key={rIdx}
                         className={`border-b transition-colors ${
-                          isDark ? 'border-white/[0.06] hover:bg-[#181B28]' : 'border-slate-200 hover:bg-slate-50'
+                          isDark ? 'border-white/[0.06] hover:bg-[#252525]' : 'border-slate-200 hover:bg-slate-50'
                         }`}
                       >
                         {tableColumns.map(col => {
@@ -283,7 +283,7 @@ export default function SqlWorkbenchTab({
                                     if (e.key === 'Enter') handleSaveCellEdit(rIdx, col, val);
                                     if (e.key === 'Escape') setEditingCell(null);
                                   }}
-                                  className="w-full px-1.5 py-0.5 rounded bg-[#090A0F] border border-blue-500 text-white font-mono text-xs focus:outline-none shadow-[0_0_10px_rgba(59,130,246,0.25)]"
+                                  className="w-full px-1.5 py-0.5 rounded bg-[#141414] border border-blue-500 text-white font-mono text-xs focus:outline-none shadow-[0_0_10px_rgba(59,130,246,0.25)]"
                                 />
                               ) : (
                                 <span className={val === null ? 'text-slate-600 italic' : ''}>
@@ -302,7 +302,7 @@ export default function SqlWorkbenchTab({
 
             {/* Pagination Footer */}
             <div className={`p-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono ${
-              isDark ? 'bg-[#0D0E15] border-white/[0.08] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
+              isDark ? 'bg-[#141414] border-white/[0.08] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
             }`}>
               <div className="flex items-center space-x-2">
                 <span>Filas por página:</span>
@@ -313,7 +313,7 @@ export default function SqlWorkbenchTab({
                     setCurrentPage(1);
                   }}
                   className={`px-2 py-1 rounded-lg border font-mono font-bold focus:outline-none transition-all ${
-                    isDark ? 'bg-[#181B28] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300'
+                    isDark ? 'bg-[#252525] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300'
                   }`}
                 >
                   <option value={25}>25</option>
@@ -332,7 +332,7 @@ export default function SqlWorkbenchTab({
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage <= 1}
                     className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors cursor-pointer ${
-                      isDark ? 'bg-[#181B28] border-white/[0.08] text-white hover:bg-[#1E2235]' : 'bg-white border-slate-300'
+                      isDark ? 'bg-[#252525] border-white/[0.08] text-white hover:bg-[#303030]' : 'bg-white border-slate-300'
                     }`}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -341,7 +341,7 @@ export default function SqlWorkbenchTab({
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage >= totalPages}
                     className={`p-1.5 rounded-lg border disabled:opacity-30 transition-colors cursor-pointer ${
-                      isDark ? 'bg-[#181B28] border-white/[0.08] text-white hover:bg-[#1E2235]' : 'bg-white border-slate-300'
+                      isDark ? 'bg-[#252525] border-white/[0.08] text-white hover:bg-[#303030]' : 'bg-white border-slate-300'
                     }`}
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -355,7 +355,7 @@ export default function SqlWorkbenchTab({
 
       {activeSubTab === 'query' && (
         <div className={`p-6 border rounded-2xl space-y-4 ${
-          isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -374,7 +374,7 @@ export default function SqlWorkbenchTab({
               onChange={(e) => setQuery(e.target.value)}
               placeholder="SELECT * FROM users;"
               className={`w-full p-3.5 font-mono text-xs rounded-xl border focus:outline-none transition-all ${
-                isDark ? 'bg-[#090A0F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
+                isDark ? 'bg-[#141414] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
               }`}
             />
           </div>

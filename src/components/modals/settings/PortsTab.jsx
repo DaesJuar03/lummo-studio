@@ -13,25 +13,25 @@ export default function PortsTab({ theme, t }) {
 
       <div className="space-y-3 font-mono text-xs">
         <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
-          isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5]' : 'bg-slate-50 border-slate-200'
         }`}>
           <span>Vite / React Dev Server</span>
           <span className="font-bold text-blue-400">:5173</span>
         </div>
         <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
-          isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5]' : 'bg-slate-50 border-slate-200'
         }`}>
           <span>Next.js App Router</span>
           <span className="font-bold text-blue-400">:3000</span>
         </div>
         <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
-          isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5]' : 'bg-slate-50 border-slate-200'
         }`}>
           <span>Express / Node API</span>
           <span className="font-bold text-blue-400">:8080</span>
         </div>
         <div className={`flex items-center justify-between p-3.5 rounded-xl border ${
-          isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-50 border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5]' : 'bg-slate-50 border-slate-200'
         }`}>
           <span>PHP Artisan Serve</span>
           <span className="font-bold text-blue-400">:8000</span>

@@ -15,6 +15,7 @@ const NewTabActionModal = lazy(() => import('./components/modals/NewTabActionMod
 const ImportProjectModal = lazy(() => import('./components/modals/ImportProjectModal'));
 const OnboardingWizard = lazy(() => import('./components/views/OnboardingWizard'));
 const StandaloneLogWindow = lazy(() => import('./components/views/StandaloneLogWindow'));
+const StandaloneApiHubWindow = lazy(() => import('./components/views/StandaloneApiHubWindow'));
 const ProjectDetailPage = lazy(() => import('./components/views/ProjectDetailPage'));
 const DatabaseDetailPage = lazy(() => import('./components/views/DatabaseDetailPage'));
 
@@ -86,7 +87,32 @@ export default function App() {
     const searchParams = new URLSearchParams(hash.split('?')[1] || '');
     const projectName = searchParams.get('name') || 'Terminal Logs';
 
-    return <StandaloneLogWindow projectId={projectId} projectName={projectName} />;
+    return (
+      <Suspense fallback={<div className="h-screen bg-[#141414]" />}>
+        <StandaloneLogWindow projectId={projectId} projectName={projectName} />
+      </Suspense>
+    );
+  }
+
+  // Check Hash for Standalone API & Webhook Hub route: #/api-hub/{projectId}
+  if (hash.startsWith('#/api-hub/')) {
+    const projectId = hash.replace('#/api-hub/', '').split('?')[0];
+    const searchParams = new URLSearchParams(hash.split('?')[1] || '');
+    const projectName = searchParams.get('name') || 'API & Webhooks';
+    const port = Number(searchParams.get('port')) || 3000;
+    const projectPath = searchParams.get('path') || '';
+
+    return (
+      <Suspense fallback={<div className="h-screen bg-[#141414]" />}>
+        <StandaloneApiHubWindow
+          projectId={projectId}
+          projectName={projectName}
+          port={port}
+          projectPath={projectPath}
+          theme={theme}
+        />
+      </Suspense>
+    );
   }
 
   const runningCount = projects.filter(p => p.status === 'RUNNING').length;
@@ -121,7 +147,7 @@ export default function App() {
 
   return (
     <div className={`h-screen w-screen flex flex-col font-sans overflow-hidden transition-colors duration-200 ${
-      theme === 'dark' ? 'bg-[#0d0e11] text-[#e6e8ec]' : 'bg-slate-50 text-slate-900'
+      theme === 'dark' ? 'bg-[#141414] text-[#E5E5E5]' : 'bg-slate-50 text-slate-900'
     }`}>
       {/* Header */}
       <Header

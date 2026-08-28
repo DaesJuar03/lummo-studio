@@ -52,10 +52,10 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
   const bottomPadding = Math.max(0, (totalCount - endIndex) * rowHeight);
 
   return (
-    <div className={`rounded-2xl border overflow-hidden ${isDark ? 'border-white/[0.08] bg-[#0D0E15]' : 'border-slate-200 bg-slate-50/50'}`}>
+    <div className={`rounded-2xl border overflow-hidden ${isDark ? 'border-white/[0.08] bg-[#141414]' : 'border-slate-200 bg-slate-50/50'}`}>
       {/* Quick Filter Header */}
       <div className={`px-4 py-2 border-b flex items-center justify-between gap-3 text-xs font-mono min-h-[44px] ${
-        isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-100/80 border-slate-200'
+        isDark ? 'bg-[#181818] border-white/[0.08]' : 'bg-slate-100/80 border-slate-200'
       }`}>
         <div className="flex items-center flex-1 max-w-md">
           <AnimatePresence mode="wait">
@@ -73,7 +73,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                 }}
                 className={`p-2 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
                   isDark
-                    ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:text-white hover:border-blue-500/50 shadow-xs'
+                    ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:text-white hover:border-blue-500/50 shadow-xs'
                     : 'bg-white border-slate-300 text-slate-700 hover:text-slate-900 hover:border-blue-500 shadow-xs'
                 }`}
               >
@@ -88,7 +88,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                 transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-mono w-full ${
                   isDark
-                    ? 'bg-[#12141F] border-blue-500/60 text-slate-200 shadow-sm shadow-blue-500/10'
+                    ? 'bg-[#1E1E1E] border-blue-500/60 text-slate-200 shadow-sm shadow-blue-500/10'
                     : 'bg-white border-blue-500 text-slate-900 shadow-sm'
                 }`}
               >
@@ -107,7 +107,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
                     setIsExpanded(false);
                   }}
                   className={`p-1 rounded-lg transition-colors shrink-0 cursor-pointer ${
-                    isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                    isDark ? 'text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                   title="Cerrar búsqueda"
                 >
@@ -130,7 +130,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
       >
         <table className="w-full text-left text-xs font-mono">
           <thead className={`sticky top-0 z-10 border-b text-[11px] uppercase ${
-            isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
           }`}>
             <tr>
               <th className="px-3 py-3 w-12 text-center text-slate-400">#</th>
@@ -149,7 +149,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
               <tr 
                 key={originalIndex} 
                 style={{ height: `${rowHeight}px` }}
-                className={isDark ? 'hover:bg-[#181B28] group transition-colors' : 'hover:bg-white group transition-colors'}
+                className={isDark ? 'hover:bg-[#252525] group transition-colors' : 'hover:bg-white group transition-colors'}
               >
                 <td className="px-2 py-2 text-center text-[10px] text-slate-400 font-mono select-none">
                   {onDeleteRow ? (
@@ -184,7 +184,7 @@ export default function VirtualizedTable({ rows, isDark, containerHeight = 420, 
         </table>
       </div>
       <div className={`px-4 py-2 border-t text-[10px] font-mono flex items-center justify-between ${
-        isDark ? 'border-white/[0.08] bg-[#090A0F] text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-600'
+        isDark ? 'border-white/[0.08] bg-[#181818] text-slate-400' : 'border-slate-200 bg-slate-100 text-slate-600'
       }`}>
         <span>Total: {totalCount} fila(s)</span>
         <span>Mostrando filas {startIndex + 1} - {Math.min(totalCount, endIndex)} (Virtualizado)</span>

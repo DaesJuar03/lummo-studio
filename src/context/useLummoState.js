@@ -3,7 +3,18 @@ import { getTranslations, detectSystemLanguage } from '../locales';
 import { useTabNavigation } from '../hooks/useTabNavigation';
 
 export function useLummoState() {
-  const [projects, setProjects] = useState([]);
+  // Initialize projects immediately from localStorage
+  const [projects, setProjects] = useState(() => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem('lummo-projects');
+        return saved ? JSON.parse(saved) : [];
+      }
+    } catch {
+      return [];
+    }
+    return [];
+  });
   const [envStatus, setEnvStatus] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [logs, setLogs] = useState({});
@@ -85,7 +96,7 @@ export function useLummoState() {
     } catch {}
   }, [theme]);
 
-  // Persist custom databases
+  // Persist custom databases to localStorage and Electron JSON file
   useEffect(() => {
     try {
       if (typeof localStorage !== 'undefined') {
@@ -94,7 +105,24 @@ export function useLummoState() {
     } catch (e) {
       console.error(e);
     }
+    if (window.electronAPI?.saveCustomDatabases) {
+      window.electronAPI.saveCustomDatabases(customDatabases).catch(console.error);
+    }
   }, [customDatabases]);
+
+  // Initial load of custom databases from disk if available
+  useEffect(() => {
+    if (window.electronAPI?.getCustomDatabases) {
+      window.electronAPI.getCustomDatabases().then(dbs => {
+        if (Array.isArray(dbs) && dbs.length > 0) {
+          setCustomDatabases(dbs);
+          try {
+            localStorage.setItem('lummo-custom-databases', JSON.stringify(dbs));
+          } catch {}
+        }
+      }).catch(console.error);
+    }
+  }, []);
 
   // Global Error Listener
   useEffect(() => {
@@ -158,14 +186,42 @@ export function useLummoState() {
   }, []);
 
   const loadRecentProjects = useCallback(async () => {
+    let loadedProjects = [];
+
+    // 1. Try reading from Electron JSON persistence
     if (window.electronAPI?.getRecentProjects) {
-      const recents = await window.electronAPI.getRecentProjects();
-      if (Array.isArray(recents) && recents.length > 0) {
-        setProjects(recents);
-        try {
-          localStorage.setItem('lummo-projects', JSON.stringify(recents));
-        } catch (_e) {}
+      try {
+        const recents = await window.electronAPI.getRecentProjects();
+        if (Array.isArray(recents) && recents.length > 0) {
+          loadedProjects = recents;
+        }
+      } catch (err) {
+        console.error('Error cargando proyectos desde persistencia Electron:', err);
       }
+    }
+
+    // 2. Fallback to localStorage if Electron had no projects saved yet
+    if (loadedProjects.length === 0) {
+      try {
+        const saved = localStorage.getItem('lummo-projects');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            loadedProjects = parsed;
+            // Synchronize back to Electron disk JSON file
+            if (window.electronAPI?.saveRecentProjects) {
+              window.electronAPI.saveRecentProjects(parsed);
+            }
+          }
+        }
+      } catch {}
+    }
+
+    if (loadedProjects.length > 0) {
+      setProjects(loadedProjects);
+      try {
+        localStorage.setItem('lummo-projects', JSON.stringify(loadedProjects));
+      } catch {}
     }
   }, []);
 
@@ -177,7 +233,11 @@ export function useLummoState() {
       console.error(e);
     }
     if (window.electronAPI?.saveRecentProjects) {
-      await window.electronAPI.saveRecentProjects(updatedProjects);
+      try {
+        await window.electronAPI.saveRecentProjects(updatedProjects);
+      } catch (e) {
+        console.error('Error guardando proyectos en archivo JSON:', e);
+      }
     }
   }, []);
 

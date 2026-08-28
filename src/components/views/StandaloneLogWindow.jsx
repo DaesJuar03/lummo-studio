@@ -148,7 +148,7 @@ export default function StandaloneLogWindow({ projectId, projectName }) {
       </div>
 
       {/* Terminal Output Body in Studio Dark Slate */}
-      <div className="flex-1 p-5 overflow-y-auto space-y-1.5 bg-[#080b11] font-mono text-xs leading-relaxed">
+      <div className="flex-1 p-5 overflow-y-auto space-y-1.5 bg-[#141414] font-mono text-xs leading-relaxed">
         {filteredLogs.length === 0 ? (
           <div className="p-8 text-center text-slate-600 italic">
             Esperando mensajes de consola para el proyecto...

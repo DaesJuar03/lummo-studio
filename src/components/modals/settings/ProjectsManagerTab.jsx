@@ -135,7 +135,7 @@ export default function ProjectsManagerTab({
         {/* Quick Stats Pills */}
         <div className="flex items-center gap-2 text-xs font-mono shrink-0">
           <span className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 font-bold ${
-            isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
           }`}>
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>{activeProjects.length} Activos</span>
@@ -144,7 +144,7 @@ export default function ProjectsManagerTab({
           <span className={`px-2.5 py-1 rounded-xl border flex items-center gap-1.5 font-bold ${
             archivedProjects.length > 0
               ? isDark ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-amber-50 border-amber-200 text-amber-800'
-              : isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
+              : isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-500'
           }`}>
             <span className={`w-2 h-2 rounded-full ${archivedProjects.length > 0 ? 'bg-amber-500' : 'bg-slate-400'}`}></span>
             <span>{archivedProjects.length} Archivados</span>
@@ -168,14 +168,14 @@ export default function ProjectsManagerTab({
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Subtabs Filter */}
         <div className={`p-1 rounded-2xl border flex items-center space-x-1 shrink-0 ${
-          isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+          isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
         }`}>
           <button
             type="button"
             onClick={() => { setProjectsFilter('active'); setSelectedProjectIds(new Set()); }}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               projectsFilter === 'active'
-                ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                ? isDark ? 'bg-[#252525] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
                 : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -190,7 +190,7 @@ export default function ProjectsManagerTab({
             onClick={() => { setProjectsFilter('archived'); setSelectedProjectIds(new Set()); }}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               projectsFilter === 'archived'
-                ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                ? isDark ? 'bg-[#252525] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
                 : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -209,7 +209,7 @@ export default function ProjectsManagerTab({
             onClick={() => { setProjectsFilter('all'); setSelectedProjectIds(new Set()); }}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               projectsFilter === 'all'
-                ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                ? isDark ? 'bg-[#252525] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
                 : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -230,7 +230,7 @@ export default function ProjectsManagerTab({
             onChange={(e) => setProjectSearch(e.target.value)}
             className={`w-full pl-8.5 pr-3 py-1.5 rounded-2xl border text-xs outline-none transition-all ${
               isDark 
-                ? 'bg-[#12141F] border-white/[0.08] text-white placeholder-slate-500 focus:border-blue-500' 
+                ? 'bg-[#1E1E1E] border-white/[0.08] text-white placeholder-slate-500 focus:border-blue-500' 
                 : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500'
             }`}
           />
@@ -250,8 +250,8 @@ export default function ProjectsManagerTab({
       {filteredProjectsList.length > 0 && (
         <div className={`p-2.5 rounded-2xl border flex flex-wrap items-center justify-between gap-2 text-xs ${
           selectedProjectIds.size > 0
-            ? isDark ? 'bg-[#181B28] border-blue-500/40 ring-1 ring-blue-500/20' : 'bg-blue-50/80 border-blue-200'
-            : isDark ? 'bg-[#090A0F] border-white/[0.06]' : 'bg-slate-50 border-slate-200'
+            ? isDark ? 'bg-[#252525] border-blue-500/40 ring-1 ring-blue-500/20' : 'bg-blue-50/80 border-blue-200'
+            : isDark ? 'bg-[#141414] border-white/[0.06]' : 'bg-slate-50 border-slate-200'
         }`}>
           <div className="flex items-center space-x-2">
             <button
@@ -266,7 +266,7 @@ export default function ProjectsManagerTab({
               className={`px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 font-bold ${
                 selectedProjectIds.size === filteredProjectsList.length && filteredProjectsList.length > 0
                   ? 'bg-blue-600 text-white border-blue-500'
-                  : isDark ? 'border-white/[0.15] bg-[#12141F] text-slate-300' : 'border-slate-300 bg-white text-slate-700'
+                  : isDark ? 'border-white/[0.15] bg-[#1E1E1E] text-slate-300' : 'border-slate-300 bg-white text-slate-700'
               }`}
             >
               {selectedProjectIds.size === filteredProjectsList.length && filteredProjectsList.length > 0 ? (
@@ -334,7 +334,7 @@ export default function ProjectsManagerTab({
       <div className="max-h-[320px] overflow-y-auto custom-scrollbar space-y-2.5 pr-1">
         {filteredProjectsList.length === 0 ? (
           <div className={`p-10 text-center rounded-3xl border space-y-3 ${
-            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto border border-blue-500/20">
               {projectsFilter === 'archived' ? <Archive className="h-6 w-6" /> : <FolderKanban className="h-6 w-6" />}
@@ -367,10 +367,10 @@ export default function ProjectsManagerTab({
                 className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                   isSelected
                     ? isDark 
-                      ? 'bg-[#181B28] border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/30' 
+                      ? 'bg-[#252525] border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.15)] ring-1 ring-blue-500/30' 
                       : 'bg-blue-50/80 border-blue-400'
                     : isDark 
-                      ? 'bg-[#12141F] border-white/[0.08] hover:border-white/[0.16]' 
+                      ? 'bg-[#1E1E1E] border-white/[0.08] hover:border-white/[0.16]' 
                       : 'bg-white border-slate-200 hover:border-slate-300'
                 }`}
               >
@@ -382,7 +382,7 @@ export default function ProjectsManagerTab({
                     className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all cursor-pointer shrink-0 ${
                       isSelected
                         ? 'bg-blue-600 border-blue-500 text-white'
-                        : isDark ? 'border-white/[0.2] bg-[#090A0F] hover:border-white/[0.4]' : 'border-slate-300 bg-slate-50'
+                        : isDark ? 'border-white/[0.2] bg-[#141414] hover:border-white/[0.4]' : 'border-slate-300 bg-slate-50'
                     }`}
                   >
                     {isSelected && <Check className="h-3.5 w-3.5 stroke-[3]" />}
@@ -395,7 +395,7 @@ export default function ProjectsManagerTab({
                       onClick={() => handleMoveProject(masterIndex, 'up')}
                       title="Mover arriba"
                       className={`p-0.5 rounded transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed ${
-                        isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700'
+                        isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-400 hover:text-slate-700'
                       }`}
                     >
                       <ChevronUp className="h-3.5 w-3.5" />
@@ -406,7 +406,7 @@ export default function ProjectsManagerTab({
                       onClick={() => handleMoveProject(masterIndex, 'down')}
                       title="Mover abajo"
                       className={`p-0.5 rounded transition-colors cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed ${
-                        isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700'
+                        isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-400 hover:text-slate-700'
                       }`}
                     >
                       <ChevronDown className="h-3.5 w-3.5" />
@@ -433,7 +433,7 @@ export default function ProjectsManagerTab({
 
                       {project.port && (
                         <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md border ${
-                          isDark ? 'bg-[#090A0F] border-white/[0.08] text-blue-400' : 'bg-slate-100 border-slate-200 text-blue-600'
+                          isDark ? 'bg-[#141414] border-white/[0.08] text-blue-400' : 'bg-slate-100 border-slate-200 text-blue-600'
                         }`}>
                           :{project.port}
                         </span>
@@ -474,7 +474,7 @@ export default function ProjectsManagerTab({
                     type="button"
                     onClick={() => onOpenFolder && onOpenFolder(project.path)}
                     className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                      isDark ? 'border-white/[0.08] bg-[#181B28] text-slate-300 hover:text-white hover:bg-[#1E2235]' : 'border-slate-200 bg-slate-50 text-slate-600 hover:text-slate-900'
+                      isDark ? 'border-white/[0.08] bg-[#252525] text-slate-300 hover:text-white hover:bg-[#303030]' : 'border-slate-200 bg-slate-50 text-slate-600 hover:text-slate-900'
                     }`}
                     title="Abrir carpeta en el Explorador de Windows"
                   >

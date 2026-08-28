@@ -107,7 +107,7 @@ export default function DatabasesPanel({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 font-sans transition-all ${
-              isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6] placeholder-slate-500' : 'bg-white border-slate-200 text-slate-800'
+              isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5] placeholder-slate-500' : 'bg-white border-slate-200 text-slate-800'
             }`}
           />
         </div>
@@ -120,7 +120,7 @@ export default function DatabasesPanel({
         </span>
         {installedDatabases.length === 0 ? (
           <div className={`p-12 text-center rounded-2xl border space-y-4 ${
-            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
           }`}>
             <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)] mx-auto flex items-center justify-center">
               <Database className="w-6 h-6" />
@@ -177,7 +177,7 @@ export default function DatabasesPanel({
                         <span className={`text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-md border flex items-center gap-1.5 ${
                           isRunning 
                             ? isDark ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]' : 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                            : isDark ? 'bg-[#181B28] text-[#94A3B8] border-white/[0.08]' : 'bg-slate-100 text-slate-600 border-slate-200'
+                            : isDark ? 'bg-transparent text-[#888888] border-white/[0.08]' : 'bg-slate-100 text-slate-600 border-slate-200'
                         }`}>
                           <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
                           {isRunning ? 'EJECUTANDO (ACTIVO)' : 'APAGADO (STOPPED)'}
@@ -195,7 +195,7 @@ export default function DatabasesPanel({
                         copyConnectionString(db);
                       }}
                       className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors cursor-pointer ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        isDark ? 'bg-transparent border-white/[0.1] text-[#E5E5E5] hover:bg-white/[0.06] hover:border-white/[0.2]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       {copiedId === db.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
@@ -209,7 +209,7 @@ export default function DatabasesPanel({
                           setImportExportDb(db);
                         }}
                         className={`text-xs py-1.5 px-3 rounded-xl flex items-center space-x-1.5 border font-semibold transition-colors cursor-pointer ${
-                          isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                          isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                         title="Importar o Exportar respaldos SQL"
                       >
@@ -239,7 +239,7 @@ export default function DatabasesPanel({
       {/* NOT DETECTED ENGINES */}
       {notDetectedEngines.length > 0 && (
         <div className={`p-4 rounded-2xl border space-y-2 text-xs ${
-          isDark ? 'bg-[#12141F]/80 border-white/[0.08]' : 'bg-slate-100/60 border-slate-200/80'
+          isDark ? 'bg-[#1E1E1E]/80 border-white/[0.08]' : 'bg-slate-100/60 border-slate-200/80'
         }`}>
           <div className="text-slate-400 font-bold font-mono">
             Motores no detectados en el sistema local:
@@ -248,10 +248,10 @@ export default function DatabasesPanel({
           <div className="flex flex-wrap items-center gap-3 font-mono text-slate-400">
             {notDetectedEngines.map((db) => (
               <div key={db.id} className={`flex items-center space-x-2 px-3 py-1 rounded-xl border ${
-                isDark ? 'bg-[#181B28] border-white/[0.08]' : 'bg-white border-slate-200'
+                isDark ? 'bg-[#252525] border-white/[0.08]' : 'bg-white border-slate-200'
               }`}>
                 <span className="w-2 h-2 rounded-full bg-slate-500"></span>
-                <span className={`font-bold ${isDark ? 'text-[#F3F4F6]' : 'text-slate-700'}`}>{db.name}</span>
+                <span className={`font-bold ${isDark ? 'text-[#E5E5E5]' : 'text-slate-700'}`}>{db.name}</span>
                 <span className="text-slate-400 text-[11px]">(No detectado)</span>
               </div>
             ))}

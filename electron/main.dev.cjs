@@ -24,6 +24,7 @@ let isQuitting = false;
 const runningProcesses = new Map();
 const projectLogsStore = new Map();
 const logWindows = new Map();
+const apiHubWindows = new Map();
 
 const appIconPath = path.join(__dirname, '../public/Lummo.ico');
 const MAX_LOG_LINES = 1000;
@@ -156,6 +157,49 @@ function openLogWindow(projectId, projectName) {
   logWindows.set(projectId, logWindow);
 }
 
+function openApiHubWindow({ projectId, projectName, port = 3000, projectPath = '' }) {
+  if (apiHubWindows.has(projectId)) {
+    const existing = apiHubWindows.get(projectId);
+    if (!existing.isDestroyed()) {
+      existing.focus();
+      return;
+    }
+  }
+
+  const hubWindow = new BrowserWindow({
+    width: 1240,
+    height: 820,
+    minWidth: 850,
+    minHeight: 580,
+    title: `API & Webhook Hub: ${projectName || projectId}`,
+    icon: fs.existsSync(appIconPath) ? appIconPath : path.join(__dirname, '../public/Lummo.png'),
+    frame: false,
+    backgroundColor: '#141414',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      devTools: !app.isPackaged
+    }
+  });
+
+  applySecurityPolicies(hubWindow);
+
+  const queryName = encodeURIComponent(projectName || 'API Hub');
+  const queryPath = encodeURIComponent(projectPath || '');
+  const targetUrl = process.env.VITE_DEV_SERVER_URL
+    ? `${process.env.VITE_DEV_SERVER_URL}#/api-hub/${projectId}?name=${queryName}&port=${port}&path=${queryPath}`
+    : `file://${path.join(__dirname, '../dist/index.html')}#/api-hub/${projectId}?name=${queryName}&port=${port}&path=${queryPath}`;
+
+  hubWindow.loadURL(targetUrl);
+
+  hubWindow.on('closed', () => {
+    apiHubWindows.delete(projectId);
+  });
+
+  apiHubWindows.set(projectId, hubWindow);
+}
+
 app.whenReady().then(() => {
   createWindow();
   createSystemTray();
@@ -213,6 +257,7 @@ app.whenReady().then(() => {
     runningProcesses,
     projectLogsStore,
     logWindows,
+    apiHubWindows,
     emitLog: (projectId, msg) => {
       let existing = projectLogsStore.get(projectId) || [];
       existing.push(msg);
@@ -226,7 +271,8 @@ app.whenReady().then(() => {
     stopProjectById,
     updateTrayContextMenu: () => updateTrayContextMenu(),
     showNativeNotification,
-    openLogWindow
+    openLogWindow,
+    openApiHubWindow
   });
 
   app.on('activate', () => {

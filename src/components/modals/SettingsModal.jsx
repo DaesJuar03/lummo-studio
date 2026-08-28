@@ -113,12 +113,12 @@ export default function SettingsModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-5xl lg:max-w-6xl h-[720px] max-h-[92vh] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
@@ -133,7 +133,7 @@ export default function SettingsModal({
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
               className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-5 w-5" />
@@ -144,7 +144,7 @@ export default function SettingsModal({
           <div className="flex-1 flex overflow-hidden">
             {/* Left Sidebar Categories */}
             <div className={`w-64 border-r p-4 space-y-1 shrink-0 ${
-              isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50/80 border-slate-200'
+              isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50/80 border-slate-200'
             }`}>
               {categories.map((cat) => {
                 const Icon = cat.icon;
@@ -156,10 +156,10 @@ export default function SettingsModal({
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left cursor-pointer ${
                       isActive
                         ? isDark 
-                          ? 'bg-[#181B28] border border-white/[0.08] text-white shadow-[0_0_12px_rgba(59,130,246,0.15)]' 
+                          ? 'bg-[#252525] border border-white/[0.08] text-white shadow-[0_0_12px_rgba(59,130,246,0.15)]' 
                           : 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                         : isDark
-                          ? 'text-slate-400 hover:bg-[#12141F] hover:text-white'
+                          ? 'text-slate-400 hover:bg-[#1E1E1E] hover:text-white'
                           : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
                     }`}
                   >
@@ -182,7 +182,7 @@ export default function SettingsModal({
             </div>
 
             {/* Right Category Details View */}
-            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#0D0E15]' : 'bg-white'}`}>
+            <div className={`flex-1 p-6 overflow-y-auto space-y-6 ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
               {activeCategory === 'services' && (
                 <ServicesTab
                   envStatus={envStatus}

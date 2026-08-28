@@ -49,20 +49,20 @@
     --accent-main: #2563eb;
   }
 
-  /* Dark Theme - Modern High-Contrast Linear / Vercel / Raycast Aesthetic */
+  /* Dark Theme - Obsidian Charcoal / Minimalist Studio */
   body.dark-theme {
-    background-color: #090A0F;
-    color: #F3F4F6;
-    --bg-main: #090A0F;
-    --bg-surface: #12141F;
-    --bg-surface-hover: #1A1D2D;
-    --fg-main: #F3F4F6;
-    --fg-secondary: #94A3B8;
-    --fg-muted: #4B5563;
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.16);
+    background-color: #141414;
+    color: #E5E5E5;
+    --bg-main: #141414;
+    --bg-surface: #1E1E1E;
+    --bg-surface-hover: #2A2A2A;
+    --fg-main: #E5E5E5;
+    --fg-secondary: #888888;
+    --fg-muted: #5A5A5A;
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --border-hover: rgba(255, 255, 255, 0.15);
     --accent-main: #3B82F6;
-    --accent-glow: rgba(59, 130, 246, 0.25);
+    --accent-glow: rgba(59, 130, 246, 0.2);
   }
 
   code, kbd, .font-mono {
@@ -83,7 +83,7 @@
 }
 
 body.dark-theme .custom-scrollbar::-webkit-scrollbar-track {
-  background: #090A0F;
+  background: #141414;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -94,7 +94,7 @@ body.dark-theme .custom-scrollbar::-webkit-scrollbar-track {
 }
 
 body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #1E2235;
+  background-color: #2A2A2A;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -102,7 +102,7 @@ body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb {
 }
 
 body.dark-theme .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #3B82F6;
+  background-color: #3A3A3A;
 }
 
 /* Light Theme Cards */
@@ -120,21 +120,21 @@ body.light-theme .pure-card:hover {
   box-shadow: 0 10px 30px -4px rgba(37, 99, 235, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
 }
 
-/* Dark Theme High-Contrast Cards (Linear / Vercel / Raycast Surface Hierarchy) */
+/* Dark Theme Transparent Cards (Obsidian Minimalist - Sin fondo gris) */
 body.dark-theme .pure-card {
-  background-color: #12141F;
+  background-color: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  color: #F3F4F6;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  color: #E5E5E5;
+  box-shadow: none;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease;
 }
 
 body.dark-theme .pure-card:hover {
   transform: translateY(-2px);
-  background-color: #1A1D2D;
+  background-color: rgba(255, 255, 255, 0.02);
   border-color: rgba(59, 130, 246, 0.45);
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6), 0 0 20px -2px rgba(59, 130, 246, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
 }
 
 /* Hotkey Badges */
@@ -155,9 +155,9 @@ body.dark-theme .hotkey-badge {
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94A3B8;
+  background: #252525;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888888;
 }
 
 /* Keyframe Animations */

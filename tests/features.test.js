@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-describe('Lummo Studio v2.3.0 Major Features Unit Tests', () => {
+describe('Lummo Studio v2.3.11 Major Features Unit Tests', () => {
   it('should generate valid mock data row for tables', () => {
     const mockColumns = [
       { name: 'id', pk: true, type: 'INTEGER' },

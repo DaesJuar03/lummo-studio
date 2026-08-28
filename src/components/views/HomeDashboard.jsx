@@ -40,6 +40,7 @@ export default function HomeDashboard({
   const [showCloneRepoModal, setShowCloneRepoModal] = useState(false);
   const [showWizardModal, setShowWizardModal] = useState(false);
   const [showMoreModal, setShowMoreModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const isDark = theme === 'dark';
 
   const allDbs = (customDatabases || []).map(d => ({ ...d, isDb: true }));
@@ -58,7 +59,7 @@ export default function HomeDashboard({
 
       {/* Page Header Title with Simple Telemetry Text */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4 ${
-        isDark ? 'border-[#2b2b2b]' : 'border-slate-200'
+        isDark ? 'border-white/[0.08]' : 'border-slate-200'
       }`}>
         <div>
           <h2 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -95,16 +96,12 @@ export default function HomeDashboard({
       {/* Main Grid: Left Launcher Cards & Right Recent List */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
 
-        {/* Left Column: Launcher Cards (Including Wizard, Import & Git Clone) */}
-        <div className="lg:col-span-5 space-y-4">
+        {/* Left Column: Launcher Options (Clean & Borderless) */}
+        <div className="lg:col-span-5 space-y-6">
           
-          {/* Card 1: New Project Wizard & Import Folder Row */}
-          <div className={`p-4 rounded-2xl border transition-all ${
-            isDark 
-              ? 'bg-[#12141F] border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] hover:border-white/[0.14]' 
-              : 'bg-slate-50 border-slate-200'
-          }`}>
-            <div className="flex items-center space-x-3 mb-3">
+          {/* Option 1: New Project Wizard & Import Folder Row */}
+          <div className="space-y-2.5">
+            <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(59,130,246,0.15)]">
                 <FolderPlus className="h-4.5 w-4.5" />
               </div>
@@ -118,7 +115,7 @@ export default function HomeDashboard({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="grid grid-cols-2 gap-2 pt-0.5">
               <button
                 onClick={() => setShowWizardModal(true)}
                 className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2 px-3 rounded-xl shadow-md shadow-blue-600/20 hover:shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
@@ -130,7 +127,7 @@ export default function HomeDashboard({
               <button
                 onClick={onAddProject}
                 className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-1.5 cursor-pointer ${
-                  isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                  isDark ? 'bg-transparent border-white/[0.1] text-[#E5E5E5] hover:bg-white/[0.06] hover:border-white/[0.2]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
                 }`}
               >
                 <FolderOpen className="h-3.5 w-3.5 text-blue-400" />
@@ -139,13 +136,9 @@ export default function HomeDashboard({
             </div>
           </div>
 
-          {/* Card 2: Clone Git Repository */}
-          <div className={`p-4 rounded-2xl border transition-all ${
-            isDark 
-              ? 'bg-[#12141F] border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] hover:border-white/[0.14]' 
-              : 'bg-slate-50 border-slate-200'
-          }`}>
-            <div className="flex items-center space-x-3 mb-3">
+          {/* Option 2: Clone Git Repository */}
+          <div className="space-y-2.5">
+            <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
                 <GitBranch className="h-4.5 w-4.5" />
               </div>
@@ -162,7 +155,7 @@ export default function HomeDashboard({
             <button
               onClick={() => setShowCloneRepoModal(true)}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-                isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-transparent border-white/[0.1] text-[#E5E5E5] hover:bg-white/[0.06] hover:border-white/[0.2]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <Download className="h-4 w-4 text-blue-400" />
@@ -170,13 +163,9 @@ export default function HomeDashboard({
             </button>
           </div>
 
-          {/* Card 3: Projects Panel Shortcut */}
-          <div className={`p-4 rounded-2xl border transition-all ${
-            isDark 
-              ? 'bg-[#12141F] border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] hover:border-white/[0.14]' 
-              : 'bg-slate-50 border-slate-200'
-          }`}>
-            <div className="flex items-center space-x-3 mb-3">
+          {/* Option 3: Projects Panel Shortcut */}
+          <div className="space-y-2.5">
+            <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
                 <Layers className="h-4.5 w-4.5" />
               </div>
@@ -193,7 +182,7 @@ export default function HomeDashboard({
             <button
               onClick={onOpenProjectsTab}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-                isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-transparent border-white/[0.1] text-[#E5E5E5] hover:bg-white/[0.06] hover:border-white/[0.2]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <span>Explorar Proyectos</span>
@@ -201,13 +190,9 @@ export default function HomeDashboard({
             </button>
           </div>
 
-          {/* Card 4: Databases Panel Shortcut */}
-          <div className={`p-4 rounded-2xl border transition-all ${
-            isDark 
-              ? 'bg-[#12141F] border-white/[0.08] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] hover:border-white/[0.14]' 
-              : 'bg-slate-50 border-slate-200'
-          }`}>
-            <div className="flex items-center space-x-3 mb-3">
+          {/* Option 4: Databases Panel Shortcut */}
+          <div className="space-y-2.5">
+            <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
                 <Database className="h-4.5 w-4.5" />
               </div>
@@ -224,7 +209,7 @@ export default function HomeDashboard({
             <button
               onClick={onOpenDatabasesTab}
               className={`w-full font-bold text-xs py-2 px-3 rounded-xl border transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-                isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
+                isDark ? 'bg-transparent border-white/[0.1] text-[#E5E5E5] hover:bg-white/[0.06] hover:border-white/[0.2]' : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200/60'
               }`}
             >
               <span>Explorar Bases de Datos</span>
@@ -242,9 +227,7 @@ export default function HomeDashboard({
           className="lg:col-span-7 space-y-4 lg:pl-2"
         >
           {/* Header Title with Clean Proyectos Recientes... */}
-          <div className={`flex items-center justify-between border-b pb-3 ${
-            isDark ? 'border-white/[0.08]' : 'border-slate-200'
-          }`}>
+          <div className="flex items-center justify-between pb-1">
             <div>
               <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 Proyectos Recientes...
@@ -272,7 +255,7 @@ export default function HomeDashboard({
               </div>
             </motion.div>
           ) : (
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               <AnimatePresence>
                 {displayedList.map((item, index) => {
                   const isDb = item.isDb;
@@ -286,15 +269,17 @@ export default function HomeDashboard({
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.2, delay: index * 0.04 }}
                         onClick={() => onSelectDatabaseDetail && onSelectDatabaseDetail(item)}
-                        className={`pure-card p-4 cursor-pointer transition-all hover:border-blue-500 border ${
-                          isDark ? 'border-white/[0.08]' : 'border-slate-200'
+                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                          isDark 
+                            ? 'bg-transparent border-white/[0.08] hover:border-white/[0.18] hover:bg-white/[0.02]' 
+                            : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-4">
                           
                           <div className="flex items-center space-x-3.5 min-w-0 flex-1">
-                            <div className={`p-2.5 rounded-xl border shrink-0 ${
-                              isDark ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.15)]' : 'bg-blue-50 border-blue-200 text-blue-600'
+                            <div className={`p-2.5 rounded-xl shrink-0 ${
+                              isDark ? 'bg-blue-500/10 text-blue-400' : 'bg-blue-50 text-blue-600'
                             }`}>
                               <Database className="h-5 w-5" />
                             </div>
@@ -305,7 +290,7 @@ export default function HomeDashboard({
                                 }`}>
                                   {item.name}
                                 </h4>
-                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/20 shrink-0">
+                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 shrink-0">
                                   Base de Datos
                                 </span>
                               </div>
@@ -314,8 +299,8 @@ export default function HomeDashboard({
                           </div>
 
                           <div className="flex items-center space-x-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-                            <span className={`w-28 py-2 text-center text-xs font-mono font-bold px-2.5 rounded-xl border ${
-                              isDark ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            <span className={`w-28 py-2 text-center text-xs font-mono font-bold px-2.5 rounded-xl ${
+                              isDark ? 'text-emerald-400' : 'text-emerald-700'
                             }`}>
                               Activo
                             </span>
@@ -331,9 +316,9 @@ export default function HomeDashboard({
 
                             {onRemoveDatabase ? (
                               <button
-                                onClick={() => onRemoveDatabase(item.id)}
+                                onClick={() => setItemToDelete({ id: item.id, name: item.name, isDb: true })}
                                 className="p-2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-colors shrink-0 cursor-pointer"
-                                title="Eliminar"
+                                title="Eliminar de la lista"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -355,19 +340,19 @@ export default function HomeDashboard({
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.2, delay: index * 0.04 }}
                       onClick={() => onSelectProjectDetail(item)}
-                      className={`pure-card p-4 cursor-pointer transition-all border ${
+                      className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                         isRunning 
-                          ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.15)]' 
-                          : isDark ? 'border-white/[0.08]' : 'border-slate-200'
+                          ? 'border-blue-500/50 ring-1 ring-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]' 
+                          : isDark ? 'bg-transparent border-white/[0.08] hover:border-white/[0.18] hover:bg-white/[0.02]' : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-4">
                         
                         <div className="flex items-center space-x-3.5 min-w-0 flex-1">
-                          <div className={`p-2.5 rounded-xl border shrink-0 ${
+                          <div className={`p-2.5 rounded-xl shrink-0 ${
                             isRunning 
-                              ? isDark ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                              : isDark ? 'bg-[#181B28] border-white/[0.08] text-[#94A3B8]' : 'bg-slate-100 border-slate-200 text-slate-600'
+                              ? isDark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
+                              : isDark ? 'bg-transparent text-[#888888]' : 'bg-slate-100 text-slate-600'
                           }`}>
                             <Layers className="h-5 w-5" />
                           </div>
@@ -378,11 +363,11 @@ export default function HomeDashboard({
                               }`}>
                                 {item.name}
                               </h4>
-                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-blue-500/10 text-blue-400 border-blue-500/20 shrink-0">
+                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 shrink-0">
                                 :{item.port}
                               </span>
                               {item.hasBackend && (
-                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-purple-500/10 text-purple-400 border-purple-500/30 shrink-0">
+                                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 shrink-0">
                                   Entorno Dual
                                 </span>
                               )}
@@ -392,10 +377,10 @@ export default function HomeDashboard({
                         </div>
 
                         <div className="flex items-center space-x-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-                          <span className={`w-28 py-2 text-center text-xs font-mono font-bold px-2.5 rounded-xl border flex items-center justify-center gap-1.5 ${
+                          <span className={`w-28 py-2 text-center text-xs font-mono font-bold px-2.5 rounded-xl flex items-center justify-center gap-1.5 ${
                             isRunning 
-                              ? isDark ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                              : isDark ? 'bg-[#181B28] text-[#94A3B8] border-white/[0.08]' : 'bg-slate-100 text-slate-600 border-slate-200'
+                              ? isDark ? 'text-emerald-400' : 'text-emerald-700' 
+                              : isDark ? 'text-[#888888]' : 'text-slate-600'
                           }`}>
                             <span className={`w-2 h-2 rounded-full ${isRunning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
                             {isRunning ? 'En Ejecución' : 'Stopped'}
@@ -415,9 +400,9 @@ export default function HomeDashboard({
                           </motion.button>
 
                           <button
-                            onClick={() => onRemoveProject(item.id)}
+                            onClick={() => setItemToDelete({ id: item.id, name: item.name, isDb: false })}
                             className="p-2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
-                            title="Eliminar"
+                            title="Eliminar de la lista"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -429,14 +414,14 @@ export default function HomeDashboard({
                 })}
               </AnimatePresence>
 
-              {/* Hyperlink "Mostrar más..." if > 5 items */}
-              {combinedList.length > 5 && (
+              {/* Hyperlink "Ver más proyectos..." if > 4 items */}
+              {combinedList.length > 4 && (
                 <div className="pt-2 text-right">
                   <button
                     onClick={() => setShowMoreModal(true)}
-                    className="text-xs font-bold text-blue-400 hover:text-blue-300 hover:underline transition-all cursor-pointer"
+                    className="text-xs font-bold text-blue-400 hover:text-blue-300 hover:underline transition-all cursor-pointer inline-flex items-center gap-1"
                   >
-                    Mostrar más ({combinedList.length - 5} adicionales)...
+                    <span>Ver más proyectos ({combinedList.length - 4} adicionales)...</span>
                   </button>
                 </div>
               )}
@@ -465,14 +450,14 @@ export default function HomeDashboard({
         language={language}
       />
 
-      {/* Modal with Hypertext List of All Recent Projects & Databases */}
+      {/* Modal with Complete List of All Added Projects & Databases */}
       <AnimatePresence>
         {showMoreModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 select-none"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 select-none"
             onClick={() => setShowMoreModal(false)}
           >
             <motion.div
@@ -482,33 +467,35 @@ export default function HomeDashboard({
               transition={{ type: "spring", stiffness: 350, damping: 28 }}
               onClick={(e) => e.stopPropagation()}
               className={`w-full max-w-lg rounded-3xl border shadow-2xl overflow-hidden ${
-                isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+                isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
               }`}
             >
               {/* Header */}
               <div className={`px-6 py-4 border-b flex items-center justify-between ${
-                isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                isDark ? 'bg-[#181818] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div>
                   <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    Lista Extendida de Proyectos y BDs
+                    Todos los Proyectos y Bases de Datos ({combinedList.length})
                   </h3>
-                  <p className="text-xs text-slate-400">Haz clic en cualquier enlace para ser redirigido directamente</p>
+                  <p className="text-xs text-slate-400">Haz clic en cualquier elemento para abrir su panel de control</p>
                 </div>
                 <button
                   onClick={() => setShowMoreModal(false)}
                   className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
-                    isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                    isDark ? 'text-slate-400 hover:text-white hover:bg-white/[0.06]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
                   }`}
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              {/* Clean Hypertext List */}
-              <div className="p-6 max-h-96 overflow-y-auto space-y-3">
+              {/* Items List */}
+              <div className="p-5 max-h-96 overflow-y-auto space-y-2 custom-scrollbar">
                 {combinedList.map((item) => {
                   const isDb = item.isDb;
+                  const isRunning = item.status === 'RUNNING';
+
                   return (
                     <div
                       key={item.id}
@@ -520,20 +507,44 @@ export default function HomeDashboard({
                           if (onSelectProjectDetail) onSelectProjectDetail(item);
                         }
                       }}
-                      className="flex items-center justify-between group cursor-pointer py-2 border-b border-slate-200/30 last:border-0 transition-colors"
+                      className={`p-3 rounded-2xl border transition-all flex items-center justify-between group cursor-pointer ${
+                        isDark 
+                          ? 'bg-[#141414] border-white/[0.06] hover:border-blue-500/50 hover:bg-white/[0.03]' 
+                          : 'bg-slate-50 border-slate-200 hover:border-blue-400 hover:bg-blue-50/30'
+                      }`}
                     >
                       <div className="flex items-center space-x-3 min-w-0">
-                        {/* Pure Hypertext Link */}
-                        <span className={`font-bold text-sm transition-all truncate group-hover:text-blue-600 group-hover:underline ${
-                          isDark ? 'text-slate-200' : 'text-slate-900'
+                        <div className={`p-2 rounded-xl border shrink-0 ${
+                          isDb 
+                            ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                            : isRunning
+                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                              : isDark ? 'bg-transparent border-white/[0.08] text-[#888888]' : 'bg-slate-100 border-slate-200 text-slate-600'
                         }`}>
-                          {item.name}
-                        </span>
+                          {isDb ? <Database className="h-4 w-4" /> : <Layers className="h-4 w-4" />}
+                        </div>
+                        <div className="min-w-0">
+                          <span className={`font-bold text-sm truncate block group-hover:text-blue-400 transition-colors ${
+                            isDark ? 'text-slate-200' : 'text-slate-900'
+                          }`}>
+                            {item.name}
+                          </span>
+                          <span className="text-[11px] font-mono text-slate-400 truncate block">
+                            {item.tech || item.techStack}
+                          </span>
+                        </div>
                       </div>
 
-                      <span className="text-xs font-mono text-slate-400 group-hover:text-blue-500 transition-colors shrink-0 pl-2">
-                        {item.tech || item.techStack} →
-                      </span>
+                      <div className="flex items-center space-x-2 shrink-0 pl-2">
+                        {item.port && (
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            :{item.port}
+                          </span>
+                        )}
+                        <span className="text-xs font-mono text-slate-400 group-hover:text-blue-400 transition-colors">
+                          →
+                        </span>
+                      </div>
                     </div>
                   );
                 })}
@@ -566,6 +577,68 @@ export default function HomeDashboard({
           }
         }}
       />
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {itemToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 select-none"
+            onClick={() => setItemToDelete(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-3xl border p-6 space-y-5 shadow-2xl ${
+                isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
+              }`}
+            >
+              <div className="flex items-start space-x-4">
+                <div className="w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 shadow-md shadow-rose-500/10">
+                  <Trash2 className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    ¿Eliminar {itemToDelete.isDb ? 'Base de Datos' : 'Proyecto'}?
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    ¿Estás seguro de que deseas eliminar <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>"{itemToDelete.name}"</span> de tu lista? No se borrarán los archivos físicos de tu disco, solo se desvinculará de Lummo Studio.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2.5 pt-2">
+                <button
+                  onClick={() => setItemToDelete(null)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    isDark ? 'text-[#888888] hover:text-white hover:bg-white/[0.06]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    if (itemToDelete.isDb) {
+                      if (onRemoveDatabase) onRemoveDatabase(itemToDelete.id);
+                    } else {
+                      if (onRemoveProject) onRemoveProject(itemToDelete.id);
+                    }
+                    setItemToDelete(null);
+                  }}
+                  className="px-5 py-2 rounded-xl bg-transparent border border-rose-500 text-white hover:text-rose-500 hover:border-rose-500 hover:bg-rose-500/10 font-bold text-xs transition-all cursor-pointer"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

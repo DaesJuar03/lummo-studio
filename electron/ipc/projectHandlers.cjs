@@ -1,4 +1,4 @@
-const { ipcMain, BrowserWindow } = require('electron');
+const { ipcMain, BrowserWindow, app } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -41,7 +41,8 @@ function registerProjectHandlers({
   stopProjectById,
   updateTrayContextMenu,
   showNativeNotification,
-  openLogWindow
+  openLogWindow,
+  openApiHubWindow
 }) {
   let activeCloneProcess = null;
 
@@ -425,27 +426,175 @@ function registerProjectHandlers({
     return { success: false, error: 'Motor de creación de proyectos no disponible' };
   });
 
-  // 8. Persistencia de Proyectos Recientes
-  safeHandle('get-recent-projects', async () => {
+  // 8. Persistencia Robusta de Proyectos Recientes y Bases de Datos
+  const getProjectsStoragePaths = () => {
+    let userDataPath = null;
     try {
-      const configPath = path.join(process.cwd(), 'lummo_projects.json');
-      if (fs.existsSync(configPath)) {
-        const content = fs.readFileSync(configPath, 'utf-8');
-        return JSON.parse(content);
+      if (app && typeof app.getPath === 'function') {
+        const userDir = app.getPath('userData');
+        if (userDir) {
+          userDataPath = path.join(userDir, 'lummo_projects.json');
+        }
       }
-    } catch (e) {
-      console.error('Error leyendo lummo_projects.json:', e);
+    } catch {}
+
+    const localPath = path.join(process.cwd(), 'lummo_projects.json');
+    return { userDataPath, localPath };
+  };
+
+  const getDatabasesStoragePaths = () => {
+    let userDataPath = null;
+    try {
+      if (app && typeof app.getPath === 'function') {
+        const userDir = app.getPath('userData');
+        if (userDir) {
+          userDataPath = path.join(userDir, 'lummo_databases.json');
+        }
+      }
+    } catch {}
+
+    const localPath = path.join(process.cwd(), 'lummo_databases.json');
+    return { userDataPath, localPath };
+  };
+
+  safeHandle('get-projects-file-path', async () => {
+    const { userDataPath, localPath } = getProjectsStoragePaths();
+    return {
+      userDataPath,
+      localPath,
+      activePath: (userDataPath && fs.existsSync(userDataPath)) ? userDataPath : localPath
+    };
+  });
+
+  safeHandle('get-recent-projects', async () => {
+    const { userDataPath, localPath } = getProjectsStoragePaths();
+    
+    // 1. Check userDataPath first
+    if (userDataPath && fs.existsSync(userDataPath)) {
+      try {
+        const content = fs.readFileSync(userDataPath, 'utf-8');
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error('Error leyendo lummo_projects.json en userData:', e);
+      }
     }
+
+    // 2. Check localPath (cwd workspace file)
+    if (localPath && fs.existsSync(localPath)) {
+      try {
+        const content = fs.readFileSync(localPath, 'utf-8');
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error('Error leyendo lummo_projects.json en localPath:', e);
+      }
+    }
+
     return [];
   });
 
   safeHandle('save-recent-projects', async (event, projectsList) => {
     try {
-      const configPath = path.join(process.cwd(), 'lummo_projects.json');
-      fs.writeFileSync(configPath, JSON.stringify(projectsList, null, 2), 'utf-8');
-      return { success: true };
+      if (!Array.isArray(projectsList)) {
+        return { success: false, error: 'La lista de proyectos debe ser un array' };
+      }
+
+      // Sanitize projects so status is always STOPPED on disk
+      const sanitized = projectsList.map(p => ({
+        id: p.id,
+        name: p.name,
+        path: p.path,
+        techStack: p.techStack || p.tech,
+        command: p.command || '',
+        port: p.port,
+        status: 'STOPPED',
+        hasBackend: Boolean(p.hasBackend),
+        backend: p.backend || null,
+        envApiUrl: p.envApiUrl || null,
+        dualLabel: p.dualLabel || null,
+        isArchived: Boolean(p.isArchived),
+        updatedAt: new Date().toISOString()
+      }));
+
+      const jsonStr = JSON.stringify(sanitized, null, 2);
+      const { userDataPath, localPath } = getProjectsStoragePaths();
+      let savedAnywhere = false;
+
+      // 1. Guardar en userDataPath (almacenamiento de usuario del sistema)
+      if (userDataPath) {
+        try {
+          const dir = path.dirname(userDataPath);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(userDataPath, jsonStr, 'utf-8');
+          savedAnywhere = true;
+        } catch (err) {
+          console.warn('No se pudo guardar en userDataPath:', err.message);
+        }
+      }
+
+      // 2. Guardar también en localPath (raíz del espacio de trabajo / ejecutable)
+      if (localPath) {
+        try {
+          const dir = path.dirname(localPath);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(localPath, jsonStr, 'utf-8');
+          savedAnywhere = true;
+        } catch (err) {
+          console.warn('No se pudo guardar en localPath:', err.message);
+        }
+      }
+
+      return { 
+        success: savedAnywhere, 
+        count: sanitized.length,
+        userDataPath,
+        localPath
+      };
     } catch (e) {
       console.error('Error guardando lummo_projects.json:', e);
+      return { success: false, error: e.message };
+    }
+  });
+
+  safeHandle('get-custom-databases', async () => {
+    const { userDataPath, localPath } = getDatabasesStoragePaths();
+    if (userDataPath && fs.existsSync(userDataPath)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(userDataPath, 'utf-8'));
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    if (localPath && fs.existsSync(localPath)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(localPath, 'utf-8'));
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return [];
+  });
+
+  safeHandle('save-custom-databases', async (event, dbsList) => {
+    try {
+      if (!Array.isArray(dbsList)) return { success: false };
+      const jsonStr = JSON.stringify(dbsList, null, 2);
+      const { userDataPath, localPath } = getDatabasesStoragePaths();
+      if (userDataPath) {
+        try {
+          const dir = path.dirname(userDataPath);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(userDataPath, jsonStr, 'utf-8');
+        } catch {}
+      }
+      if (localPath) {
+        try {
+          const dir = path.dirname(localPath);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(localPath, jsonStr, 'utf-8');
+        } catch {}
+      }
+      return { success: true };
+    } catch (e) {
       return { success: false, error: e.message };
     }
   });
@@ -626,6 +775,14 @@ function registerProjectHandlers({
       return { success: true };
     }
     return { success: false, error: 'Función de ventana de logs no disponible' };
+  });
+
+  safeHandle('open-api-hub-window', (event, { projectId, projectName, port, projectPath }) => {
+    if (typeof openApiHubWindow === 'function') {
+      openApiHubWindow({ projectId, projectName, port, projectPath });
+      return { success: true };
+    }
+    return { success: false, error: 'Función de ventana de API Hub no disponible' };
   });
 
   safeHandle('get-project-logs', (event, projectId) => {

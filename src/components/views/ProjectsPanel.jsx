@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, 
   Square, 
@@ -35,6 +35,7 @@ export default function ProjectsPanel({
   const [filterView, setFilterView] = useState('active'); // 'active' | 'archived' | 'all'
   const [copiedId, setCopiedId] = useState(null);
   const [portStatus, setPortStatus] = useState({});
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   const isDark = theme === 'dark';
 
@@ -126,20 +127,20 @@ export default function ProjectsPanel({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={`w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 font-sans transition-all ${
-              isDark ? 'bg-[#12141F] border-white/[0.08] text-[#F3F4F6] placeholder-slate-500' : 'bg-white border-slate-200 text-slate-800'
+              isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5] placeholder-slate-500' : 'bg-white border-slate-200 text-slate-800'
             }`}
           />
         </div>
 
         {archivedCount > 0 && (
           <div className={`p-1 rounded-2xl border flex items-center space-x-1 shrink-0 ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setFilterView('active')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 filterView === 'active'
-                  ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                  ? isDark ? 'bg-[#252525] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -153,7 +154,7 @@ export default function ProjectsPanel({
               onClick={() => setFilterView('archived')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 filterView === 'archived'
-                  ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                  ? isDark ? 'bg-[#252525] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -167,7 +168,7 @@ export default function ProjectsPanel({
               onClick={() => setFilterView('all')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 filterView === 'all'
-                  ? isDark ? 'bg-[#181B28] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
+                  ? isDark ? 'bg-[#252525] text-white shadow-xs border border-white/[0.08]' : 'bg-white text-slate-900 shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -180,7 +181,7 @@ export default function ProjectsPanel({
       {/* Projects List */}
       {filteredProjects.length === 0 ? (
         <div className={`text-center py-20 rounded-3xl border space-y-4 ${
-          isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}>
           <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center mx-auto border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.15)]">
             <FolderPlus className="h-8 w-8" />
@@ -220,7 +221,7 @@ export default function ProjectsPanel({
                     <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-medium shrink-0 ${
                       isRunning 
                         ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]' 
-                        : isDark ? 'bg-[#181B28] border-white/[0.08] text-[#94A3B8]' : 'bg-slate-100 border-slate-200 text-slate-600'
+                        : isDark ? 'bg-transparent border-white/[0.08] text-[#888888]' : 'bg-slate-100 border-slate-200 text-slate-600'
                     }`}>
                       <Code className="h-4 w-4" />
                     </div>
@@ -234,7 +235,7 @@ export default function ProjectsPanel({
                         <span className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border flex items-center gap-1.5 ${
                           isRunning 
                             ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.2)]' 
-                            : isDark ? 'bg-[#181B28] text-[#94A3B8] border-white/[0.08]' : 'bg-slate-100 text-slate-600 border-slate-200'
+                            : isDark ? 'bg-transparent text-[#888888] border-white/[0.08]' : 'bg-slate-100 text-slate-600 border-slate-200'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></span>
                           {isRunning ? 'RUNNING' : 'STOPPED'}
@@ -282,7 +283,7 @@ export default function ProjectsPanel({
                     <button
                       onClick={() => onOpenBrowser(projectUrl)}
                       className={`text-xs py-1.5 px-3 rounded-xl border font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
                       title="Abrir en Navegador"
                     >
@@ -293,7 +294,7 @@ export default function ProjectsPanel({
                     <button
                       onClick={() => onOpenEditor(project.path)}
                       className={`text-xs py-1.5 px-3 rounded-xl border font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
                       title="Abrir en VS Code / Editor"
                     >
@@ -306,7 +307,7 @@ export default function ProjectsPanel({
                       className={`text-xs py-1.5 px-3 rounded-xl border font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer ${
                         activeLogsProject === project.id
                           ? 'bg-blue-600 text-white border-blue-600 shadow-[0_0_12px_rgba(59,130,246,0.25)]'
-                          : isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                          : isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
                       title="Ver Logs en Vivo"
                     >
@@ -324,7 +325,7 @@ export default function ProjectsPanel({
                         value={project.port}
                         onChange={(e) => handlePortChange(project.id, e.target.value)}
                         className={`w-16 border rounded-lg px-2 py-1 font-bold text-center focus:outline-none transition-all ${
-                          isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200 text-slate-800'
+                          isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200 text-slate-800'
                         }`}
                       />
                       {isBusy && (
@@ -339,8 +340,8 @@ export default function ProjectsPanel({
                     </div>
 
                     <button
-                      onClick={() => onRemoveProject(project.id)}
-                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                      onClick={() => setProjectToDelete(project)}
+                      className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
                       title="Eliminar de proyectos"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -352,6 +353,64 @@ export default function ProjectsPanel({
           })}
         </div>
       )}
+
+      {/* Delete Project Confirmation Modal */}
+      <AnimatePresence>
+        {projectToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 select-none"
+            onClick={() => setProjectToDelete(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-md rounded-3xl border p-6 space-y-5 shadow-2xl ${
+                isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
+              }`}
+            >
+              <div className="flex items-start space-x-4">
+                <div className="w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 shadow-md shadow-rose-500/10">
+                  <Trash2 className="h-5 w-5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    ¿Eliminar Proyecto?
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    ¿Estás seguro de que deseas eliminar <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>"{projectToDelete.name}"</span> de Lummo Studio? No se borrarán los archivos físicos de tu disco duro.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2.5 pt-2">
+                <button
+                  onClick={() => setProjectToDelete(null)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    isDark ? 'text-[#888888] hover:text-white hover:bg-white/[0.06]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    if (onRemoveProject) onRemoveProject(projectToDelete.id);
+                    setProjectToDelete(null);
+                  }}
+                  className="px-5 py-2 rounded-xl bg-transparent border border-rose-500 text-white hover:text-rose-500 hover:border-rose-500 hover:bg-rose-500/10 font-bold text-xs transition-all cursor-pointer"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

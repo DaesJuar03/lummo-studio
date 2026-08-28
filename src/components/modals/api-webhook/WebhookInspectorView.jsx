@@ -169,7 +169,7 @@ export default function WebhookInspectorView({
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* Top Webhook Control Bar */}
       <div className={`p-4 border-b flex flex-wrap items-center justify-between gap-3 shrink-0 ${
-        isDark ? 'border-[#1e212b] bg-[#0c0d12]' : 'border-slate-200 bg-white'
+        isDark ? 'border-[rgba(255, 255, 255, 0.08)] bg-[#141414]' : 'border-slate-200 bg-white'
       }`}>
         <div className="flex items-center space-x-3">
           {tunnelUrl ? (
@@ -209,7 +209,7 @@ export default function WebhookInspectorView({
           <button
             onClick={onClearEvents}
             className={`p-2 rounded-2xl border transition-colors cursor-pointer ${
-              isDark ? 'border-[#262a36] hover:bg-[#151822] text-slate-400 hover:text-rose-400' : 'border-slate-200 hover:bg-slate-100 text-slate-600'
+              isDark ? 'border-[rgba(255, 255, 255, 0.08)] hover:bg-[#1E1E1E] text-slate-400 hover:text-rose-400' : 'border-slate-200 hover:bg-slate-100 text-slate-600'
             }`}
             title="Limpiar Historial de Webhooks"
           >
@@ -219,11 +219,11 @@ export default function WebhookInspectorView({
       </div>
 
       {/* Split Feed & Inspector */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-[#1e212b]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-[rgba(255, 255, 255, 0.08)]">
         {/* LEFT 4 COLS: TRAFFIC FEED LIST */}
         <div className="lg:col-span-4 flex flex-col min-h-0 overflow-hidden">
           <div className={`p-3 border-b space-y-2 shrink-0 ${
-            isDark ? 'border-[#1e212b] bg-[#12141c]' : 'border-slate-200 bg-slate-50'
+            isDark ? 'border-[rgba(255, 255, 255, 0.08)] bg-[#181818]' : 'border-slate-200 bg-slate-50'
           }`}>
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
@@ -233,7 +233,7 @@ export default function WebhookInspectorView({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-9 pr-3 py-1.5 rounded-xl border text-xs font-mono focus:outline-none ${
-                  isDark ? 'bg-[#181a24] border-[#262a36] text-white' : 'bg-white border-slate-200'
+                  isDark ? 'bg-[#181a24] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-white border-slate-200'
                 }`}
               />
             </div>
@@ -271,7 +271,7 @@ export default function WebhookInspectorView({
                     className={`p-3 rounded-2xl border transition-all cursor-pointer space-y-1.5 ${
                       isSelected
                         ? 'bg-purple-500/10 border-purple-500/40 shadow-sm'
-                        : isDark ? 'bg-[#12141c] border-[#1f222e] hover:border-[#2f3346]' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                        : isDark ? 'bg-[#181818] border-[#1f222e] hover:border-[#2f3346]' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -317,7 +317,7 @@ export default function WebhookInspectorView({
           {activeWebhookEvent ? (
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
               <div className={`p-4 border-b flex flex-wrap items-center justify-between gap-3 shrink-0 ${
-                isDark ? 'border-[#1e212b] bg-[#12141c]' : 'border-slate-200 bg-slate-50'
+                isDark ? 'border-[rgba(255, 255, 255, 0.08)] bg-[#181818]' : 'border-slate-200 bg-slate-50'
               }`}>
                 <div className="flex items-center space-x-3">
                   <span className={`px-2.5 py-1 rounded-xl font-mono text-xs font-black border ${getMethodBadgeColor(activeWebhookEvent.method)}`}>
@@ -351,7 +351,7 @@ export default function WebhookInspectorView({
                       copyToClipboard(curl);
                     }}
                     className={`p-2 rounded-2xl border transition-colors cursor-pointer ${
-                      isDark ? 'border-[#262a36] hover:bg-[#151822] text-slate-300' : 'border-slate-200 hover:bg-slate-100'
+                      isDark ? 'border-[rgba(255, 255, 255, 0.08)] hover:bg-[#1E1E1E] text-slate-300' : 'border-slate-200 hover:bg-slate-100'
                     }`}
                     title="Copiar como cURL"
                   >
@@ -366,7 +366,7 @@ export default function WebhookInspectorView({
                 </div>
               )}
 
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#1e212b] overflow-hidden min-h-0">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[rgba(255, 255, 255, 0.08)] overflow-hidden min-h-0">
                 {/* Left: Incoming Request Payload & Headers */}
                 <div className="p-4 flex flex-col min-h-0 overflow-hidden space-y-3">
                   <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
@@ -384,7 +384,7 @@ export default function WebhookInspectorView({
 
                   <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-1">
                     <span className="text-[11px] font-mono text-slate-400">Cuerpo de la Petición (Request Body)</span>
-                    <pre className="flex-1 p-3 rounded-2xl border font-mono text-xs overflow-y-auto custom-scrollbar bg-[#12141c] border-[#1e212b] text-emerald-400 select-text">
+                    <pre className="flex-1 p-3 rounded-2xl border font-mono text-xs overflow-y-auto custom-scrollbar bg-[#181818] border-[rgba(255, 255, 255, 0.08)] text-emerald-400 select-text">
                       {typeof activeWebhookEvent.body === 'object'
                         ? JSON.stringify(activeWebhookEvent.body, null, 2)
                         : String(activeWebhookEvent.rawBody || 'Sin cuerpo')}
@@ -412,7 +412,7 @@ export default function WebhookInspectorView({
 
                   <div className="flex-1 flex flex-col min-h-0 overflow-hidden space-y-1">
                     <span className="text-[11px] font-mono text-slate-400">Cuerpo de Respuesta (Response Body)</span>
-                    <pre className="flex-1 p-3 rounded-2xl border font-mono text-xs overflow-y-auto custom-scrollbar bg-[#12141c] border-[#1e212b] text-slate-300 select-text">
+                    <pre className="flex-1 p-3 rounded-2xl border font-mono text-xs overflow-y-auto custom-scrollbar bg-[#181818] border-[rgba(255, 255, 255, 0.08)] text-slate-300 select-text">
                       {typeof activeWebhookEvent.responseBody === 'object'
                         ? JSON.stringify(activeWebhookEvent.responseBody, null, 2)
                         : String(activeWebhookEvent.responseBody || 'Respuesta vacía del servidor')}
@@ -442,7 +442,7 @@ export default function WebhookInspectorView({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               className={`w-full max-w-2xl rounded-3xl border p-6 space-y-4 shadow-2xl ${
-                isDark ? 'bg-[#151822] border-[#2b3040] text-white' : 'bg-white border-slate-200 text-slate-900'
+                isDark ? 'bg-[#1E1E1E] border-[#2b3040] text-white' : 'bg-white border-slate-200 text-slate-900'
               }`}
             >
               <div className="flex items-center justify-between border-b pb-3 border-white/5">
@@ -494,7 +494,7 @@ export default function WebhookInspectorView({
                   value={mockPayloadText}
                   onChange={(e) => setMockPayloadText(e.target.value)}
                   className={`w-full p-3 rounded-2xl border font-mono text-xs text-emerald-400 focus:outline-none ${
-                    isDark ? 'bg-[#12141c] border-[#1e212b]' : 'bg-slate-50 border-slate-200'
+                    isDark ? 'bg-[#181818] border-[rgba(255, 255, 255, 0.08)]' : 'bg-slate-50 border-slate-200'
                   }`}
                 />
               </div>

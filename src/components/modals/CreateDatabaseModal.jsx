@@ -58,12 +58,12 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-md rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#181818] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
@@ -79,7 +79,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
             <button
               onClick={onClose}
               className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -96,13 +96,13 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
                 value={engine}
                 onChange={(e) => handleEngineChange(e.target.value)}
                 className={`w-full rounded-xl p-2.5 font-bold border focus:outline-none focus:border-blue-500 transition-all ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
                 }`}
               >
-                <option value="sqlite" className="bg-[#12141F] text-white">SQLite (archivo local .sqlite en Documentos)</option>
-                <option value="mysql" className="bg-[#12141F] text-white">MySQL / MariaDB (Puerto estándar :3306)</option>
-                <option value="postgres" className="bg-[#12141F] text-white">PostgreSQL (Puerto estándar :5432)</option>
-                <option value="redis" className="bg-[#12141F] text-white">Redis Key-Value Cache (Puerto :6379)</option>
+                <option value="sqlite" className="bg-[#1E1E1E] text-white">SQLite (archivo local .sqlite en Documentos)</option>
+                <option value="mysql" className="bg-[#1E1E1E] text-white">MySQL / MariaDB (Puerto estándar :3306)</option>
+                <option value="postgres" className="bg-[#1E1E1E] text-white">PostgreSQL (Puerto estándar :5432)</option>
+                <option value="redis" className="bg-[#1E1E1E] text-white">Redis Key-Value Cache (Puerto :6379)</option>
               </select>
             </div>
 
@@ -117,7 +117,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
                 value={dbName}
                 onChange={(e) => setDbName(e.target.value)}
                 className={`w-full rounded-xl p-2.5 font-mono font-bold border focus:outline-none focus:border-blue-500 transition-all ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               />
             </div>
@@ -134,7 +134,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
                     onChange={(e) => setHost(e.target.value)}
                     placeholder="127.0.0.1"
                     className={`w-full rounded-xl p-2.5 font-mono border focus:outline-none transition-all ${
-                      isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
+                      isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                     }`}
                   />
                 </div>
@@ -148,7 +148,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
                     onChange={(e) => setPort(Number(e.target.value))}
                     placeholder={engine === 'mysql' ? '3306' : engine === 'postgres' ? '5432' : '6379'}
                     className={`w-full rounded-xl p-2.5 font-mono border focus:outline-none transition-all ${
-                      isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
+                      isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                     }`}
                   />
                 </div>
@@ -161,7 +161,7 @@ export default function CreateDatabaseModal({ isOpen, onClose, onCreate, theme =
                 onClick={onClose}
                 className={`px-4 py-2.5 rounded-xl border font-bold transition-all cursor-pointer ${
                   isDark
-                    ? 'border-white/[0.08] bg-[#181B28] text-slate-300 hover:bg-[#1E2235] hover:text-white'
+                    ? 'border-white/[0.08] bg-[#252525] text-slate-300 hover:bg-[#303030] hover:text-white'
                     : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                 }`}
               >

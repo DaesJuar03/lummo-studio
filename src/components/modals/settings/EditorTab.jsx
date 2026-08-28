@@ -26,7 +26,7 @@ export default function EditorTab({
           onClick={onScanEditors}
           disabled={isScanningEditors}
           className={`px-3 py-1.5 rounded-xl border flex items-center space-x-1.5 text-xs font-bold transition-all cursor-pointer ${
-            isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-200 hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
+            isDark ? 'bg-[#252525] border-white/[0.08] text-slate-200 hover:bg-[#303030]' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
           }`}
         >
           <RefreshCw className={`h-3.5 w-3.5 ${isScanningEditors ? 'animate-spin text-blue-400' : 'text-slate-400'}`} />
@@ -44,7 +44,7 @@ export default function EditorTab({
           onChange={(e) => onSelectEditorCmd(e.target.value)}
           className={`w-full p-3.5 rounded-2xl border text-xs font-bold font-mono focus:outline-none transition-all cursor-pointer ${
             isDark 
-              ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' 
+              ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' 
               : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-blue-600'
           }`}
         >
@@ -102,7 +102,7 @@ export default function EditorTab({
                       ? 'bg-blue-600/15 border-blue-500 ring-1 ring-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.2)]'
                       : 'bg-blue-50/80 border-blue-500 ring-2 ring-blue-100 text-blue-900 font-bold'
                     : isDark
-                      ? 'bg-[#12141F] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#1A1D2D]'
+                      ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#2A2A2A]'
                       : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >

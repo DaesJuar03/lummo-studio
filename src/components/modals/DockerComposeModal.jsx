@@ -257,12 +257,12 @@ export default function DockerComposeModal({
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.96 }}
           className={`w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'border-white/[0.08] bg-[#090A0F]' : 'border-slate-100 bg-slate-50'
+            isDark ? 'border-white/[0.08] bg-[#141414]' : 'border-slate-100 bg-slate-50'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shadow-md shadow-blue-500/10">
@@ -291,7 +291,7 @@ export default function DockerComposeModal({
             <button
               onClick={onClose}
               className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'hover:bg-[#1E2235] text-slate-400 hover:text-white' : 'hover:bg-slate-200 text-slate-500'
+                isDark ? 'hover:bg-[#303030] text-slate-400 hover:text-white' : 'hover:bg-slate-200 text-slate-500'
               }`}
             >
               <X className="h-5 w-5" />
@@ -300,7 +300,7 @@ export default function DockerComposeModal({
 
           {/* Navigation Sub-Tabs */}
           <div className={`px-6 pt-3 pb-2 border-b flex items-center justify-between gap-4 ${
-            isDark ? 'border-white/[0.08] bg-[#090A0F]' : 'border-slate-200 bg-slate-100/50'
+            isDark ? 'border-white/[0.08] bg-[#141414]' : 'border-slate-200 bg-slate-100/50'
           }`}>
             <div className="flex items-center space-x-2">
               <button
@@ -308,7 +308,7 @@ export default function DockerComposeModal({
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
                   activeTab === 'dashboard'
                     ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20'
-                    : isDark ? 'text-slate-400 hover:text-white hover:bg-[#181B28]' : 'text-slate-600 hover:text-slate-900'
+                    : isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Boxes className="h-3.5 w-3.5" />
@@ -320,7 +320,7 @@ export default function DockerComposeModal({
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
                   activeTab === 'generator'
                     ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20'
-                    : isDark ? 'text-slate-400 hover:text-white hover:bg-[#181B28]' : 'text-slate-600 hover:text-slate-900'
+                    : isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Plus className="h-3.5 w-3.5" />
@@ -332,7 +332,7 @@ export default function DockerComposeModal({
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 cursor-pointer ${
                   activeTab === 'logs'
                     ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20'
-                    : isDark ? 'text-slate-400 hover:text-white hover:bg-[#181B28]' : 'text-slate-600 hover:text-slate-900'
+                    : isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Terminal className="h-3.5 w-3.5" />
@@ -366,7 +366,7 @@ export default function DockerComposeModal({
               <div className="space-y-6">
                 {/* Global Controls Row */}
                 <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
                 }`}>
                   <div>
                     <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300">
@@ -399,7 +399,7 @@ export default function DockerComposeModal({
                     <button
                       onClick={() => handleRunAction('restart')}
                       className={`p-2 rounded-xl border transition-colors cursor-pointer ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:text-white hover:bg-[#1E2235]' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:text-white hover:bg-[#303030]' : 'bg-white border-slate-200'
                       }`}
                       title="Reiniciar todos los contenedores"
                     >
@@ -416,7 +416,7 @@ export default function DockerComposeModal({
 
                   {composeStatus.services.length === 0 ? (
                     <div className={`p-10 text-center rounded-2xl border space-y-3 ${
-                      isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                      isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
                     }`}>
                       <Boxes className="h-10 w-10 text-slate-500 mx-auto" />
                       <div className="space-y-1">
@@ -442,8 +442,8 @@ export default function DockerComposeModal({
                           key={idx}
                           className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                             isRunning 
-                              ? isDark ? 'bg-[#12141F] border-blue-500/40 ring-1 ring-blue-500/20' : 'bg-blue-50/50 border-blue-200'
-                              : isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                              ? isDark ? 'bg-[#1E1E1E] border-blue-500/40 ring-1 ring-blue-500/20' : 'bg-blue-50/50 border-blue-200'
+                              : isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
                           }`}
                         >
                           {/* Service Details */}
@@ -451,7 +451,7 @@ export default function DockerComposeModal({
                             <div className={`w-10 h-10 rounded-xl border flex items-center justify-center font-bold shrink-0 ${
                               isRunning 
                                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
-                                : isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-400' : 'bg-slate-800 border-slate-700 text-slate-400'
+                                : isDark ? 'bg-[#252525] border-white/[0.08] text-slate-400' : 'bg-slate-800 border-slate-700 text-slate-400'
                             }`}>
                               <Server className="h-5 w-5" />
                             </div>
@@ -462,7 +462,7 @@ export default function DockerComposeModal({
                                 <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
                                   isRunning 
                                     ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.3)]' 
-                                    : isDark ? 'bg-[#181B28] text-slate-400 border-white/[0.08]' : 'bg-slate-800 text-slate-400 border-slate-700'
+                                    : isDark ? 'bg-[#252525] text-slate-400 border-white/[0.08]' : 'bg-slate-800 text-slate-400 border-slate-700'
                                 }`}>
                                   {svc.status || svc.state}
                                 </span>
@@ -496,7 +496,7 @@ export default function DockerComposeModal({
                             <button
                               onClick={() => handleRunAction('restart', svc.service)}
                               className={`p-2 rounded-xl border transition-colors cursor-pointer ${
-                                isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:text-white hover:bg-[#1E2235]' : 'bg-white border-slate-200 text-slate-700'
+                                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:text-white hover:bg-[#303030]' : 'bg-white border-slate-200 text-slate-700'
                               }`}
                               title="Reiniciar contenedor"
                             >
@@ -506,7 +506,7 @@ export default function DockerComposeModal({
                             <button
                               onClick={() => handleFetchLogs(svc.service)}
                               className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-colors flex items-center space-x-1 cursor-pointer ${
-                                isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:text-white hover:bg-[#1E2235]' : 'bg-white border-slate-200 text-slate-700'
+                                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:text-white hover:bg-[#303030]' : 'bg-white border-slate-200 text-slate-700'
                               }`}
                               title="Ver logs de este contenedor"
                             >
@@ -549,7 +549,7 @@ export default function DockerComposeModal({
                             ? isDark 
                               ? 'bg-blue-600/10 border-blue-500 shadow-md shadow-blue-500/10 ring-1 ring-blue-500' 
                               : 'bg-blue-50 border-blue-500 shadow-md'
-                            : isDark ? 'bg-[#12141F] border-white/[0.08] hover:border-blue-500/40 hover:bg-[#181B28]' : 'bg-slate-50 border-slate-200'
+                            : isDark ? 'bg-[#1E1E1E] border-white/[0.08] hover:border-blue-500/40 hover:bg-[#252525]' : 'bg-slate-50 border-slate-200'
                         }`}
                       >
                         <div>
@@ -582,7 +582,7 @@ export default function DockerComposeModal({
                 {/* Configuration Options Drawer */}
                 {selectedServices.length > 0 && (
                   <div className={`p-5 rounded-2xl border space-y-4 ${
-                    isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                    isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
                   }`}>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center space-x-2">
                       <Terminal className="h-3.5 w-3.5 text-blue-400" />
@@ -598,7 +598,7 @@ export default function DockerComposeModal({
                             value={customConfig.postgresPort}
                             onChange={(e) => setCustomConfig({ ...customConfig, postgresPort: Number(e.target.value) })}
                             className={`w-full p-2 rounded-xl border font-mono transition-all ${
-                              isDark ? 'bg-[#090A0F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300 text-slate-900'
+                              isDark ? 'bg-[#141414] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300 text-slate-900'
                             }`}
                           />
                         </div>
@@ -612,7 +612,7 @@ export default function DockerComposeModal({
                             value={customConfig.mysqlPort}
                             onChange={(e) => setCustomConfig({ ...customConfig, mysqlPort: Number(e.target.value) })}
                             className={`w-full p-2 rounded-xl border font-mono transition-all ${
-                              isDark ? 'bg-[#090A0F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300 text-slate-900'
+                              isDark ? 'bg-[#141414] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300 text-slate-900'
                             }`}
                           />
                         </div>
@@ -626,7 +626,7 @@ export default function DockerComposeModal({
                             value={customConfig.redisPort}
                             onChange={(e) => setCustomConfig({ ...customConfig, redisPort: Number(e.target.value) })}
                             className={`w-full p-2 rounded-xl border font-mono transition-all ${
-                              isDark ? 'bg-[#090A0F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300 text-slate-900'
+                              isDark ? 'bg-[#141414] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-300 text-slate-900'
                             }`}
                           />
                         </div>
@@ -654,7 +654,7 @@ export default function DockerComposeModal({
                 </div>
 
                 <div className={`h-80 text-emerald-400 font-mono text-[11px] p-4 rounded-2xl border overflow-y-auto custom-scrollbar whitespace-pre-wrap leading-relaxed ${
-                  isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-black/90 border-slate-800'
+                  isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-black/90 border-slate-800'
                 }`}>
                   {logs.length === 0 ? (
                     <div className="text-slate-500 text-center py-20">No hay logs registrados para este contenedor.</div>
@@ -669,12 +669,12 @@ export default function DockerComposeModal({
 
           {/* Footer Actions */}
           <div className={`px-6 py-4 border-t flex items-center justify-between ${
-            isDark ? 'border-white/[0.08] bg-[#090A0F]' : 'border-slate-100 bg-slate-50'
+            isDark ? 'border-white/[0.08] bg-[#141414]' : 'border-slate-100 bg-slate-50'
           }`}>
             <button
               onClick={onClose}
               className={`px-4 py-2 text-xs font-bold rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#181B28]' : 'text-slate-600 hover:text-slate-900'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Cerrar

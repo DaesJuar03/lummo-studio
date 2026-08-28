@@ -39,11 +39,11 @@ function createProxyMiddleware() {
           <meta charset="utf-8"/>
           <title>404 - Dominio Local No Asignado | Lummo Studio</title>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #090A0F; color: #F3F4F6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .card { background: #12141F; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 40px; max-width: 520px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #141414; color: #E5E5E5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .card { background: #1E1E1E; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 40px; max-width: 520px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
             h2 { color: #F43F5E; margin-top: 0; }
-            code { background: #181B28; padding: 3px 8px; border-radius: 6px; color: #38BDF8; font-family: monospace; }
-            p { color: #94A3B8; font-size: 14px; line-height: 1.6; }
+            code { background: #252525; padding: 3px 8px; border-radius: 6px; color: #38BDF8; font-family: monospace; }
+            p { color: #888888; font-size: 14px; line-height: 1.6; }
             .badge { display: inline-block; background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: bold; margin-bottom: 16px; }
           </style>
         </head>
@@ -88,11 +88,11 @@ function createProxyMiddleware() {
           <meta charset="utf-8"/>
           <title>502 - Bad Gateway | Lummo Studio</title>
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #090A0F; color: #F3F4F6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .card { background: #12141F; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 40px; max-width: 520px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #141414; color: #E5E5E5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .card { background: #1E1E1E; border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 40px; max-width: 520px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
             h2 { color: #F59E0B; margin-top: 0; }
-            code { background: #181B28; padding: 3px 8px; border-radius: 6px; color: #F59E0B; font-family: monospace; }
-            p { color: #94A3B8; font-size: 14px; line-height: 1.6; }
+            code { background: #252525; padding: 3px 8px; border-radius: 6px; color: #F59E0B; font-family: monospace; }
+            p { color: #888888; font-size: 14px; line-height: 1.6; }
             .badge { display: inline-block; background: rgba(245,158,11,0.15); color: #FBBF24; border: 1px solid rgba(245,158,11,0.3); padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: bold; margin-bottom: 16px; }
           </style>
         </head>

@@ -39,12 +39,12 @@ export default function NetworkTunnelModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-lg rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-2xl bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
@@ -60,7 +60,7 @@ export default function NetworkTunnelModal({
             <button
               onClick={onClose}
               className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -98,7 +98,7 @@ export default function NetworkTunnelModal({
                       className={`p-2.5 rounded-xl border text-left flex items-center space-x-2 transition-all cursor-pointer ${
                         provider === 'cloudflare'
                           ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 ring-1 ring-amber-500/30'
-                          : isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#1A1D2D]' : 'bg-slate-50 border-slate-200'
+                          : isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200'
                       }`}
                     >
                       <Shield className="h-4 w-4 text-amber-400 shrink-0" />
@@ -114,7 +114,7 @@ export default function NetworkTunnelModal({
                       className={`p-2.5 rounded-xl border text-left flex items-center space-x-2 transition-all cursor-pointer ${
                         provider === 'localtunnel'
                           ? 'bg-blue-500/15 border-blue-500/40 text-blue-300 ring-1 ring-blue-500/30'
-                          : isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#1A1D2D]' : 'bg-slate-50 border-slate-200'
+                          : isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200'
                       }`}
                     >
                       <Globe className="h-4 w-4 text-blue-400 shrink-0" />
@@ -202,7 +202,7 @@ export default function NetworkTunnelModal({
                     onChange={(e) => setLocalDomainInput(e.target.value)}
                     placeholder="mi-proyecto.test"
                     className={`w-full border rounded-xl py-2 pl-16 pr-3 text-xs font-mono font-bold focus:outline-none transition-all ${
-                      isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900'
+                      isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-purple-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                     }`}
                   />
                 </div>
@@ -265,12 +265,12 @@ export default function NetworkTunnelModal({
 
           {/* Modal Footer */}
           <div className={`px-6 py-3.5 border-t flex justify-end ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <button
               onClick={onClose}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:bg-[#1E2235] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:bg-[#303030] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
               }`}
             >
               Cerrar

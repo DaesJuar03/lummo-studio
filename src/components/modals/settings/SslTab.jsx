@@ -77,7 +77,7 @@ export default function SslTab({ theme }) {
             type="button"
             onClick={loadSslStatus}
             className={`p-2 rounded-xl border transition-colors cursor-pointer ${
-              isDark ? 'border-white/[0.08] bg-[#181B28] text-slate-400 hover:text-white' : 'border-slate-200 bg-white text-slate-600 hover:text-slate-900'
+              isDark ? 'border-white/[0.08] bg-[#252525] text-slate-400 hover:text-white' : 'border-slate-200 bg-white text-slate-600 hover:text-slate-900'
             }`}
             title="Actualizar estado SSL"
           >
@@ -96,7 +96,7 @@ export default function SslTab({ theme }) {
       <div className={`p-5 rounded-3xl border relative overflow-hidden ${
         sslStatus?.caInstalled
           ? isDark ? 'bg-emerald-950/15 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'
-          : isDark ? 'bg-[#12141F] border-amber-500/30' : 'bg-amber-50 border-amber-200'
+          : isDark ? 'bg-[#1E1E1E] border-amber-500/30' : 'bg-amber-50 border-amber-200'
       }`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start space-x-3.5">
@@ -163,7 +163,7 @@ export default function SslTab({ theme }) {
       {/* Technical details grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <div className={`p-4 rounded-2xl border space-y-1.5 ${
-          isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}>
           <div className="flex items-center space-x-2 text-xs font-bold text-slate-400">
             <Lock className="h-4 w-4 text-emerald-400" />
@@ -183,7 +183,7 @@ export default function SslTab({ theme }) {
         </div>
 
         <div className={`p-4 rounded-2xl border space-y-1.5 ${
-          isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}>
           <div className="flex items-center space-x-2 text-xs font-bold text-slate-400">
             <Key className="h-4 w-4 text-purple-400" />
@@ -206,7 +206,7 @@ export default function SslTab({ theme }) {
       {/* CA Public Cert Path */}
       {sslStatus?.caCertPath && (
         <div className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
-          isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
         }`}>
           <div className="min-w-0">
             <span className="block text-[10px] font-mono font-bold text-slate-400 uppercase">Ubicación del Certificado Público (.crt)</span>
@@ -218,7 +218,7 @@ export default function SslTab({ theme }) {
             type="button"
             onClick={() => copyToClipboard(sslStatus.caCertPath)}
             className={`p-2 rounded-xl border transition-colors cursor-pointer shrink-0 ${
-              isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:text-white' : 'bg-white border-slate-200 text-slate-700'
+              isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:text-white' : 'bg-white border-slate-200 text-slate-700'
             }`}
             title="Copiar ruta"
           >
@@ -235,7 +235,7 @@ export default function SslTab({ theme }) {
 
         {(!sslStatus?.domains || sslStatus.domains.length === 0) ? (
           <div className={`p-6 rounded-2xl border text-center space-y-1.5 ${
-            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <Globe className="h-6 w-6 text-slate-500 mx-auto" />
             <p className="text-xs text-slate-400">No hay dominios locales vinculados aún.</p>
@@ -249,7 +249,7 @@ export default function SslTab({ theme }) {
               <div
                 key={dom.domain}
                 className={`p-3.5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-white border-slate-200'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-white border-slate-200'
                 }`}
               >
                 <div className="flex items-center space-x-3">

@@ -94,12 +94,12 @@ export default function Header({
 
   return (
     <header className={`relative z-40 border-b select-none w-full transition-colors duration-200 ${
-      isDark ? 'border-white/[0.08] bg-[#090A0F]' : 'border-slate-200'
+      isDark ? 'border-white/[0.08] bg-[#141414]' : 'border-slate-200'
     }`} onClick={closeContextMenu}>
       {/* Top Titlebar Row */}
       <div 
         className={`h-11 pl-3 pr-0 flex items-center justify-between border-b ${
-          isDark ? 'bg-[#090A0F]/95 backdrop-blur-md border-white/[0.08] text-[#F3F4F6]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
+          isDark ? 'bg-[#141414]/95 backdrop-blur-md border-white/[0.08] text-[#E5E5E5]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
       >
@@ -111,7 +111,7 @@ export default function Header({
               disabled={!canGoBack}
               className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-2xs disabled:opacity-25 disabled:pointer-events-none cursor-pointer ${
                 isDark
-                  ? 'bg-[#12141F] border border-white/[0.08] text-[#94A3B8] hover:text-white hover:bg-[#1A1D2D] hover:border-white/[0.16]'
+                  ? 'bg-[#1E1E1E] border border-white/[0.08] text-[#888888] hover:text-white hover:bg-[#2A2A2A] hover:border-white/[0.16]'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
               title="Retroceder"
@@ -124,7 +124,7 @@ export default function Header({
               disabled={!canGoForward}
               className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all shadow-2xs disabled:opacity-25 disabled:pointer-events-none cursor-pointer ${
                 isDark
-                  ? 'bg-[#12141F] border border-white/[0.08] text-[#94A3B8] hover:text-white hover:bg-[#1A1D2D] hover:border-white/[0.16]'
+                  ? 'bg-[#1E1E1E] border border-white/[0.08] text-[#888888] hover:text-white hover:bg-[#2A2A2A] hover:border-white/[0.16]'
                   : 'bg-white border border-slate-300 text-slate-800 hover:bg-blue-600 hover:text-white hover:border-blue-600'
               }`}
               title="Avanzar"
@@ -148,7 +148,7 @@ export default function Header({
                 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
                 : 'bg-blue-50 text-blue-600 border border-blue-200'
             }`}>
-              v2.3.0
+              v2.3.11
             </span>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function Header({
             onClick={onOpenCommandPalette}
             className={`w-60 sm:w-72 md:w-80 flex items-center justify-between px-3 py-1 rounded-xl border text-xs transition-all shadow-2xs cursor-pointer ${
               isDark
-                ? 'bg-[#12141F] border border-white/[0.08] text-[#F3F4F6] hover:bg-[#1A1D2D] hover:border-blue-500/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                ? 'bg-[#1E1E1E] border border-white/[0.08] text-[#E5E5E5] hover:bg-[#2A2A2A] hover:border-blue-500/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.15)]'
                 : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400'
             }`}
           >
@@ -177,7 +177,7 @@ export default function Header({
             onClick={onOpenSettings}
             className={`mr-2 px-2.5 py-1 rounded-lg border border-transparent transition-all flex items-center space-x-1.5 text-xs font-bold cursor-pointer ${
               isDark 
-                ? 'text-[#94A3B8] hover:bg-[#12141F] hover:border-white/[0.08] hover:text-white hover:shadow-2xs' 
+                ? 'text-[#888888] hover:bg-[#1E1E1E] hover:border-white/[0.08] hover:text-white hover:shadow-2xs' 
                 : 'text-slate-700 hover:bg-slate-300/60 hover:border-slate-300 hover:text-slate-900 hover:shadow-2xs'
             }`}
             title={t.settings}
@@ -190,7 +190,7 @@ export default function Header({
             <button
               onClick={handleMinimize}
               className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
-                isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-[#888888] hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Minimizar"
             >
@@ -199,7 +199,7 @@ export default function Header({
             <button
               onClick={handleMaximize}
               className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
-                isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                isDark ? 'text-[#888888] hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
               }`}
               title="Maximizar"
             >
@@ -219,7 +219,7 @@ export default function Header({
       {/* Bottom Row: Dedicated Open Tabs Bar with Drag & Drop and Pin Tabs */}
       <div 
         className={`h-9 px-3 flex items-center space-x-1 overflow-x-auto no-scrollbar scroll-smooth w-full ${
-          isDark ? 'bg-[#0D0E15] border-t border-white/[0.08]' : 'bg-slate-100/80 border-t border-slate-200/80'
+          isDark ? 'bg-[#141414] border-t border-white/[0.08]' : 'bg-slate-100/80 border-t border-slate-200/80'
         }`}
         style={{ WebkitAppRegion: 'no-drag' }}
       >
@@ -247,10 +247,10 @@ export default function Header({
                 } ${
                   isActive
                     ? isDark 
-                      ? 'bg-[#12141F] border-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.2)] font-extrabold' 
+                      ? 'bg-[#1E1E1E] border-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.2)] font-extrabold' 
                       : 'bg-white border-slate-300/90 text-blue-600 shadow-2xs font-extrabold'
                     : isDark
-                      ? 'bg-[#090A0F]/70 border-white/[0.06] text-[#94A3B8] hover:text-white hover:bg-[#12141F] hover:border-white/[0.12]'
+                      ? 'bg-[#141414]/70 border-white/[0.06] text-[#888888] hover:text-white hover:bg-[#1E1E1E] hover:border-white/[0.12]'
                       : 'bg-slate-200/50 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-300/50'
                 }`}
                 title={tab.title}
@@ -281,7 +281,7 @@ export default function Header({
           whileTap={{ scale: 0.9 }}
           onClick={onPlusClick}
           className={`p-1 rounded-md transition-all h-7 w-7 flex items-center justify-center shrink-0 cursor-pointer ${
-            isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[#12141F]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+            isDark ? 'text-[#888888] hover:text-white hover:bg-[#1E1E1E]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
           }`}
           title="Nueva pestaña"
         >
@@ -293,7 +293,7 @@ export default function Header({
       {contextMenu && (
         <div
           style={{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }}
-          className="fixed z-50 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl p-1.5 w-48 text-xs font-medium text-slate-200 animate-in fade-in zoom-in-95 duration-100"
+          className="fixed z-50 bg-[#1E1E1E] border border-white/[0.08] rounded-xl shadow-2xl p-1.5 w-48 text-xs font-medium text-neutral-200 animate-in fade-in zoom-in-95 duration-100"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -301,7 +301,7 @@ export default function Header({
               if (onTogglePinTab) onTogglePinTab(contextMenu.tab.id);
               closeContextMenu();
             }}
-            className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 flex items-center gap-2 transition-colors"
+            className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-[#2A2A2A] flex items-center gap-2 transition-colors"
           >
             {contextMenu.tab.pinned ? (
               <>
@@ -321,7 +321,7 @@ export default function Header({
               if (onDuplicateTab) onDuplicateTab(contextMenu.tab.id);
               closeContextMenu();
             }}
-            className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 flex items-center gap-2 transition-colors"
+            className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-[#2A2A2A] flex items-center gap-2 transition-colors"
           >
             <Copy className="w-3.5 h-3.5 text-purple-400" />
             <span>Duplicar Pestaña</span>
@@ -329,13 +329,13 @@ export default function Header({
 
           {contextMenu.tab.closable && (
             <>
-              <div className="h-[1px] bg-slate-800 my-1" />
+              <div className="h-[1px] bg-white/[0.08] my-1" />
               <button
                 onClick={() => {
                   if (onCloseOtherTabs) onCloseOtherTabs(contextMenu.tab.id);
                   closeContextMenu();
                 }}
-                className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 flex items-center gap-2 transition-colors"
+                className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-[#2A2A2A] flex items-center gap-2 transition-colors"
               >
                 <FolderX className="w-3.5 h-3.5 text-amber-400" />
                 <span>Cerrar Otras Pestañas</span>

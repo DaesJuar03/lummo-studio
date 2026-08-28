@@ -51,12 +51,12 @@ export default function GeneralTab({
               onChange={(e) => onSelectLanguage && onSelectLanguage(e.target.value)}
               className={`w-full px-3.5 py-2.5 rounded-2xl border text-xs font-bold outline-none cursor-pointer appearance-none transition-all ${
                 isDark 
-                  ? 'bg-[#12141F] border-white/[0.08] text-white hover:border-white/[0.16] focus:border-blue-500' 
+                  ? 'bg-[#1E1E1E] border-white/[0.08] text-white hover:border-white/[0.16] focus:border-blue-500' 
                   : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-slate-300 focus:border-blue-500'
               }`}
             >
               {availableLocales.map((loc) => (
-                <option key={loc.code} value={loc.code} className={isDark ? 'bg-[#12141F] text-white' : 'bg-white text-slate-900'}>
+                <option key={loc.code} value={loc.code} className={isDark ? 'bg-[#1E1E1E] text-white' : 'bg-white text-slate-900'}>
                   {loc.name} ({loc.badge})
                 </option>
               ))}
@@ -82,14 +82,14 @@ export default function GeneralTab({
               }}
               className={`w-full px-3.5 py-2.5 rounded-2xl border text-xs font-bold outline-none cursor-pointer appearance-none transition-all ${
                 isDark 
-                  ? 'bg-[#12141F] border-white/[0.08] text-white hover:border-white/[0.16] focus:border-blue-500' 
+                  ? 'bg-[#1E1E1E] border-white/[0.08] text-white hover:border-white/[0.16] focus:border-blue-500' 
                   : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-slate-300 focus:border-blue-500'
               }`}
             >
-              <option value="light" className={isDark ? 'bg-[#12141F] text-white' : 'bg-white text-slate-900'}>
+              <option value="light" className={isDark ? 'bg-[#1E1E1E] text-white' : 'bg-white text-slate-900'}>
                 {t.lightMode}
               </option>
-              <option value="dark" className={isDark ? 'bg-[#12141F] text-white' : 'bg-white text-slate-900'}>
+              <option value="dark" className={isDark ? 'bg-[#1E1E1E] text-white' : 'bg-white text-slate-900'}>
                 {t.darkMode}
               </option>
             </select>
@@ -103,7 +103,7 @@ export default function GeneralTab({
       {/* System Notifications & Logs Memory Management */}
       <div className="space-y-2.5 pt-4 border-t border-white/[0.08]">
         <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
-          isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-500/5 border-slate-200/50'
+          isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-500/5 border-slate-200/50'
         }`}>
           <div>
             <span className="block text-xs font-bold">Notificaciones Nativas de Windows</span>
@@ -126,7 +126,7 @@ export default function GeneralTab({
             className={`px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer ${
               notificationsEnabled
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
-                : isDark ? 'bg-[#181B28] text-slate-400 border border-white/[0.08]' : 'bg-slate-300 text-slate-700'
+                : isDark ? 'bg-[#252525] text-slate-400 border border-white/[0.08]' : 'bg-slate-300 text-slate-700'
             }`}
           >
             {notificationsEnabled ? 'ACTIVADAS' : 'DESACTIVADAS'}
@@ -134,7 +134,7 @@ export default function GeneralTab({
         </div>
 
         <div className={`flex items-center justify-between p-3.5 rounded-2xl border ${
-          isDark ? 'bg-[#12141F] border-rose-500/20' : 'bg-rose-500/5 border-rose-500/20'
+          isDark ? 'bg-[#1E1E1E] border-rose-500/20' : 'bg-rose-500/5 border-rose-500/20'
         }`}>
           <div>
             <span className="block text-xs font-bold text-rose-400">Memoria de Logs de Servidores</span>

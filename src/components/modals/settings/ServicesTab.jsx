@@ -75,7 +75,7 @@ export default function ServicesTab({
               onClick={onScanEnv}
               disabled={isScanning || isInstallingTechs}
               className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 whitespace-nowrap shrink-0 transition-all cursor-pointer disabled:opacity-50 ${
-                isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-200 hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-200 hover:bg-[#303030]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <RefreshCw className={`h-4 w-4 shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
@@ -181,7 +181,7 @@ export default function ServicesTab({
               } ${
                 isChecked && !isInstalled
                   ? isDark ? 'bg-blue-500/10 border-blue-500/50' : 'bg-blue-50 border-blue-200'
-                  : isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                  : isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
               }`}
             >
               <div className="flex items-center space-x-3">

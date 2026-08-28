@@ -242,13 +242,13 @@ export default function OnboardingWizard({
 
   return (
     <div className={`min-h-screen w-full flex flex-col font-sans select-none overflow-x-hidden transition-colors duration-200 ${
-      isDark ? 'bg-[#090A0F] text-[#F3F4F6]' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-[#141414] text-[#E5E5E5]' : 'bg-slate-50 text-slate-900'
     }`}>
       
       {/* Electron Custom Title Drag Bar */}
       <div 
         className={`h-11 border-b pl-6 pr-0 flex items-center justify-between shrink-0 ${
-          isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-white border-slate-200'
+          isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-white border-slate-200'
         }`}
         style={{ WebkitAppRegion: 'drag' }}
       >
@@ -264,7 +264,7 @@ export default function OnboardingWizard({
           <button
             onClick={handleMinimize}
             className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
-              isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+              isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
             }`}
             title="Minimizar"
           >
@@ -273,7 +273,7 @@ export default function OnboardingWizard({
           <button
             onClick={handleMaximize}
             className={`w-11 h-full flex items-center justify-center transition-colors cursor-pointer ${
-              isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+              isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
             }`}
             title="Maximizar"
           >
@@ -320,8 +320,8 @@ export default function OnboardingWizard({
                   step === s.id
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                     : step > s.id
-                      ? isDark ? 'bg-[#181B28] text-emerald-400 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                      : isDark ? 'bg-[#12141F] text-slate-400 border border-white/[0.08]' : 'bg-slate-100 text-slate-400'
+                      ? isDark ? 'bg-[#252525] text-emerald-400 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                      : isDark ? 'bg-[#1E1E1E] text-slate-400 border border-white/[0.08]' : 'bg-slate-100 text-slate-400'
                 }`}
               >
                 {s.label}
@@ -374,12 +374,12 @@ export default function OnboardingWizard({
                       className={`pure-card p-5 cursor-pointer border flex items-center justify-between transition-all ${
                         isSelected
                           ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/10'
-                          : isDark ? 'border-white/[0.08] bg-[#12141F] hover:bg-[#181B28]' : 'border-slate-200 bg-white'
+                          : isDark ? 'border-white/[0.08] bg-[#1E1E1E] hover:bg-[#252525]' : 'border-slate-200 bg-white'
                       }`}
                     >
                       <div className="flex items-center space-x-3.5">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs ${
-                          isSelected ? 'bg-blue-600 text-white' : isDark ? 'bg-[#181B28] text-slate-400' : 'bg-slate-100 text-slate-600'
+                          isSelected ? 'bg-blue-600 text-white' : isDark ? 'bg-[#252525] text-slate-400' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {loc.code.toUpperCase()}
                         </div>
@@ -407,7 +407,7 @@ export default function OnboardingWizard({
                   className={`pure-card p-5 cursor-pointer border flex items-center justify-between transition-all ${
                     !isDark
                       ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/10'
-                      : 'border-white/[0.08] bg-[#12141F] hover:bg-[#181B28]'
+                      : 'border-white/[0.08] bg-[#1E1E1E] hover:bg-[#252525]'
                   }`}
                 >
                   <div className="flex items-center space-x-3.5">
@@ -470,7 +470,7 @@ export default function OnboardingWizard({
                   onClick={onScanEnv}
                   disabled={isScanning || isInstallingTechs}
                   className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 whitespace-nowrap shrink-0 transition-all cursor-pointer disabled:opacity-50 ${
-                    isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-200 hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                    isDark ? 'bg-[#252525] border-white/[0.08] text-slate-200 hover:bg-[#303030]' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
                   }`}
                 >
                   <RefreshCw className={`h-4 w-4 shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
@@ -508,7 +508,7 @@ export default function OnboardingWizard({
 
               return (
                 <div className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-300' : 'bg-blue-50/60 border-blue-100 text-slate-700'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-300' : 'bg-blue-50/60 border-blue-100 text-slate-700'
                 }`}>
                   <div className="flex items-center space-x-2">
                     <CheckSquare className="h-4 w-4 text-blue-400" />
@@ -537,7 +537,7 @@ export default function OnboardingWizard({
             {/* Real-Time Installation Progress Monitor Panel */}
             {(isInstallingTechs || Object.keys(installProgressMap).length > 0) && (
               <div className={`p-5 rounded-2xl border space-y-4 ${
-                isDark ? 'bg-[#12141F] border-blue-500/30' : 'bg-slate-50 border-blue-200'
+                isDark ? 'bg-[#1E1E1E] border-blue-500/30' : 'bg-slate-50 border-blue-200'
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2.5">
@@ -611,7 +611,7 @@ export default function OnboardingWizard({
                     } ${
                       isChecked && !isInstalled
                         ? isDark ? 'border-blue-500/60 bg-blue-500/10' : 'border-blue-500 bg-blue-50/50'
-                        : isDark ? 'border-white/[0.08] bg-[#12141F] hover:bg-[#181B28]' : 'border-slate-200 bg-white'
+                        : isDark ? 'border-white/[0.08] bg-[#1E1E1E] hover:bg-[#252525]' : 'border-slate-200 bg-white'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -665,7 +665,7 @@ export default function OnboardingWizard({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#1E1E1E]' : 'border-slate-200 bg-white'}`}>
                 <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Layers className="h-5 w-5" />
                 </div>
@@ -675,7 +675,7 @@ export default function OnboardingWizard({
                 </p>
               </div>
 
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#1E1E1E]' : 'border-slate-200 bg-white'}`}>
                 <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Database className="h-5 w-5" />
                 </div>
@@ -685,7 +685,7 @@ export default function OnboardingWizard({
                 </p>
               </div>
 
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#1E1E1E]' : 'border-slate-200 bg-white'}`}>
                 <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Terminal className="h-5 w-5" />
                 </div>
@@ -695,7 +695,7 @@ export default function OnboardingWizard({
                 </p>
               </div>
 
-              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#12141F]' : 'border-slate-200 bg-white'}`}>
+              <div className={`pure-card p-6 border space-y-3 ${isDark ? 'border-white/[0.08] bg-[#1E1E1E]' : 'border-slate-200 bg-white'}`}>
                 <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
                   <Sliders className="h-5 w-5" />
                 </div>

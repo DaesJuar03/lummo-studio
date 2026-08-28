@@ -237,14 +237,14 @@ export default function ApiClientView({
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* REQUEST ADDRESS BAR */}
       <div className={`p-4 border-b flex items-center gap-3 shrink-0 ${
-        isDark ? 'border-[#1e212b] bg-[#0c0d12]' : 'border-slate-200 bg-white'
+        isDark ? 'border-[rgba(255, 255, 255, 0.08)] bg-[#141414]' : 'border-slate-200 bg-white'
       }`}>
         <select
           value={method}
           onChange={(e) => setMethod(e.target.value)}
           className={`px-3 py-2.5 rounded-2xl font-mono font-black text-xs border outline-none cursor-pointer ${
             getMethodBadgeColor(method)
-          } ${isDark ? 'bg-[#151822]' : 'bg-slate-100'}`}
+          } ${isDark ? 'bg-[#1E1E1E]' : 'bg-slate-100'}`}
         >
           <option value="GET">GET</option>
           <option value="POST">POST</option>
@@ -262,7 +262,7 @@ export default function ApiClientView({
             onChange={(e) => setEndpoint(e.target.value)}
             placeholder={`http://localhost:${port}/api/v1/users`}
             className={`w-full px-4 py-2.5 rounded-2xl border font-mono text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
-              isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-100 border-slate-200 text-slate-900'
+              isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-100 border-slate-200 text-slate-900'
             }`}
           />
         </div>
@@ -283,7 +283,7 @@ export default function ApiClientView({
         <button
           onClick={() => setShowSaveModal(true)}
           className={`p-2.5 rounded-2xl border transition-colors cursor-pointer ${
-            isDark ? 'border-[#262a36] hover:bg-[#151822] text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700'
+            isDark ? 'border-[rgba(255, 255, 255, 0.08)] hover:bg-[#1E1E1E] text-slate-300' : 'border-slate-200 hover:bg-slate-100 text-slate-700'
           }`}
           title="Guardar en Colección de Proyecto (.lummo)"
         >
@@ -295,7 +295,7 @@ export default function ApiClientView({
       {showSaveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className={`w-full max-w-md p-6 rounded-3xl border shadow-2xl space-y-4 ${
-            isDark ? 'bg-[#151822] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}>
             <h3 className="font-extrabold text-sm">Guardar Petición en Colección</h3>
             <input
@@ -304,7 +304,7 @@ export default function ApiClientView({
               value={reqSaveName}
               onChange={(e) => setReqSaveName(e.target.value)}
               className={`w-full p-3 rounded-2xl border text-xs font-mono outline-none ${
-                isDark ? 'bg-[#0e1015] border-[#242731]' : 'bg-slate-50 border-slate-200'
+                isDark ? 'bg-[#181818] border-[rgba(255, 255, 255, 0.08)]' : 'bg-slate-50 border-slate-200'
               }`}
             />
             <div className="flex justify-end space-x-2">
@@ -326,11 +326,11 @@ export default function ApiClientView({
       )}
 
       {/* MAIN API CLIENT CONTENT (Split Request Config & Response) */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-[#1e212b]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-[rgba(255, 255, 255, 0.08)]">
         {/* LEFT 6 COLS: REQUEST BUILDER */}
         <div className="lg:col-span-6 flex flex-col min-h-0 overflow-hidden">
           <div className={`flex items-center justify-between px-4 border-b shrink-0 ${
-            isDark ? 'border-[#1e212b] bg-[#12141c]' : 'border-slate-200 bg-slate-50'
+            isDark ? 'border-[rgba(255, 255, 255, 0.08)] bg-[#181818]' : 'border-slate-200 bg-slate-50'
           }`}>
             <div className="flex space-x-2 py-2">
               {[
@@ -362,7 +362,7 @@ export default function ApiClientView({
                   if (item) handleLoadCollectionRequest(item);
                 }}
                 className={`text-[11px] font-mono px-2.5 py-1 rounded-xl border outline-none ${
-                  isDark ? 'bg-[#151822] border-[#262a36] text-slate-300' : 'bg-white border-slate-200'
+                  isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-slate-300' : 'bg-white border-slate-200'
                 }`}
               >
                 <option value="">Colecciones ({collections.length})...</option>
@@ -404,7 +404,7 @@ export default function ApiClientView({
                         setQueryParams(updated);
                       }}
                       className={`w-1/2 p-2 rounded-xl border text-xs font-mono font-semibold ${
-                        isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     />
                     <input
@@ -417,7 +417,7 @@ export default function ApiClientView({
                         setQueryParams(updated);
                       }}
                       className={`flex-1 p-2 rounded-xl border text-xs font-mono ${
-                        isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     />
                     <button
@@ -466,7 +466,7 @@ export default function ApiClientView({
                         setHeaders(updated);
                       }}
                       className={`w-1/2 p-2 rounded-xl border text-xs font-mono font-semibold ${
-                        isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     />
                     <input
@@ -479,7 +479,7 @@ export default function ApiClientView({
                         setHeaders(updated);
                       }}
                       className={`flex-1 p-2 rounded-xl border text-xs font-mono ${
-                        isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     />
                     <button
@@ -541,7 +541,7 @@ export default function ApiClientView({
                       value={jsonBody}
                       onChange={(e) => setJsonBody(e.target.value)}
                       className={`w-full p-3 rounded-2xl font-mono text-xs focus:outline-none border ${
-                        isDark ? 'bg-[#151822] border-[#262a36] text-emerald-400' : 'bg-slate-50 border-slate-200 text-slate-800'
+                        isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-emerald-400' : 'bg-slate-50 border-slate-200 text-slate-800'
                       }`}
                     />
                   </div>
@@ -561,7 +561,7 @@ export default function ApiClientView({
                             setFormPairs(updated);
                           }}
                           className={`w-1/2 p-2 rounded-xl border text-xs font-mono font-semibold ${
-                            isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                            isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                           }`}
                         />
                         <input
@@ -574,7 +574,7 @@ export default function ApiClientView({
                             setFormPairs(updated);
                           }}
                           className={`flex-1 p-2 rounded-xl border text-xs font-mono ${
-                            isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                            isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                           }`}
                         />
                         <button
@@ -602,7 +602,7 @@ export default function ApiClientView({
                     onChange={(e) => setRawBodyText(e.target.value)}
                     placeholder="Raw data / XML / Text..."
                     className={`w-full p-3 rounded-2xl font-mono text-xs focus:outline-none border ${
-                      isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                      isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                     }`}
                   />
                 )}
@@ -639,7 +639,7 @@ export default function ApiClientView({
                       value={bearerToken}
                       onChange={(e) => setBearerToken(e.target.value)}
                       className={`w-full p-2.5 rounded-2xl border font-mono text-xs ${
-                        isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                       }`}
                     />
                   </div>
@@ -654,7 +654,7 @@ export default function ApiClientView({
                         value={basicAuth.username}
                         onChange={(e) => setBasicAuth({ ...basicAuth, username: e.target.value })}
                         className={`w-full p-2.5 rounded-2xl border font-mono text-xs ${
-                          isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                          isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                         }`}
                       />
                     </div>
@@ -665,7 +665,7 @@ export default function ApiClientView({
                         value={basicAuth.password}
                         onChange={(e) => setBasicAuth({ ...basicAuth, password: e.target.value })}
                         className={`w-full p-2.5 rounded-2xl border font-mono text-xs ${
-                          isDark ? 'bg-[#151822] border-[#262a36] text-white' : 'bg-slate-50 border-slate-200'
+                          isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-white' : 'bg-slate-50 border-slate-200'
                         }`}
                       />
                     </div>
@@ -702,7 +702,7 @@ export default function ApiClientView({
                   </button>
                 </div>
                 <pre className={`p-4 rounded-2xl border font-mono text-xs overflow-x-auto ${
-                  isDark ? 'bg-[#151822] border-[#262a36] text-slate-300' : 'bg-slate-100 border-slate-200'
+                  isDark ? 'bg-[#1E1E1E] border-[rgba(255, 255, 255, 0.08)] text-slate-300' : 'bg-slate-100 border-slate-200'
                 }`}>
                   <code>{getGeneratedSnippet()}</code>
                 </pre>
@@ -714,7 +714,7 @@ export default function ApiClientView({
         {/* RIGHT 6 COLS: RESPONSE VIEWER */}
         <div className="lg:col-span-6 flex flex-col min-h-0 overflow-hidden">
           <div className={`flex items-center justify-between px-4 py-2.5 border-b shrink-0 ${
-            isDark ? 'border-[#1e212b] bg-[#12141c]' : 'border-slate-200 bg-slate-50'
+            isDark ? 'border-[rgba(255, 255, 255, 0.08)] bg-[#181818]' : 'border-slate-200 bg-slate-50'
           }`}>
             <div className="flex items-center space-x-3">
               <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">

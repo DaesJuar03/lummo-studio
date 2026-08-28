@@ -9,10 +9,12 @@ const { safeHandle } = require('./ipcUtils.cjs');
 
 function registerApiWebhookHandlers(getMainWindow, emitLogToProject) {
   const emitWebhookEvent = (projectId, eventObj) => {
-    const win = typeof getMainWindow === 'function' ? getMainWindow() : null;
-    if (win && !win.isDestroyed()) {
-      win.webContents.send('webhook-traffic-event', { projectId, event: eventObj });
-    }
+    const { BrowserWindow } = require('electron');
+    BrowserWindow.getAllWindows().forEach((win) => {
+      if (win && !win.isDestroyed()) {
+        win.webContents.send('webhook-traffic-event', { projectId, event: eventObj });
+      }
+    });
   };
 
   // 1. API Client: Enviar Petición HTTP / GraphQL nativa

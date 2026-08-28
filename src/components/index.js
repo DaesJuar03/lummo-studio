@@ -6,6 +6,7 @@ export { default as ProjectDetailPage } from './views/ProjectDetailPage';
 export { default as DatabaseDetailPage } from './views/DatabaseDetailPage';
 export { default as OnboardingWizard } from './views/OnboardingWizard';
 export { default as StandaloneLogWindow } from './views/StandaloneLogWindow';
+export { default as StandaloneApiHubWindow } from './views/StandaloneApiHubWindow';
 
 // Modals
 export { default as CloneRepoModal } from './modals/CloneRepoModal';

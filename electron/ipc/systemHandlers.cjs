@@ -1,4 +1,4 @@
-const { ipcMain, dialog, shell, Notification } = require('electron');
+const { ipcMain, dialog, shell, Notification, BrowserWindow } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { exec, spawn } = require('child_process');
@@ -7,14 +7,14 @@ const { safeHandle } = require('./ipcUtils.cjs');
 const ALLOWED_EDITORS = new Set(['code', 'cursor', 'vscodium', 'subl', 'atom', 'idea', 'webstorm', 'phpstorm', 'notepad', 'explorer']);
 
 function registerSystemHandlers(getMainWindow, appIconPath) {
-  safeHandle('window-minimize', () => {
-    const win = getMainWindow();
-    if (win) win.minimize();
+  safeHandle('window-minimize', (event) => {
+    const win = (event && event.sender) ? (BrowserWindow.fromWebContents(event.sender) || getMainWindow()) : getMainWindow();
+    if (win && !win.isDestroyed()) win.minimize();
   });
 
-  safeHandle('window-maximize', () => {
-    const win = getMainWindow();
-    if (win) {
+  safeHandle('window-maximize', (event) => {
+    const win = (event && event.sender) ? (BrowserWindow.fromWebContents(event.sender) || getMainWindow()) : getMainWindow();
+    if (win && !win.isDestroyed()) {
       if (win.isMaximized()) {
         win.unmaximize();
       } else {
@@ -23,9 +23,9 @@ function registerSystemHandlers(getMainWindow, appIconPath) {
     }
   });
 
-  safeHandle('window-close', () => {
-    const win = getMainWindow();
-    if (win) win.close();
+  safeHandle('window-close', (event) => {
+    const win = (event && event.sender) ? (BrowserWindow.fromWebContents(event.sender) || getMainWindow()) : getMainWindow();
+    if (win && !win.isDestroyed()) win.close();
   });
 
   safeHandle('select-folder', async () => {

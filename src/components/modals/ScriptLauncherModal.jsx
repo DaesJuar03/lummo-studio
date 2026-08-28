@@ -84,12 +84,12 @@ export default function ScriptLauncherModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-xl rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
@@ -105,7 +105,7 @@ export default function ScriptLauncherModal({
             <button
               onClick={onClose}
               className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -183,7 +183,7 @@ export default function ScriptLauncherModal({
                   onClick={() => handleExecute('npx prisma db push')}
                   disabled={isExecutingScript}
                   className={`p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all cursor-pointer disabled:opacity-50 ${
-                    isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-300 hover:border-blue-500/40 hover:bg-[#1A1D2D]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
+                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-300 hover:border-blue-500/40 hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
                   }`}
                 >
                   <PlayCircle className="h-4 w-4 text-blue-400 shrink-0" />
@@ -194,7 +194,7 @@ export default function ScriptLauncherModal({
                   onClick={() => handleExecute('npx eslint . --fix')}
                   disabled={isExecutingScript}
                   className={`p-3 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all cursor-pointer disabled:opacity-50 ${
-                    isDark ? 'bg-[#12141F] border-white/[0.08] text-slate-300 hover:border-purple-500/40 hover:bg-[#1A1D2D]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
+                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-slate-300 hover:border-purple-500/40 hover:bg-[#2A2A2A]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400'
                   }`}
                 >
                   <PlayCircle className="h-4 w-4 text-purple-400 shrink-0" />
@@ -216,7 +216,7 @@ export default function ScriptLauncherModal({
                         onClick={() => handleExecute(sc.cmd)}
                         disabled={isExecutingScript}
                         className={`flex-1 p-2.5 rounded-xl border font-mono font-bold flex items-center space-x-2 text-left transition-all cursor-pointer truncate ${
-                          isDark ? 'bg-[#12141F] border-white/[0.08] text-amber-400 hover:border-amber-500/40 hover:bg-[#1A1D2D]' : 'bg-amber-50 border-amber-200 text-amber-900 hover:border-amber-400'
+                          isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-amber-400 hover:border-amber-500/40 hover:bg-[#2A2A2A]' : 'bg-amber-50 border-amber-200 text-amber-900 hover:border-amber-400'
                         }`}
                       >
                         <PlayCircle className="h-3.5 w-3.5 shrink-0" />
@@ -262,7 +262,7 @@ export default function ScriptLauncherModal({
                     }
                   }}
                   className={`flex-1 border rounded-xl p-2.5 text-xs font-mono font-bold focus:outline-none transition-all ${
-                    isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-amber-500' : 'bg-slate-50 border-slate-200 text-slate-900'
+                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-amber-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 />
                 <button
@@ -278,7 +278,7 @@ export default function ScriptLauncherModal({
               {/* Form to save custom shortcut */}
               {showAddShortcut && (
                 <form onSubmit={handleAddShortcut} className={`p-3 rounded-2xl border space-y-2 mt-2 ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-amber-50/5 border-amber-500/20'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-amber-50/5 border-amber-500/20'
                 }`}>
                   <span className="font-bold text-[11px] text-amber-400 block">Guardar Nuevo Acceso Directo</span>
                   <div className="grid grid-cols-2 gap-2">
@@ -288,7 +288,7 @@ export default function ScriptLauncherModal({
                       value={newShortcutName}
                       onChange={(e) => setNewShortcutName(e.target.value)}
                       className={`border rounded-xl p-2 text-xs font-mono transition-all ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08] text-white focus:border-amber-500' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#252525] border-white/[0.08] text-white focus:border-amber-500' : 'bg-white border-slate-200'
                       }`}
                     />
                     <input
@@ -297,7 +297,7 @@ export default function ScriptLauncherModal({
                       value={newShortcutCmd}
                       onChange={(e) => setNewShortcutCmd(e.target.value)}
                       className={`border rounded-xl p-2 text-xs font-mono transition-all ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08] text-white focus:border-amber-500' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#252525] border-white/[0.08] text-white focus:border-amber-500' : 'bg-white border-slate-200'
                       }`}
                     />
                   </div>
@@ -318,12 +318,12 @@ export default function ScriptLauncherModal({
 
           {/* Modal Footer */}
           <div className={`px-6 py-3.5 border-t flex justify-end ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <button
               onClick={onClose}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:bg-[#1E2235] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:bg-[#303030] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
               }`}
             >
               Cerrar

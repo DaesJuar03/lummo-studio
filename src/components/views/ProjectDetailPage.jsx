@@ -30,7 +30,6 @@ import {
 import NetworkTunnelModal from '../modals/NetworkTunnelModal';
 import ScriptLauncherModal from '../modals/ScriptLauncherModal';
 import ExecutionConfigModal from '../modals/ExecutionConfigModal';
-import ApiAndWebhookModal from '../modals/ApiAndWebhookModal';
 import DockerComposeModal from '../modals/DockerComposeModal';
 
 export default function ProjectDetailPage({
@@ -53,9 +52,26 @@ export default function ProjectDetailPage({
   const [showNetworkModal, setShowNetworkModal] = useState(false);
   const [showScriptModal, setShowScriptModal] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [showApiWebhookModal, setShowApiWebhookModal] = useState(false);
   const [showDockerModal, setShowDockerModal] = useState(false);
   const [hasDockerCompose, setHasDockerCompose] = useState(false);
+
+  const handleOpenApiWebhookHub = () => {
+    if (!project) return;
+    if (window.electronAPI?.openApiHubWindow) {
+      window.electronAPI.openApiHubWindow({
+        projectId: project.id,
+        projectName: project.name,
+        port: project.port || 3000,
+        projectPath: project.path
+      });
+    } else {
+      window.open(
+        `#/api-hub/${project.id}?name=${encodeURIComponent(project.name)}&port=${project.port || 3000}&path=${encodeURIComponent(project.path || '')}`,
+        '_blank',
+        'width=1240,height=820'
+      );
+    }
+  };
 
   // Port Conflict Modal State
   const [portConflict, setPortConflict] = useState(null); // { port, pid, processName }
@@ -446,7 +462,7 @@ export default function ProjectDetailPage({
           <button
             onClick={onBack}
             className={`p-2 rounded-xl border text-xs font-bold transition-all flex items-center space-x-1 cursor-pointer ${
-              isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+              isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030] hover:border-white/[0.16]' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
             }`}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -461,7 +477,7 @@ export default function ProjectDetailPage({
               <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border ${
                 isRunning 
                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]' 
-                  : isDark ? 'bg-[#181B28] text-slate-400 border-white/[0.08]' : 'bg-slate-200 text-slate-600 border-slate-300'
+                  : isDark ? 'bg-[#252525] text-slate-400 border-white/[0.08]' : 'bg-slate-200 text-slate-600 border-slate-300'
               }`}>
                 :{project.port} ({isRunning ? 'Activo' : 'Detenido'})
               </span>
@@ -494,12 +510,12 @@ export default function ProjectDetailPage({
 
           {/* Group 1: Core Target Explorers */}
           <div className={`flex items-center gap-0.5 p-1 rounded-2xl border ${
-            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => onOpenBrowser(projectUrl)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Abrir en Navegador Web"
             >
@@ -509,7 +525,7 @@ export default function ProjectDetailPage({
             <button
               onClick={() => onOpenEditor(project.path)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Abrir Carpeta en VS Code / Explorador"
             >
@@ -519,7 +535,7 @@ export default function ProjectDetailPage({
             <button
               onClick={() => onOpenLogs(project)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Abrir Consola de Logs Independiente"
             >
@@ -529,16 +545,16 @@ export default function ProjectDetailPage({
 
           {/* Group 2: Dev Tools & Services */}
           <div className={`flex items-center gap-1.5 p-1 rounded-2xl border ${
-            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
-              onClick={() => setShowApiWebhookModal(true)}
+              onClick={handleOpenApiWebhookHub}
               className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer relative ${
                 isDark 
                   ? 'bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 border border-purple-500/30' 
                   : 'bg-purple-100 text-purple-800 hover:bg-purple-200 border border-purple-200'
               }`}
-              title="API Client & Live Webhook Inspector"
+              title="Abrir Ventana Independiente de API Client & Webhooks"
             >
               <Radio className="h-3.5 w-3.5 text-purple-400" />
               <span>API & Webhooks</span>
@@ -552,7 +568,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all relative cursor-pointer ${
                 tunnelUrl 
                   ? 'bg-emerald-500/20 text-emerald-400' 
-                  : isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                  : isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Red & Acceso Externo (Túneles Cloudflare & Localtunnel)"
             >
@@ -567,7 +583,7 @@ export default function ProjectDetailPage({
               className={`p-2 rounded-xl transition-all cursor-pointer relative ${
                 hasDockerCompose 
                   ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/25' 
-                  : isDark ? 'text-[#94A3B8] hover:bg-[#1E2235] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
+                  : isDark ? 'text-[#888888] hover:bg-[#303030] hover:text-white' : 'text-slate-700 hover:bg-white hover:shadow-xs'
               }`}
               title="Gestor Visual de Docker Compose & Contenedores"
             >
@@ -580,12 +596,12 @@ export default function ProjectDetailPage({
 
           {/* Group 3: Automation & Configuration */}
           <div className={`flex items-center gap-0.5 p-1 rounded-2xl border ${
-            isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setShowScriptModal(true)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-amber-400 hover:bg-[#1E2235]' : 'text-amber-600 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-amber-400 hover:bg-[#303030]' : 'text-amber-600 hover:bg-white hover:shadow-xs'
               }`}
               title="Lanzador de Scripts & Comandos CLI"
             >
@@ -595,7 +611,7 @@ export default function ProjectDetailPage({
             <button
               onClick={() => setShowConfigModal(true)}
               className={`p-2 rounded-xl transition-all cursor-pointer ${
-                isDark ? 'text-blue-400 hover:bg-[#1E2235]' : 'text-blue-600 hover:bg-white hover:shadow-xs'
+                isDark ? 'text-blue-400 hover:bg-[#303030]' : 'text-blue-600 hover:bg-white hover:shadow-xs'
               }`}
               title="Configuración de Ejecución (Puerto y Comando de Inicio)"
             >
@@ -725,7 +741,7 @@ export default function ProjectDetailPage({
           </div>
 
           <div className={`relative w-full h-80 rounded-2xl border overflow-hidden flex flex-col items-center justify-center text-center group shadow-sm ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-900 border-slate-800'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-900 border-slate-800'
           }`}>
             {isRunning ? (
               <>
@@ -750,7 +766,7 @@ export default function ProjectDetailPage({
             ) : (
               <div className="p-6 space-y-3">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto ${
-                  isDark ? 'bg-[#12141F] border border-white/[0.08] text-slate-400' : 'bg-slate-800 text-slate-400'
+                  isDark ? 'bg-[#1E1E1E] border border-white/[0.08] text-slate-400' : 'bg-slate-800 text-slate-400'
                 }`}>
                   <Globe className="h-6 w-6" />
                 </div>
@@ -778,7 +794,7 @@ export default function ProjectDetailPage({
                 type="button"
                 onClick={() => setMaskSecrets(!maskSecrets)}
                 className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
-                  isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600'
+                  isDark ? 'bg-[#252525] border-white/[0.08] text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600'
                 }`}
                 title={maskSecrets ? 'Revelar valores secretos' : 'Ocultar valores secretos'}
               >
@@ -788,7 +804,7 @@ export default function ProjectDetailPage({
               <button
                 onClick={() => setRawEnvMode(!rawEnvMode)}
                 className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
-                  isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235]' : 'bg-white border-slate-200 text-slate-700'
+                  isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030]' : 'bg-white border-slate-200 text-slate-700'
                 }`}
               >
                 {rawEnvMode ? 'Formulario' : 'Texto Plano'}
@@ -827,7 +843,7 @@ export default function ProjectDetailPage({
                       value={pair.key}
                       onChange={(e) => handleEnvPairChange(idx, 'key', e.target.value)}
                       className={`w-2/5 border rounded-xl p-2 text-xs font-mono font-bold transition-all ${
-                        isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200'
                       }`}
                     />
                     <span className="text-slate-400 font-mono font-bold">=</span>
@@ -837,7 +853,7 @@ export default function ProjectDetailPage({
                       value={pair.value}
                       onChange={(e) => handleEnvPairChange(idx, 'value', e.target.value)}
                       className={`flex-1 border rounded-xl p-2 text-xs font-mono transition-all ${
-                        isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200'
                       }`}
                     />
                     <button
@@ -867,7 +883,7 @@ export default function ProjectDetailPage({
                 onChange={(e) => setEnvContent(e.target.value)}
                 placeholder="PORT=3000&#10;NODE_ENV=development"
                 className={`w-full border rounded-2xl p-3 text-xs font-mono font-semibold focus:outline-none transition-all ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200 text-slate-900'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200 text-slate-900'
                 }`}
               />
             </div>
@@ -900,7 +916,7 @@ export default function ProjectDetailPage({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               className={`w-full max-w-md rounded-2xl border shadow-2xl overflow-hidden p-6 space-y-4 ${
-                isDark ? 'bg-[#0D0E15] border-white/[0.08] text-white' : 'bg-white border-slate-200 text-slate-900'
+                isDark ? 'bg-[#141414] border-white/[0.08] text-white' : 'bg-white border-slate-200 text-slate-900'
               }`}
             >
               <div className="flex items-center space-x-3 text-amber-400">
@@ -914,7 +930,7 @@ export default function ProjectDetailPage({
               </div>
 
               <div className={`p-3.5 rounded-xl border text-xs font-mono space-y-1 ${
-                isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+                isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
               }`}>
                 <div>Proceso: <span className="text-indigo-400 font-bold">{portConflict.processName}</span></div>
                 <div>PID: <span className="text-amber-400 font-bold">{portConflict.pid}</span></div>
@@ -937,7 +953,7 @@ export default function ProjectDetailPage({
                   onClick={handleUseFreePortAndStart}
                   disabled={isResolvingPort}
                   className={`w-full py-2.5 px-4 rounded-xl border font-bold text-xs transition-all flex items-center justify-center space-x-2 cursor-pointer ${
-                    isDark ? 'bg-[#181B28] border-white/[0.08] text-[#F3F4F6] hover:bg-[#1E2235]' : 'bg-slate-100 border-slate-200 text-slate-800'
+                    isDark ? 'bg-[#252525] border-white/[0.08] text-[#E5E5E5] hover:bg-[#303030]' : 'bg-slate-100 border-slate-200 text-slate-800'
                   }`}
                 >
                   <Play className="h-3.5 w-3.5" />
@@ -999,16 +1015,6 @@ export default function ProjectDetailPage({
         onSaveConfig={handleSaveConfig}
         isRestarting={isRestarting}
         savedMessage={savedMessage}
-        theme={theme}
-      />
-
-      {/* API Client & Webhook Inspector Modal */}
-      <ApiAndWebhookModal
-        isOpen={showApiWebhookModal}
-        onClose={() => setShowApiWebhookModal(false)}
-        project={project}
-        tunnelUrl={tunnelUrl}
-        onStartTunnel={handleToggleTunnel}
         theme={theme}
       />
 

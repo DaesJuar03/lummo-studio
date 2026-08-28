@@ -154,12 +154,12 @@ export default function CloneRepoModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-lg rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#181818] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
@@ -177,7 +177,7 @@ export default function CloneRepoModal({
             <button
               onClick={handleCancel}
               className={`p-1.5 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#2A2A2A]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
               title="Cancelar y Cerrar"
             >
@@ -206,7 +206,7 @@ export default function CloneRepoModal({
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
                 className={`w-full border rounded-2xl px-4 py-3 text-xs font-mono font-semibold focus:outline-none focus:border-blue-500 transition-all ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                 }`}
               />
             </div>
@@ -225,7 +225,7 @@ export default function CloneRepoModal({
                   placeholder="Selecciona la carpeta de tu equipo..."
                   value={destinationFolder}
                   className={`flex-1 border rounded-2xl px-4 py-3 text-xs font-mono font-semibold truncate focus:outline-none transition-all ${
-                    isDark ? 'bg-[#12141F] border-white/[0.08] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                    isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                   }`}
                 />
 
@@ -235,7 +235,7 @@ export default function CloneRepoModal({
                   onClick={handleSelectDestination}
                   className={`px-4 py-3 rounded-2xl border text-xs font-bold shrink-0 flex items-center space-x-1.5 transition-all cursor-pointer ${
                     isDark
-                      ? 'bg-[#181B28] border-white/[0.08] text-slate-200 hover:bg-[#1E2235] hover:text-white'
+                      ? 'bg-[#252525] border-white/[0.08] text-slate-200 hover:bg-[#303030] hover:text-white'
                       : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200/70'
                   }`}
                 >
@@ -258,7 +258,7 @@ export default function CloneRepoModal({
 
                 {/* Animated Progress Track */}
                 <div className={`w-full h-3 rounded-full overflow-hidden p-0.5 border ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
                 }`}>
                   <motion.div
                     initial={{ width: '0%' }}
@@ -276,7 +276,7 @@ export default function CloneRepoModal({
                 type="button"
                 onClick={handleCancel}
                 className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  isDark ? 'text-slate-400 hover:text-white hover:bg-[#181B28]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                  isDark ? 'text-slate-400 hover:text-white hover:bg-[#252525]' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
               >
                 Cancelar

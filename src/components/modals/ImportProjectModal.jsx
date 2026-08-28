@@ -165,12 +165,12 @@ export default function ImportProjectModal({
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header */}
           <div className={`px-5 py-3.5 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50/80 border-slate-200/80'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50/80 border-slate-200/80'
           }`}>
             <div className="flex items-center space-x-2.5">
               <div className="w-8 h-8 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
@@ -203,7 +203,7 @@ export default function ImportProjectModal({
             <button
               onClick={onClose}
               className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -222,7 +222,7 @@ export default function ImportProjectModal({
                   isDragging
                     ? 'border-blue-500 bg-blue-500/10 scale-[1.005]'
                     : isDark
-                    ? 'border-white/[0.12] bg-[#12141F] hover:border-blue-500/50 hover:bg-[#1A1D2D]'
+                    ? 'border-white/[0.12] bg-[#1E1E1E] hover:border-blue-500/50 hover:bg-[#2A2A2A]'
                     : 'border-slate-300 bg-slate-50/50 hover:border-blue-400 hover:bg-blue-50/20'
                 }`}
                 onClick={handleBrowseFolder}
@@ -231,7 +231,7 @@ export default function ImportProjectModal({
                   isDragging 
                     ? 'bg-blue-600 text-white border-blue-400' 
                     : isDark 
-                    ? 'bg-[#181B28] border-white/[0.08] text-blue-400' 
+                    ? 'bg-[#252525] border-white/[0.08] text-blue-400' 
                     : 'bg-white border-slate-200 text-blue-600 shadow-2xs'
                 }`}>
                   <UploadCloud className="h-6 w-6" />
@@ -265,7 +265,7 @@ export default function ImportProjectModal({
             {/* STEP 2: ANALYZING */}
             {step === 'analyzing' && (
               <div className={`p-6 rounded-xl border text-center space-y-5 ${
-                isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50/50 border-slate-200/80'
+                isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50/50 border-slate-200/80'
               }`}>
                 <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full border-2 border-blue-500/20 animate-ping"></div>
@@ -323,7 +323,7 @@ export default function ImportProjectModal({
                 {/* Dual Environment Card */}
                 {detectedFolder.hasBackend ? (
                   <div className={`p-4 rounded-xl border space-y-3 ${
-                    isDark ? 'bg-[#12141F] border-purple-500/20' : 'bg-purple-50/40 border-purple-200/80'
+                    isDark ? 'bg-[#1E1E1E] border-purple-500/20' : 'bg-purple-50/40 border-purple-200/80'
                   }`}>
                     <div className="flex items-center justify-between border-b pb-2.5 border-purple-500/15">
                       <div className="flex items-center space-x-2">
@@ -347,7 +347,7 @@ export default function ImportProjectModal({
                     <div className="grid grid-cols-2 gap-2.5 text-xs">
                       {/* Frontend */}
                       <div className={`p-3 rounded-lg border space-y-1 ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08]' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#252525] border-white/[0.08]' : 'bg-white border-slate-200'
                       }`}>
                         <div className="flex items-center space-x-1.5 text-blue-400 font-medium text-[11px]">
                           <Layers className="h-3.5 w-3.5" />
@@ -363,7 +363,7 @@ export default function ImportProjectModal({
 
                       {/* Backend */}
                       <div className={`p-3 rounded-lg border space-y-1 ${
-                        isDark ? 'bg-[#181B28] border-white/[0.08]' : 'bg-white border-slate-200'
+                        isDark ? 'bg-[#252525] border-white/[0.08]' : 'bg-white border-slate-200'
                       }`}>
                         <div className="flex items-center space-x-1.5 text-purple-400 font-medium text-[11px]">
                           <Server className="h-3.5 w-3.5" />
@@ -385,7 +385,7 @@ export default function ImportProjectModal({
                 ) : (
                   /* Single Environment Card */
                   <div className={`p-4 rounded-xl border ${
-                    isDark ? 'bg-[#12141F] border-white/[0.08]' : 'bg-slate-50/50 border-slate-200/80'
+                    isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-50/50 border-slate-200/80'
                   }`}>
                     <div className="flex items-center space-x-3">
                       <div className="w-9 h-9 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">

@@ -10,6 +10,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   stopProject: (id) => ipcRenderer.invoke('stop-project', id),
   getRecentProjects: () => ipcRenderer.invoke('get-recent-projects'),
   saveRecentProjects: (projects) => ipcRenderer.invoke('save-recent-projects', projects),
+  getProjectsFilePath: () => ipcRenderer.invoke('get-projects-file-path'),
+  getCustomDatabases: () => ipcRenderer.invoke('get-custom-databases'),
+  saveCustomDatabases: (dbs) => ipcRenderer.invoke('save-custom-databases', dbs),
   openInBrowser: (url) => ipcRenderer.invoke('open-in-browser', url),
   openInEditor: (folderPath, editorCmd) => ipcRenderer.invoke('open-in-editor', { folderPath, editorCmd }),
   detectEditors: () => ipcRenderer.invoke('detect-editors'),
@@ -128,6 +131,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Dedicated Log Windows & Retention
   openLogWindow: (projectId, projectName) => ipcRenderer.invoke('open-log-window', { projectId, projectName }),
+  openApiHubWindow: (data) => ipcRenderer.invoke('open-api-hub-window', data),
   getProjectLogs: (projectId) => ipcRenderer.invoke('get-project-logs', projectId),
   clearProjectLogs: (projectId) => ipcRenderer.invoke('clear-project-logs', projectId),
   writeProjectStdin: (projectId, input) => ipcRenderer.invoke('write-project-stdin', { projectId, input }),

@@ -35,12 +35,12 @@ export default function ExecutionConfigModal({
           transition={{ type: "spring", stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
           className={`w-full max-w-md rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-[#0D0E15] border-white/[0.08] text-[#F3F4F6]' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#141414] border-white/[0.08] text-[#E5E5E5]' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Modal Header */}
           <div className={`px-6 py-4 border-b flex items-center justify-between ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
@@ -56,7 +56,7 @@ export default function ExecutionConfigModal({
             <button
               onClick={onClose}
               className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'text-slate-400 hover:text-white hover:bg-[#1E2235]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
+                isDark ? 'text-slate-400 hover:text-white hover:bg-[#303030]' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200/60'
               }`}
             >
               <X className="h-4 w-4" />
@@ -75,7 +75,7 @@ export default function ExecutionConfigModal({
                 onChange={(e) => setPortInput(e.target.value)}
                 placeholder="ej: 3000"
                 className={`w-full border rounded-xl p-3 font-mono font-bold text-sm focus:outline-none transition-all ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               />
               <span className="text-[11px] text-slate-400 block">
@@ -93,7 +93,7 @@ export default function ExecutionConfigModal({
                 onChange={(e) => setCommandInput(e.target.value)}
                 placeholder="ej: npm run dev"
                 className={`w-full border rounded-xl p-3 font-mono font-bold text-sm focus:outline-none transition-all ${
-                  isDark ? 'bg-[#12141F] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
+                  isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               />
               <span className="text-[11px] text-slate-400 block">
@@ -111,12 +111,12 @@ export default function ExecutionConfigModal({
 
           {/* Modal Footer */}
           <div className={`px-6 py-4 border-t flex items-center justify-between ${
-            isDark ? 'bg-[#090A0F] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#141414] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <button
               onClick={onClose}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                isDark ? 'bg-[#181B28] border-white/[0.08] text-slate-300 hover:bg-[#1E2235] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                isDark ? 'bg-[#252525] border-white/[0.08] text-slate-300 hover:bg-[#303030] hover:text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
               }`}
             >
               Cancelar

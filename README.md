@@ -2,14 +2,14 @@
   <img src="public/Lummo.png" alt="Lummo Studio Logo" width="160" />
 </p>
 
-<h1 align="center">Lummo Studio v2.4.30</h1>
+<h1 align="center">Lummo Studio v2.4.31</h1>
 
 <p align="center">
   <strong>Modern Control Panel for Local Development Environments & Relational Database Management</strong>
 </p>
 
 <p align="center">
-  <a href="https://img.shields.io/badge/Version-2.4.30-blue"><img src="https://img.shields.io/badge/Version-2.4.30-blue?style=flat-square" alt="Version" /></a>
+  <a href="https://img.shields.io/badge/Version-2.4.31-blue"><img src="https://img.shields.io/badge/Version-2.4.31-blue?style=flat-square" alt="Version" /></a>
   <a href="https://electronjs.org"><img src="https://img.shields.io/badge/Electron-34.2-47848F?style=flat-square&logo=electron&logoColor=white" alt="Electron" /></a>
   <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" /></a>
   <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/Vite-6.1-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite" /></a>

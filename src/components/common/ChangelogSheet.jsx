@@ -5,7 +5,7 @@ import { getTranslations } from '../../locales';
 
 export default function ChangelogSheet({
   show,
-  version = '2.4.30',
+  version = '2.4.31',
   releaseNotes,
   onClose,
   theme = 'dark',

@@ -6,7 +6,7 @@
     "badge": "ES"
   },
   "translations": {
-    "appVersion": "v2.4.30",
+    "appVersion": "v2.4.31",
     "home": "Inicio",
     "projects": "Proyectos",
     "databases": "Bases de Datos",
@@ -51,7 +51,7 @@
     "additional": "adicionales",
     "baseDeDatos": "Base de Datos",
     "settingsTitle": "Ajustes & Configuración",
-    "settingsDesc": "Configuración global de Lummo Studio v2.4.30",
+    "settingsDesc": "Configuración global de Lummo Studio v2.4.31",
     "systemServices": "Servicios del Sistema",
     "diagnosticsDesc": "Diagnóstico de ejecutables y motores locales detectados en tu equipo",
     "defaultPorts": "Puertos por Defecto",

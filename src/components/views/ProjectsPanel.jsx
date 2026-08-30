@@ -26,6 +26,7 @@ export default function ProjectsPanel({
   onOpenBrowser,
   onOpenEditor,
   onRemoveProject,
+  onUpdateProject,
   onUpdatePort,
   onToggleLogs,
   onSelectProjectDetail,
@@ -52,25 +53,38 @@ export default function ProjectsPanel({
   }, [projects]);
 
   const checkPort = async (projectId, port) => {
-    if (window.electronAPI?.checkPort) {
+    if (window.electronAPI?.checkPort && port) {
       const busy = await window.electronAPI.checkPort(port);
       setPortStatus((prev) => ({ ...prev, [projectId]: busy }));
     }
   };
 
   const handlePortChange = async (projectId, newPort) => {
+    if (newPort === '') return;
     const portNum = parseInt(newPort, 10);
-    if (onUpdatePort) onUpdatePort(projectId, portNum);
-    checkPort(projectId, portNum);
+    if (!isNaN(portNum) && portNum > 0) {
+      if (onUpdateProject) {
+        onUpdateProject(projectId, { port: portNum });
+      } else if (onUpdatePort) {
+        onUpdatePort(projectId, portNum);
+      }
+      checkPort(projectId, portNum);
+    }
   };
 
   const handleAutoAssignFreePort = async (projectId, currentPort) => {
     if (window.electronAPI) {
       const freePort = await window.electronAPI.findFreePort(currentPort || 3000);
-      if (onUpdatePort) onUpdatePort(projectId, freePort);
+      if (onUpdateProject) {
+        onUpdateProject(projectId, { port: freePort });
+      } else if (onUpdatePort) {
+        onUpdatePort(projectId, freePort);
+      }
       checkPort(projectId, freePort);
     } else {
-      if (onUpdatePort) onUpdatePort(projectId, 5173);
+      const fallback = 5173;
+      if (onUpdateProject) onUpdateProject(projectId, { port: fallback });
+      else if (onUpdatePort) onUpdatePort(projectId, fallback);
     }
   };
 
@@ -329,7 +343,7 @@ export default function ProjectsPanel({
                       <span className="text-slate-500">{t.port || 'Port:'}</span>
                       <input
                         type="number"
-                        value={project.port}
+                        value={project.port ?? ''}
                         onChange={(e) => handlePortChange(project.id, e.target.value)}
                         className={`w-16 border rounded-lg px-2 py-1 font-bold text-center focus:outline-none transition-all ${
                           isDark ? 'bg-[#1E1E1E] border-white/[0.08] text-white focus:border-blue-500' : 'bg-white border-slate-200 text-slate-800'

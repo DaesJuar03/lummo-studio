@@ -417,27 +417,68 @@ export function useLummoState() {
     closeTab(projectId);
   }, [projects, saveProjects, closeTab]);
 
-  const handleUpdatePort = useCallback((projectId, newPort) => {
-    const updated = projects.map(p => (p.id === projectId || p.path === projectId) ? { ...p, port: newPort } : p);
-    saveProjects(updated);
+  const handleUpdateProject = useCallback((projectId, updates) => {
+    if (!projectId || !updates) return;
+
+    setProjects(prevProjects => {
+      const updated = prevProjects.map(p => {
+        if (p.id === projectId || p.path === projectId) {
+          const merged = { ...p, ...updates };
+          if (updates.port !== undefined) {
+            const parsed = parseInt(updates.port, 10);
+            if (!isNaN(parsed) && parsed > 0) {
+              merged.port = parsed;
+            }
+          }
+          return merged;
+        }
+        return p;
+      });
+
+      try {
+        localStorage.setItem('lummo-projects', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      if (window.electronAPI?.saveRecentProjects) {
+        window.electronAPI.saveRecentProjects(updated).catch(console.error);
+      }
+
+      return updated;
+    });
+
     setOpenTabs(prev => prev.map(t => {
       if (t.project && (t.project.id === projectId || t.project.path === projectId)) {
-        return { ...t, project: { ...t.project, port: newPort } };
+        const merged = { ...t.project, ...updates };
+        if (updates.port !== undefined) {
+          const parsed = parseInt(updates.port, 10);
+          if (!isNaN(parsed) && parsed > 0) {
+            merged.port = parsed;
+          }
+        }
+        return { ...t, project: merged };
       }
       return t;
     }));
-  }, [projects, saveProjects, setOpenTabs]);
+  }, [setOpenTabs]);
+
+  const handleUpdatePort = useCallback((projectId, newPort) => {
+    const portNum = parseInt(newPort, 10);
+    if (!isNaN(portNum) && portNum > 0) {
+      handleUpdateProject(projectId, { port: portNum });
+      setProjects(curr => {
+        const proj = curr.find(p => p.id === projectId || p.path === projectId);
+        if (proj?.path && window.electronAPI?.syncEnvPort) {
+          window.electronAPI.syncEnvPort(proj.path, portNum).catch(() => {});
+        }
+        return curr;
+      });
+    }
+  }, [handleUpdateProject]);
 
   const handleUpdateCommand = useCallback((projectId, newCommand) => {
-    const updated = projects.map(p => (p.id === projectId || p.path === projectId) ? { ...p, command: newCommand } : p);
-    saveProjects(updated);
-    setOpenTabs(prev => prev.map(t => {
-      if (t.project && (t.project.id === projectId || t.project.path === projectId)) {
-        return { ...t, project: { ...t.project, command: newCommand } };
-      }
-      return t;
-    }));
-  }, [projects, saveProjects, setOpenTabs]);
+    handleUpdateProject(projectId, { command: newCommand });
+  }, [handleUpdateProject]);
 
   return {
     projects,
@@ -485,6 +526,7 @@ export function useLummoState() {
     handleOpenBrowser,
     handleOpenEditor,
     handleRemoveProject,
+    handleUpdateProject,
     handleUpdatePort,
     handleUpdateCommand
   };

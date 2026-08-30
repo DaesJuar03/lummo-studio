@@ -41,6 +41,7 @@ export default function ProjectDetailPage({
   onOpenBrowser,
   onOpenEditor,
   onOpenLogs,
+  onUpdateProject,
   onUpdatePort,
   onUpdateCommand,
   theme,
@@ -406,34 +407,48 @@ export default function ProjectDetailPage({
 
   const handleSaveConfig = async () => {
     const newPort = parseInt(portInput, 10) || 3000;
+    const cleanCmd = (commandInput || '').trim() || 'npm run dev';
 
-    const updatedPairs = envPairs.map(p => {
-      if (p.key.toUpperCase() === 'PORT' || p.key.toUpperCase() === 'VITE_PORT') {
-        return { ...p, value: String(newPort) };
+    // 1. Non-destructively sync .env port
+    if (envPairs && envPairs.length > 0) {
+      const updatedPairs = envPairs.map(p => {
+        if (p.key.toUpperCase() === 'PORT' || p.key.toUpperCase() === 'VITE_PORT' || p.key.toUpperCase() === 'APP_PORT' || p.key.toUpperCase() === 'SERVER_PORT') {
+          return { ...p, value: String(newPort) };
+        }
+        return p;
+      });
+
+      if (!updatedPairs.some(p => p.key.toUpperCase() === 'PORT')) {
+        updatedPairs.unshift({ key: 'PORT', value: String(newPort) });
       }
-      return p;
-    });
+      setEnvPairs(updatedPairs);
 
-    if (!updatedPairs.some(p => p.key.toUpperCase() === 'PORT')) {
-      updatedPairs.unshift({ key: 'PORT', value: String(newPort) });
+      if (window.electronAPI?.syncEnvPort && project?.path) {
+        await window.electronAPI.syncEnvPort(project.path, newPort);
+      } else if (window.electronAPI?.writeEnvFile && project?.path) {
+        const textToSave = generateEnvText(updatedPairs);
+        await window.electronAPI.writeEnvFile(project.path, textToSave, selectedEnvFile);
+      }
+    } else if (window.electronAPI?.syncEnvPort && project?.path) {
+      await window.electronAPI.syncEnvPort(project.path, newPort);
     }
-    setEnvPairs(updatedPairs);
 
-    const textToSave = generateEnvText(updatedPairs);
-    if (window.electronAPI?.writeEnvFile && project?.path) {
-      await window.electronAPI.writeEnvFile(project.path, textToSave, selectedEnvFile);
+    // 2. Perform atomic update in unified state
+    if (onUpdateProject) {
+      onUpdateProject(project.id, { port: newPort, command: cleanCmd });
+    } else {
+      if (onUpdatePort) onUpdatePort(project.id, newPort);
+      if (onUpdateCommand) onUpdateCommand(project.id, cleanCmd);
     }
 
-    if (onUpdatePort) onUpdatePort(project.id, newPort);
-    if (onUpdateCommand) onUpdateCommand(project.id, commandInput);
-
+    // 3. Restart server on new port if currently running
     if (isRunning) {
       setIsRestarting(true);
       setSavedMessage(language === 'es' ? 'Reiniciando servidor en nuevo puerto...' : 'Restarting server on new port...');
       await onToggleProject(project);
 
       setTimeout(async () => {
-        const updatedProj = { ...project, port: newPort, command: commandInput, status: 'STOPPED' };
+        const updatedProj = { ...project, port: newPort, command: cleanCmd, status: 'STOPPED' };
         await onToggleProject(updatedProj);
         setIsRestarting(false);
         setSavedMessage(language === 'es' ? `¡Servidor activo en puerto :${newPort}!` : `Server active on port :${newPort}!`);

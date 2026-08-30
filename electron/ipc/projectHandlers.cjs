@@ -31,6 +31,148 @@ function validateAndSanitizeGitUrl(repoUrl) {
   return { valid: true, cleanUrl };
 }
 
+function resolveProjectCommand(baseCommand, port, techStack) {
+  let cmd = (baseCommand || '').trim();
+  const portNum = Number(port) || 3000;
+
+  // 1. Static project detection
+  if (cmd === 'lummo:static' || cmd === 'static' || (techStack && techStack.includes('HTML/CSS') && !cmd.includes('http.server') && !cmd.includes('-S'))) {
+    return { isStatic: true, finalCommand: 'lummo:static', port: portNum };
+  }
+
+  if (!cmd) {
+    cmd = 'npm run dev';
+  }
+
+  // 2. Replace {port} placeholder everywhere
+  if (cmd.includes('{port}')) {
+    cmd = cmd.replace(/\{port\}/g, String(portNum));
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  // 3. Replace existing port flags if present (--port 3000, --port=3000, -p 3000, -p=3000)
+  const hasPortFlag = /--port[=\s]\d+/i.test(cmd);
+  const hasPFlag = /(^|\s)-p[=\s]\d+/i.test(cmd);
+  if (hasPortFlag) {
+    cmd = cmd.replace(/--port([=\s])\d+/gi, (m, sep) => `--port${sep}${portNum}`);
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+  if (hasPFlag) {
+    cmd = cmd.replace(/(^|\s)-p([=\s])\d+/gi, (m, pre, sep) => `${pre}-p${sep}${portNum}`);
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  // 4. PHP built-in server: php -S localhost:8000 or php -S 127.0.0.1:8000
+  if (/php\s+-S\s+[a-zA-Z0-9\.\-]+:\d+/i.test(cmd)) {
+    cmd = cmd.replace(/(php\s+-S\s+[a-zA-Z0-9\.\-]+:)\d+/i, `$1${portNum}`);
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+  if (/php\s+-S\s+[a-zA-Z0-9\.\-]+(?!\:)/i.test(cmd)) {
+    cmd = cmd.replace(/(php\s+-S\s+[a-zA-Z0-9\.\-]+)/i, `$1:${portNum}`);
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  // 5. Python http.server: python -m http.server 8000 or python3 -m http.server
+  if (/python3?\s+-m\s+http\.server(\s+\d+)?/i.test(cmd)) {
+    cmd = cmd.replace(/(python3?\s+-m\s+http\.server)(\s+\d+)?/i, `$1 ${portNum}`);
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  // 6. PHP artisan serve
+  if (cmd.includes('php artisan serve')) {
+    cmd = `${cmd} --port=${portNum}`;
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  // 7. Next.js CLI: next dev or next start
+  if (cmd.startsWith('next ') || cmd.startsWith('npx next ')) {
+    cmd = `${cmd} -p ${portNum}`;
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  // 8. Package managers and scripts
+  if (cmd.startsWith('npm run ') || cmd.startsWith('npm start')) {
+    cmd = `${cmd} -- --port ${portNum}`;
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  if (cmd.startsWith('bun run ') || cmd.startsWith('bun dev') || cmd.startsWith('bun start')) {
+    cmd = `${cmd} -- --port ${portNum}`;
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  if (cmd.startsWith('pnpm ') || cmd.startsWith('yarn ')) {
+    cmd = `${cmd} --port ${portNum}`;
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  if (cmd.startsWith('vite') || cmd.startsWith('npx vite') || cmd.startsWith('astro') || cmd.startsWith('npx astro') || cmd.startsWith('uvicorn')) {
+    cmd = `${cmd} --port ${portNum}`;
+    return { isStatic: false, finalCommand: cmd, port: portNum };
+  }
+
+  return { isStatic: false, finalCommand: cmd, port: portNum };
+}
+
+function syncProjectEnvPort(folderPath, port) {
+  if (!folderPath || !fs.existsSync(folderPath)) {
+    return { success: false, error: 'Directorio de proyecto no válido' };
+  }
+
+  const portNum = Number(port) || 3000;
+  const envFiles = ['.env', '.env.local', '.env.development'];
+  let updatedAny = false;
+
+  for (const envFileName of envFiles) {
+    const envFilePath = path.join(folderPath, envFileName);
+    if (fs.existsSync(envFilePath)) {
+      try {
+        let content = fs.readFileSync(envFilePath, 'utf-8');
+        let matched = false;
+
+        const portVarPatterns = [
+          /^(\s*PORT\s*=\s*).*$/m,
+          /^(\s*VITE_PORT\s*=\s*).*$/m,
+          /^(\s*NEXT_PUBLIC_PORT\s*=\s*).*$/m,
+          /^(\s*APP_PORT\s*=\s*).*$/m,
+          /^(\s*SERVER_PORT\s*=\s*).*$/m
+        ];
+
+        for (const pattern of portVarPatterns) {
+          if (pattern.test(content)) {
+            content = content.replace(pattern, `$1${portNum}`);
+            matched = true;
+          }
+        }
+
+        if (envFileName === '.env' && !matched) {
+          content = `${content.trimEnd()}\nPORT=${portNum}\n`;
+          matched = true;
+        }
+
+        if (matched) {
+          fs.writeFileSync(envFilePath, content, 'utf-8');
+          updatedAny = true;
+        }
+      } catch (err) {
+        console.error(`Error sincronizando ${envFileName}:`, err);
+      }
+    }
+  }
+
+  const mainEnvPath = path.join(folderPath, '.env');
+  if (!updatedAny && !fs.existsSync(mainEnvPath)) {
+    try {
+      fs.writeFileSync(mainEnvPath, `PORT=${portNum}\n`, 'utf-8');
+      updatedAny = true;
+    } catch (err) {
+      console.error('Error creando .env:', err);
+    }
+  }
+
+  return { success: true, updated: updatedAny };
+}
+
 function registerProjectHandlers({
   getMainWindow,
   runningProcesses,
@@ -197,21 +339,49 @@ function registerProjectHandlers({
       return { success: false, error: errorMsg };
     }
 
-    const baseCommand = project.command || 'npm run dev';
-    const port = project.port || 3000;
+    const port = Number(project.port) || 3000;
+    const { isStatic, finalCommand } = resolveProjectCommand(project.command, port, project.techStack);
 
-    let finalCommand = baseCommand;
-    if (baseCommand.includes('npm run dev') || baseCommand.includes('npm start')) {
-      if (!baseCommand.includes('--port')) {
-        finalCommand = `${baseCommand} -- --port ${port}`;
-      }
-    } else if (baseCommand.includes('vite')) {
-      if (!baseCommand.includes('--port')) {
-        finalCommand = `${baseCommand} --port ${port}`;
-      }
-    } else if (baseCommand.includes('php artisan serve')) {
-      if (!baseCommand.includes('--port')) {
-        finalCommand = `${baseCommand} --port=${port}`;
+    // Sync .env file with new port in background if present
+    syncProjectEnvPort(project.path, port);
+
+    // Handle Static HTML/CSS or lummo:static Project
+    if (isStatic) {
+      notifyLog(project.id, `[Lummo Static Server] Iniciando servidor estático en puerto ${port}...`);
+      notifyLog(project.id, `[Lummo Static Server] Carpeta: ${project.path}`);
+      try {
+        const express = require('express');
+        const staticApp = express();
+        staticApp.use(express.static(project.path));
+
+        const server = staticApp.listen(port, () => {
+          notifyLog(project.id, `[Lummo Static Server] Servidor local disponible en http://localhost:${port}`);
+        });
+
+        server.on('error', (err) => {
+          notifyLog(project.id, `[Lummo Error] Error en servidor estático: ${err.message}`);
+          if (runningProcesses) runningProcesses.delete(project.id);
+          if (typeof updateTrayContextMenu === 'function') updateTrayContextMenu();
+          emitStatus(project.id, 'STOPPED');
+        });
+
+        if (runningProcesses) {
+          runningProcesses.set(project.id, { server, name: project.name || 'Sitio Estático', port, path: project.path });
+        }
+        emitStatus(project.id, 'RUNNING');
+        if (typeof updateTrayContextMenu === 'function') updateTrayContextMenu();
+
+        if (typeof showNativeNotification === 'function') {
+          showNativeNotification({
+            title: 'Servidor Iniciado 🟢',
+            body: `${project.name || 'Sitio Estático'} escuchando en http://localhost:${port}`
+          });
+        }
+        return { success: true };
+      } catch (err) {
+        notifyLog(project.id, `[Lummo Error] No se pudo iniciar servidor estático: ${err.message}`);
+        emitStatus(project.id, 'ERROR');
+        return { success: false, error: err.message };
       }
     }
 
@@ -225,7 +395,12 @@ function registerProjectHandlers({
           ...process.env, 
           PORT: String(port), 
           VITE_PORT: String(port),
-          NEXT_PUBLIC_PORT: String(port)
+          NEXT_PUBLIC_PORT: String(port),
+          SERVER_PORT: String(port),
+          APP_PORT: String(port),
+          DEV_PORT: String(port),
+          BROWSER: 'none',
+          FORCE_COLOR: '1'
         }
       });
 
@@ -810,6 +985,10 @@ function registerProjectHandlers({
     return { success: result };
   });
 
+  safeHandle('sync-env-port', async (event, { folderPath, port }) => {
+    return syncProjectEnvPort(folderPath, port);
+  });
+
   safeHandle('clear-all-logs', () => {
     if (projectLogsStore) projectLogsStore.clear();
     const win = getMainWindow();
@@ -827,4 +1006,4 @@ function registerProjectHandlers({
   });
 }
 
-module.exports = { registerProjectHandlers };
+module.exports = { registerProjectHandlers, resolveProjectCommand, syncProjectEnvPort };

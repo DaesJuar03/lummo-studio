@@ -80,8 +80,13 @@ function killProcessTree(child) {
 function stopProjectById(projectId) {
   const item = runningProcesses.get(projectId);
   if (item) {
+    if (item.server && typeof item.server.close === 'function') {
+      try { item.server.close(); } catch (e) {}
+    }
     const child = item.child || item;
-    killProcessTree(child);
+    if (child && child.pid) {
+      killProcessTree(child);
+    }
     runningProcesses.delete(projectId);
     updateTrayContextMenu();
     if (mainWindow && !mainWindow.isDestroyed()) {
@@ -92,8 +97,13 @@ function stopProjectById(projectId) {
 
 function stopAllProjects() {
   runningProcesses.forEach((item, projectId) => {
+    if (item && item.server && typeof item.server.close === 'function') {
+      try { item.server.close(); } catch (e) {}
+    }
     const child = item.child || item;
-    killProcessTree(child);
+    if (child && child.pid) {
+      killProcessTree(child);
+    }
   });
   runningProcesses.clear();
   updateTrayContextMenu();

@@ -63,6 +63,7 @@ export default function App() {
     handleOpenBrowser,
     handleOpenEditor,
     handleRemoveProject,
+    handleUpdateProject,
     handleUpdatePort,
     handleUpdateCommand
   } = useLummoState();
@@ -218,6 +219,7 @@ export default function App() {
               onOpenBrowser={handleOpenBrowser}
               onOpenEditor={handleOpenEditor}
               onRemoveProject={handleRemoveProject}
+              onUpdateProject={handleUpdateProject}
               onUpdatePort={handleUpdatePort}
               onToggleLogs={(id) => {
                 const project = projects.find(p => p.id === id || p.path === id);
@@ -254,6 +256,7 @@ export default function App() {
                 onOpenBrowser={handleOpenBrowser}
                 onOpenEditor={handleOpenEditor}
                 onOpenLogs={handleOpenLogWindow}
+                onUpdateProject={handleUpdateProject}
                 onUpdatePort={handleUpdatePort}
                 onUpdateCommand={handleUpdateCommand}
                 theme={theme}

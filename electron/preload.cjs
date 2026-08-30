@@ -36,6 +36,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // .env file editor & comparison
   readEnvFile: (folderPath) => ipcRenderer.invoke('read-env-file', folderPath),
   writeEnvFile: (folderPath, content, fileName) => ipcRenderer.invoke('write-env-file', { folderPath, content, fileName }),
+  syncEnvPort: (folderPath, port) => ipcRenderer.invoke('sync-env-port', { folderPath, port }),
 
   // Git Repository Clone & Cancel
   cloneRepository: (repoUrl, destinationParentFolder) => ipcRenderer.invoke('clone-repository', { repoUrl, destinationParentFolder }),

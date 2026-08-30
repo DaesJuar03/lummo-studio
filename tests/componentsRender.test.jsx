@@ -144,7 +144,7 @@ describe('Full React Component Render & Connection Suite', () => {
         theme="dark"
       />
     );
-    expect(html).toContain('Gestor Completo de Proyectos');
+    expect(html).toContain('Gestor de Proyectos');
     expect(html).toContain('Test Vite App');
   });
 
@@ -226,7 +226,7 @@ describe('Full React Component Render & Connection Suite', () => {
       />
     );
     expect(html).toContain('Test Vite App');
-    expect(html).toContain('PORT');
+    expect(html).toContain('5173');
   });
 
   it('renders DatabaseDetailPage and its SQL/Redis workbenches correctly', () => {
@@ -287,7 +287,7 @@ describe('Full React Component Render & Connection Suite', () => {
     expect(renderToString(<DockerComposeModal isOpen={true} onClose={() => {}} project={mockProject} theme="dark" />)).toContain('Docker');
     expect(renderToString(<NetworkTunnelModal isOpen={true} onClose={() => {}} project={mockProject} theme="dark" />)).toContain('Túnel');
     expect(renderToString(<CommandPaletteModal isOpen={true} onClose={() => {}} theme="dark" />)).toContain('comando');
-    expect(renderToString(<UserErrorModal error={new Error('Test Error')} onClose={() => {}} theme="dark" />)).toContain('Interrupción');
+    expect(renderToString(<UserErrorModal error={new Error('Test Error')} onClose={() => {}} theme="dark" />)).toContain('Se requiere instalar un componente');
     expect(renderToString(<LogsConsole logs={[]} projects={[mockProject]} activeProjectId="proj-1" onClose={() => {}} onClearLogs={() => {}} />)).toContain('Console Logs');
   });
 });

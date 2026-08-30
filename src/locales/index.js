@@ -41,10 +41,10 @@ const localeDictionary = {
 export function getTranslations(langCode) {
   const code = langCode || (typeof localStorage !== 'undefined' ? localStorage.getItem('lummo-language') : null) || 'es';
   if (customLocales.has(code)) {
-    return { ...enLocale.translations, ...customLocales.get(code).translations };
+    return { ...esLocale.translations, ...customLocales.get(code).translations };
   }
-  const dict = localeDictionary[code] || localeDictionary.es || enLocale.translations;
-  return { ...enLocale.translations, ...dict };
+  const dict = localeDictionary[code] || localeDictionary.es || esLocale.translations;
+  return { ...esLocale.translations, ...dict };
 }
 
 /**

@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": "db-1788052365315",
+    "name": "store",
+    "engine": "sqlite",
+    "type": "sqlite",
+    "port": null,
+    "status": "READY",
+    "tech": "SQLite (.sqlite en Documentos)",
+    "installed": true,
+    "size": "0.0 MB",
+    "tables": 0,
+    "connections": 1,
+    "filePath": "C:\\Users\\desau\\OneDrive\\Documentos\\LummoStudio\\Databases\\store.sqlite",
+    "isDb": true
+  },
+  {
+    "id": "db-1788052014364",
+    "name": "reddddd",
+    "engine": "sqlite",
+    "type": "sqlite",
+    "port": null,
+    "status": "READY",
+    "tech": "SQLite (.sqlite en Documentos)",
+    "installed": true,
+    "size": "0.0 MB",
+    "tables": 0,
+    "connections": 1,
+    "filePath": "C:\\Users\\desau\\OneDrive\\Documentos\\LummoStudio\\Databases\\reddddd.sqlite",
+    "isDb": true
+  }
+]

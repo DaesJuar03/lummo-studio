@@ -4,6 +4,7 @@
   "private": true,
   "version": "2.4.69",
   "description": "Modern Dev Server & Database Control Panel",
+  "author": "DaesJuar03",
   "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
@@ -91,8 +92,7 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Lummo Studio",
       "installerIcon": "public/Lummo.ico",
-      "uninstallerIcon": "public/Lummo.ico",
-      "loadingGif": "build/installer.gif"
+      "uninstallerIcon": "public/Lummo.ico"
     }
   }
 }

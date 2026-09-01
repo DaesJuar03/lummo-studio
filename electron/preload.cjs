@@ -134,6 +134,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Dedicated Log Windows & Retention
   openLogWindow: (projectId, projectName) => ipcRenderer.invoke('open-log-window', { projectId, projectName }),
   openApiHubWindow: (data) => ipcRenderer.invoke('open-api-hub-window', data),
+  openGitWindow: (data) => ipcRenderer.invoke('open-git-window', data),
   getProjectLogs: (projectId) => ipcRenderer.invoke('get-project-logs', projectId),
   clearProjectLogs: (projectId) => ipcRenderer.invoke('clear-project-logs', projectId),
   writeProjectStdin: (projectId, input) => ipcRenderer.invoke('write-project-stdin', { projectId, input }),
@@ -210,5 +211,26 @@ contextBridge.exposeInMainWorld('electronAPI', {
       ipcRenderer.on('update-error', subscription);
       return () => ipcRenderer.removeListener('update-error', subscription);
     }
+  },
+
+  // Relaunch Application
+  relaunchApp: () => ipcRenderer.invoke('relaunch-app'),
+
+  // Git Inspector & Visual Graph API
+  git: {
+    getStatus: (folderPath) => ipcRenderer.invoke('git-get-status', folderPath),
+    getHistory: (folderPath, limit) => ipcRenderer.invoke('git-get-history', { folderPath, limit }),
+    getBranches: (folderPath) => ipcRenderer.invoke('git-get-branches', folderPath),
+    checkoutBranch: (folderPath, branchName) => ipcRenderer.invoke('git-checkout-branch', { folderPath, branchName }),
+    stageAll: (folderPath) => ipcRenderer.invoke('git-stage-all', folderPath),
+    commit: (folderPath, message) => ipcRenderer.invoke('git-commit', { folderPath, message }),
+    push: (folderPath) => ipcRenderer.invoke('git-push', folderPath),
+    pull: (folderPath) => ipcRenderer.invoke('git-pull', folderPath)
+  },
+
+  // AI Agent Infrastructure & Database Assistant API
+  ai: {
+    testConnection: (options) => ipcRenderer.invoke('ai-test-connection', options),
+    chatCompletion: (payload) => ipcRenderer.invoke('ai-chat-completion', payload)
   }
 });

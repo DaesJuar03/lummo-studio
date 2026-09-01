@@ -2,7 +2,7 @@
   "name": "lummo",
   "productName": "Lummo Studio",
   "private": true,
-  "version": "2.4.31",
+  "version": "2.4.69",
   "description": "Modern Dev Server & Database Control Panel",
   "main": "electron/main.cjs",
   "type": "module",
@@ -15,6 +15,7 @@
     "prebuild": "node ./scripts/sync-version.cjs --sync",
     "build": "vite build",
     "build:electron": "cross-env ELECTRON_RUN_AS_NODE=1 electron ./scripts/compile-bytecode.cjs",
+    "installer:gif": "electron ./scripts/generate-installer-gif.cjs",
     "dist": "npm run build && npm run build:electron && electron-builder",
     "test": "vitest run",
     "lint": "oxlint",
@@ -47,6 +48,7 @@
     "cross-env": "^7.0.3",
     "electron": "^34.2.0",
     "electron-builder": "^25.1.8",
+    "gifenc": "^1.0.3",
     "javascript-obfuscator": "^5.6.0",
     "rollup-plugin-obfuscator": "^1.1.0",
     "tailwindcss": "^4.0.0",
@@ -82,11 +84,15 @@
       ]
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Lummo Studio"
+      "shortcutName": "Lummo Studio",
+      "installerIcon": "public/Lummo.ico",
+      "uninstallerIcon": "public/Lummo.ico",
+      "loadingGif": "build/installer.gif"
     }
   }
 }

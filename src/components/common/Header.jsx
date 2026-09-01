@@ -12,7 +12,8 @@ import {
   Pin,
   PinOff,
   Copy,
-  FolderX
+  FolderX,
+  Sparkles
 } from 'lucide-react';
 import { getTranslations } from '../../locales';
 import HeaderUpdateWidget from './HeaderUpdateWidget';
@@ -26,6 +27,7 @@ export default function Header({
   onPlusClick,
   onOpenCommandPalette,
   onOpenSettings,
+  onOpenAiAssistant,
   runningCount,
   canGoBack,
   canGoForward,
@@ -185,6 +187,22 @@ export default function Header({
               isDark={isDark}
               language={language}
             />
+          )}
+
+          {/* Botón Asistente IA (Si está habilitado en Experimental) */}
+          {(typeof localStorage !== 'undefined' && localStorage.getItem('lummo-exp-ai') === 'true') && (
+            <button
+              onClick={onOpenAiAssistant}
+              className={`mr-2 px-2.5 py-1 rounded-xl border flex items-center space-x-1.5 text-xs font-bold transition-all cursor-pointer ${
+                isDark 
+                  ? 'bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.2)]' 
+                  : 'bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 shadow-xs'
+              }`}
+              title={language === 'es' ? 'Abrir Asistente Lummo IA' : 'Open Lummo AI Assistant'}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+              <span>AI</span>
+            </button>
           )}
 
           <button

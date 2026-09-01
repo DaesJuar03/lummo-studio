@@ -184,7 +184,8 @@ function registerProjectHandlers({
   updateTrayContextMenu,
   showNativeNotification,
   openLogWindow,
-  openApiHubWindow
+  openApiHubWindow,
+  openGitWindow
 }) {
   let activeCloneProcess = null;
 
@@ -958,6 +959,14 @@ function registerProjectHandlers({
       return { success: true };
     }
     return { success: false, error: 'Función de ventana de API Hub no disponible' };
+  });
+
+  safeHandle('open-git-window', (event, { projectId, projectName, projectPath }) => {
+    if (typeof openGitWindow === 'function') {
+      openGitWindow({ projectId, projectName, projectPath });
+      return { success: true };
+    }
+    return { success: false, error: 'Función de ventana de Git no disponible' };
   });
 
   safeHandle('get-project-logs', (event, projectId) => {

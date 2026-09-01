@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, CheckCircle2, Sparkles, X, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { FileText, CheckCircle2, Sparkles, X, ArrowRight, ShieldCheck, Zap, GitBranch, Bot, Sliders } from 'lucide-react';
 import { getTranslations } from '../../locales';
 
 export default function ChangelogSheet({
   show,
-  version = '2.4.31',
+  version = '2.4.69',
   releaseNotes,
   onClose,
   theme = 'dark',
@@ -17,19 +17,36 @@ export default function ChangelogSheet({
 
   const defaultFeatures = [
     {
+      icon: GitBranch,
+      color: 'emerald',
+      title: language === 'es' ? 'Inspector de Git & Ventana Independiente' : 'Git Inspector & Standalone Window',
+      desc: language === 'es' 
+        ? 'Detección automática de .git, selector de ramas, historial visual de commits, cambios pendientes y visor en ventana dedicada.' 
+        : 'Automatic .git detection, branch switcher, commit graph timeline, pending changes, and dedicated standalone window.'
+    },
+    {
+      icon: Bot,
+      color: 'purple',
+      title: language === 'es' ? 'Agente Asistente de IA (Infraestructura & BD)' : 'AI Infrastructure & Database Copilot',
+      desc: language === 'es' 
+        ? 'Asistente inteligente compatible con Ollama local (100% gratis), OpenAI, Gemini, Claude, DeepSeek y Groq con contexto de servidores y logs.' 
+        : 'Smart assistant supporting local Ollama (100% free), OpenAI, Gemini, Claude, DeepSeek, and Groq with live server & log context.'
+    },
+    {
+      icon: Sliders,
+      color: 'blue',
+      title: language === 'es' ? 'Nueva Pestaña "Experimental" en Ajustes' : 'New "Experimental" Settings Tab',
+      desc: language === 'es' 
+        ? 'Activa o desactiva funciones avanzadas bajo demanda con notificación de reinicio automático.' 
+        : 'Toggle advanced beta modules on demand with automatic application restart prompts.'
+    },
+    {
       icon: Zap,
-      title: language === 'es' ? 'Sistema de Auto-Update Integrado' : 'Integrated Auto-Update System',
-      desc: language === 'es' ? 'Detección, descarga en segundo plano y aplicación fluida sin descargas manuales.' : 'Detection, background download, and seamless application without manual downloads.'
-    },
-    {
-      icon: Sparkles,
-      title: language === 'es' ? 'Rendimiento y Arranque Acelerado' : 'Accelerated Launch & Performance',
-      desc: language === 'es' ? 'Optimización en el escaneo de puertos libres y arranque instantáneo de proyectos Vite/React.' : 'Optimized free port scanning and instant startup for Vite/React projects.'
-    },
-    {
-      icon: ShieldCheck,
-      title: language === 'es' ? 'Seguridad y Telemetría en Tiempo Real' : 'Real-time Security & Telemetry',
-      desc: language === 'es' ? 'Mayor estabilidad en el aislamiento de procesos y gestión de memoria RAM/CPU.' : 'Enhanced process isolation stability and RAM/CPU resource management.'
+      color: 'amber',
+      title: language === 'es' ? 'Nuevo Splash Screen e Instalador Minimalista' : 'New Minimalist Splash & Installer',
+      desc: language === 'es' 
+        ? 'Diseño dark mate con barra de progreso con profundidad y carga 100% opaca y sólida.' 
+        : 'Dark matte design with depth progress bar and 100% solid, opaque startup screen.'
     }
   ];
 
@@ -104,6 +121,14 @@ export default function ChangelogSheet({
             ) : (
               defaultFeatures.map((feat, idx) => {
                 const IconComponent = feat.icon;
+                const colorStyles = feat.color === 'emerald'
+                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                  : feat.color === 'purple'
+                    ? 'bg-purple-500/10 border-purple-500/20 text-purple-400'
+                    : feat.color === 'amber'
+                      ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                      : 'bg-blue-500/10 border-blue-500/20 text-blue-400';
+
                 return (
                   <div 
                     key={idx} 
@@ -111,7 +136,7 @@ export default function ChangelogSheet({
                       isDark ? 'bg-[#1E1E1E] border-white/[0.05]' : 'bg-slate-50 border-slate-100'
                     }`}
                   >
-                    <div className="w-7 h-7 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
+                    <div className={`w-7 h-7 rounded-xl border flex items-center justify-center shrink-0 mt-0.5 ${colorStyles}`}>
                       <IconComponent className="w-3.5 h-3.5" />
                     </div>
                     <div className="min-w-0">

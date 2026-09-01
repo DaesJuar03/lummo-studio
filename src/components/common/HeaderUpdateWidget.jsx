@@ -17,22 +17,23 @@ export default function HeaderUpdateWidget({
   if (status === 'downloading') {
     return (
       <div 
-        className="relative mr-2 h-7 px-3 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 shadow-md min-w-[130px] border border-blue-500/40 select-none"
+        className="relative mr-2 h-7 px-3 rounded-full flex items-center space-x-2.5 bg-[#151515] border border-white/[0.08] shadow-inner select-none"
         title={t.downloadingUpdateTitle || 'Downloading new version...'}
         style={{ WebkitAppRegion: 'no-drag' }}
       >
-        {/* Barra de progreso de color blanco llenando el fondo (sin porcentaje numérico) */}
-        <motion.div 
-          className="absolute left-0 top-0 bottom-0 bg-white/35 rounded-full"
-          initial={{ width: '0%' }}
-          animate={{ width: `${Math.max(progress, 6)}%` }}
-          transition={{ ease: 'easeOut', duration: 0.3 }}
-        />
+        <div className="flex items-center space-x-1.5 text-white text-[10.5px] font-extrabold uppercase tracking-wider">
+          <Download className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+          <span>{t.downloadingUpdate || 'Descargando...'}</span>
+        </div>
 
-        {/* Contenido en primer plano */}
-        <div className="relative z-10 flex items-center space-x-1.5 text-white text-[11px] font-bold tracking-tight">
-          <Download className="w-3.5 h-3.5 text-white" />
-          <span>{t.downloadingUpdate || 'Downloading update...'}</span>
+        {/* Barra hundida con profundidad y progreso blanco */}
+        <div className="w-20 h-2 bg-[#08080a] rounded-full overflow-hidden relative shadow-[inset_0_2px_4px_rgba(0,0,0,0.95),0_1px_0_rgba(255,255,255,0.08)] border border-white/[0.04]">
+          <motion.div 
+            className="absolute left-0 top-0 bottom-0 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+            initial={{ width: '0%' }}
+            animate={{ width: `${Math.max(progress, 6)}%` }}
+            transition={{ ease: 'easeOut', duration: 0.3 }}
+          />
         </div>
       </div>
     );

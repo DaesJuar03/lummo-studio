@@ -8,7 +8,8 @@ import {
   Code, 
   Sliders, 
   FolderKanban, 
-  ShieldCheck 
+  ShieldCheck,
+  FlaskConical
 } from 'lucide-react';
 import { getTranslations } from '../../locales';
 
@@ -18,6 +19,7 @@ import EditorTab from './settings/EditorTab';
 import ProjectsManagerTab from './settings/ProjectsManagerTab';
 import SslTab from './settings/SslTab';
 import GeneralTab from './settings/GeneralTab';
+import ExperimentalTab from './settings/ExperimentalTab';
 
 export default function SettingsModal({ 
   onClose, 
@@ -99,6 +101,12 @@ export default function SettingsModal({
     },
     { id: 'ssl', label: t.sslTab || (language === 'es' ? 'Certificados SSL & HTTPS' : 'SSL Certificates & HTTPS'), icon: ShieldCheck },
     { id: 'general', label: t.generalTab || 'General', icon: Sliders },
+    { 
+      id: 'experimental', 
+      label: t.experimentalTab || 'Experimental', 
+      icon: FlaskConical, 
+      badge: 'BETA' 
+    },
   ];
 
   return (
@@ -240,6 +248,14 @@ export default function SettingsModal({
                   theme={theme}
                   onToggleTheme={onToggleTheme}
                   onClearAllLogs={onClearAllLogs}
+                  t={t}
+                />
+              )}
+
+              {activeCategory === 'experimental' && (
+                <ExperimentalTab
+                  theme={theme}
+                  language={language}
                   t={t}
                 />
               )}

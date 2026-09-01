@@ -97,16 +97,16 @@ function createSplashScreen(appIconPath) {
 
   const splashWindow = new BrowserWindow({
     width: 440,
-    height: 290,
+    height: 280,
     frame: false,
-    transparent: true,
+    transparent: false,
     resizable: false,
     alwaysOnTop: true,
     center: true,
     show: true,
     skipTaskbar: false,
     icon: resolvedIcon,
-    backgroundColor: '#00000000',
+    backgroundColor: '#151515',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

@@ -25,7 +25,8 @@ import {
   AlertTriangle,
   Zap,
   Boxes,
-  Radio
+  Radio,
+  GitBranch
 } from 'lucide-react';
 import { getTranslations } from '../../locales';
 
@@ -33,6 +34,8 @@ import NetworkTunnelModal from '../modals/NetworkTunnelModal';
 import ScriptLauncherModal from '../modals/ScriptLauncherModal';
 import ExecutionConfigModal from '../modals/ExecutionConfigModal';
 import DockerComposeModal from '../modals/DockerComposeModal';
+import GitInspectorModal from '../modals/GitInspectorModal';
+import GitInspectorView from './git/GitInspectorView';
 
 export default function ProjectDetailPage({
   project,
@@ -77,6 +80,25 @@ export default function ProjectDetailPage({
   const [showNetworkModal, setShowNetworkModal] = useState(false);
   const [showScriptModal, setShowScriptModal] = useState(false);
   const [showDockerModal, setShowDockerModal] = useState(false);
+  const [showGitModal, setShowGitModal] = useState(false);
+
+  const isGitExpEnabled = typeof localStorage !== 'undefined' && localStorage.getItem('lummo-exp-git') === 'true';
+  const [hasGitRepo, setHasGitRepo] = useState(false);
+  const [gitBranchName, setGitBranchName] = useState('');
+  const [activeRightTab, setActiveRightTab] = useState('env'); // 'env' | 'git'
+
+  useEffect(() => {
+    if (project?.path && window.electronAPI?.git?.getStatus) {
+      window.electronAPI.git.getStatus(project.path).then((res) => {
+        if (res?.hasGit) {
+          setHasGitRepo(true);
+          setGitBranchName(res.currentBranch || 'main');
+        } else {
+          setHasGitRepo(false);
+        }
+      }).catch(() => {});
+    }
+  }, [project?.path]);
 
   // Cloudflare / Localtunnel State
   const [tunnelUrl, setTunnelUrl] = useState('');
@@ -401,6 +423,18 @@ export default function ProjectDetailPage({
     }
   };
 
+  const handleOpenGitWindow = () => {
+    if (window.electronAPI?.openGitWindow && project) {
+      window.electronAPI.openGitWindow({
+        projectId: project.id,
+        projectName: project.name,
+        projectPath: project.path
+      });
+    } else {
+      setShowGitModal(true);
+    }
+  };
+
   if (!project) return null;
 
   const projectUrl = `http://localhost:${project.port}`;
@@ -564,7 +598,7 @@ export default function ProjectDetailPage({
             </button>
           </div>
 
-          {/* Group 2: Dev Tools & Services */}
+          {/* Group 2: Dev Tools & Services (API, Git, Network, Containers) */}
           <div className={`flex items-center gap-1.5 p-1 rounded-2xl border ${
             isDark ? 'bg-[#1E1E1E] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
           }`}>
@@ -583,6 +617,32 @@ export default function ProjectDetailPage({
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               )}
             </button>
+
+            {(isGitExpEnabled || hasGitRepo) && (
+              <button
+                onClick={handleOpenGitWindow}
+                disabled={!hasGitRepo}
+                className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all ${
+                  hasGitRepo
+                    ? isDark 
+                      ? 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 border border-emerald-500/30 cursor-pointer shadow-xs' 
+                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 cursor-pointer'
+                    : isDark
+                      ? 'bg-[#1e1e24] text-slate-500 border border-white/[0.04] opacity-50 cursor-not-allowed'
+                      : 'bg-slate-100 text-slate-400 border border-slate-200 opacity-60 cursor-not-allowed'
+                }`}
+                title={
+                  hasGitRepo
+                    ? (language === 'es' ? `Abrir Ventana Independiente de Git (${gitBranchName || 'main'})` : `Open Standalone Git Inspector (${gitBranchName || 'main'})`)
+                    : (language === 'es' ? 'No se detectó repositorio Git en este proyecto' : 'No Git repository detected in this project')
+                }
+              >
+                <GitBranch className={`h-3.5 w-3.5 ${hasGitRepo ? 'text-emerald-400' : 'text-slate-500'}`} />
+                <span>{hasGitRepo ? (gitBranchName ? `Git: ${gitBranchName}` : 'Git') : 'Git (No repo)'}</span>
+              </button>
+            )}
+
+            <div className={`w-[1px] h-4 mx-0.5 ${isDark ? 'bg-white/10' : 'bg-slate-300'}`} />
 
             <button
               onClick={() => setShowNetworkModal(true)}
@@ -880,26 +940,24 @@ export default function ProjectDetailPage({
                     <button
                       onClick={() => handleRemoveEnvPair(idx)}
                       className="p-2 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
-                      title={language === 'es' ? 'Eliminar variable' : 'Delete variable'}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 );
               })}
-
               <button
                 onClick={handleAddEnvPair}
-                className="text-xs text-blue-400 font-bold hover:text-blue-300 flex items-center space-x-1 pt-1 cursor-pointer"
+                className="text-xs font-mono font-bold text-blue-400 hover:text-blue-300 flex items-center space-x-1 pt-1 transition-colors cursor-pointer"
               >
-                <Plus className="h-3.5 w-3.5" />
+                <Plus className="h-3 w-3" />
                 <span>{language === 'es' ? 'Agregar Variable' : 'Add Variable'}</span>
               </button>
             </div>
           ) : (
             <div className="space-y-2">
               <textarea
-                rows={7}
+                rows={8}
                 value={envContent}
                 onChange={(e) => setEnvContent(e.target.value)}
                 placeholder="PORT=3000&#10;NODE_ENV=development"
@@ -1050,6 +1108,15 @@ export default function ProjectDetailPage({
       <DockerComposeModal
         isOpen={showDockerModal}
         onClose={() => setShowDockerModal(false)}
+        project={project}
+        theme={theme}
+        language={language}
+      />
+
+      {/* Git Inspector Modal */}
+      <GitInspectorModal
+        isOpen={showGitModal}
+        onClose={() => setShowGitModal(false)}
         project={project}
         theme={theme}
         language={language}

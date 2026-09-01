@@ -135,6 +135,19 @@ function registerSystemHandlers(getMainWindow, appIconPath) {
 
     return { success: true, results };
   });
+
+  // Reinicio instantáneo para aplicar configuraciones y módulos experimentales
+  safeHandle('relaunch-app', () => {
+    try {
+      const { app } = require('electron');
+      app.relaunch();
+      app.exit(0);
+      return { success: true };
+    } catch (err) {
+      console.error('[Lummo Relaunch Error]:', err);
+      return { success: false, error: err.message };
+    }
+  });
 }
 
 module.exports = { registerSystemHandlers };

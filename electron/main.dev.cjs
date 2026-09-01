@@ -12,6 +12,8 @@ const { registerProjectHandlers } = require('./ipc/projectHandlers.cjs');
 const { registerApiWebhookHandlers } = require('./ipc/apiWebhookHandlers.cjs');
 const { registerDockerHandlers } = require('./ipc/dockerHandlers.cjs');
 const { registerSslHandlers } = require('./ipc/sslHandlers.cjs');
+const { registerGitHandlers } = require('./ipc/gitHandlers.cjs');
+const { registerAiHandlers } = require('./ipc/aiHandlers.cjs');
 
 // Modular Window and Tray Managers
 const { createMainWindow, createSplashScreen, applySecurityPolicies } = require('./managers/windowManager.cjs');
@@ -27,6 +29,7 @@ const runningProcesses = new Map();
 const projectLogsStore = new Map();
 const logWindows = new Map();
 const apiHubWindows = new Map();
+const gitWindows = new Map();
 
 const appIconPath = path.join(__dirname, '../public/Lummo.ico');
 const MAX_LOG_LINES = 1000;
@@ -213,12 +216,57 @@ function openApiHubWindow({ projectId, projectName, port = 3000, projectPath = '
   apiHubWindows.set(projectId, hubWindow);
 }
 
+function openGitWindow({ projectId, projectName, projectPath = '' }) {
+  if (gitWindows.has(projectId)) {
+    const existing = gitWindows.get(projectId);
+    if (!existing.isDestroyed()) {
+      existing.focus();
+      return;
+    }
+  }
+
+  const gitWindow = new BrowserWindow({
+    width: 1100,
+    height: 740,
+    minWidth: 800,
+    minHeight: 520,
+    title: `Git Inspector: ${projectName || projectId}`,
+    icon: fs.existsSync(appIconPath) ? appIconPath : path.join(__dirname, '../public/Lummo.png'),
+    frame: false,
+    backgroundColor: '#141414',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.cjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      devTools: !app.isPackaged
+    }
+  });
+
+  applySecurityPolicies(gitWindow);
+
+  const queryName = encodeURIComponent(projectName || 'Git Inspector');
+  const queryPath = encodeURIComponent(projectPath || '');
+  const targetUrl = process.env.VITE_DEV_SERVER_URL
+    ? `${process.env.VITE_DEV_SERVER_URL}#/git-inspector/${projectId}?name=${queryName}&path=${queryPath}`
+    : `file://${path.join(__dirname, '../dist/index.html')}#/git-inspector/${projectId}?name=${queryName}&path=${queryPath}`;
+
+  gitWindow.loadURL(targetUrl);
+
+  gitWindow.on('closed', () => {
+    gitWindows.delete(projectId);
+  });
+
+  gitWindows.set(projectId, gitWindow);
+}
+
 app.whenReady().then(() => {
   // 1. Register Modular IPC Handlers FIRST before window loads
   registerSystemHandlers(() => mainWindow, appIconPath);
   registerDbHandlers(() => mainWindow);
   registerDockerHandlers();
   registerSslHandlers();
+  registerGitHandlers();
+  registerAiHandlers();
   initUpdateManager(() => mainWindow);
 
   registerApiWebhookHandlers(
@@ -268,6 +316,7 @@ app.whenReady().then(() => {
     projectLogsStore,
     logWindows,
     apiHubWindows,
+    gitWindows,
     emitLog: (projectId, msg) => {
       let existing = projectLogsStore.get(projectId) || [];
       existing.push(msg);
@@ -282,7 +331,8 @@ app.whenReady().then(() => {
     updateTrayContextMenu: () => updateTrayContextMenu(),
     showNativeNotification,
     openLogWindow,
-    openApiHubWindow
+    openApiHubWindow,
+    openGitWindow
   });
 
   proxyManager.initProxyServers();

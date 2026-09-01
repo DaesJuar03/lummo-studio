@@ -19,8 +19,10 @@ const ImportProjectModal = lazy(() => import('./components/modals/ImportProjectM
 const OnboardingWizard = lazy(() => import('./components/views/OnboardingWizard'));
 const StandaloneLogWindow = lazy(() => import('./components/views/StandaloneLogWindow'));
 const StandaloneApiHubWindow = lazy(() => import('./components/views/StandaloneApiHubWindow'));
+const StandaloneGitWindow = lazy(() => import('./components/views/StandaloneGitWindow'));
 const ProjectDetailPage = lazy(() => import('./components/views/ProjectDetailPage'));
 const DatabaseDetailPage = lazy(() => import('./components/views/DatabaseDetailPage'));
+const AiAssistantDock = lazy(() => import('./components/ai/AiAssistantDock'));
 
 export default function App() {
   const {
@@ -69,6 +71,7 @@ export default function App() {
   } = useLummoState();
 
   const updater = useAppUpdater();
+  const [showAiAssistant, setShowAiAssistant] = React.useState(false);
 
   const {
     openTabs,
@@ -121,6 +124,25 @@ export default function App() {
     );
   }
 
+  // Check Hash for Standalone Git Inspector route: #/git-inspector/{projectId}
+  if (hash.startsWith('#/git-inspector/')) {
+    const projectId = hash.replace('#/git-inspector/', '').split('?')[0];
+    const searchParams = new URLSearchParams(hash.split('?')[1] || '');
+    const projectName = searchParams.get('name') || 'Git Inspector';
+    const projectPath = searchParams.get('path') || '';
+
+    return (
+      <Suspense fallback={<div className="h-screen bg-[#141414]" />}>
+        <StandaloneGitWindow
+          projectId={projectId}
+          projectName={projectName}
+          projectPath={projectPath}
+          theme={theme}
+        />
+      </Suspense>
+    );
+  }
+
   const runningCount = projects.filter(p => p.status === 'RUNNING').length;
   const activeTabObj = openTabs.find(t => t.id === activeTabId) || openTabs[0];
 
@@ -165,6 +187,7 @@ export default function App() {
         onPlusClick={() => setShowNewTabModal(true)}
         onOpenCommandPalette={() => setShowCommandPalette(true)}
         onOpenSettings={() => setShowSettings(true)}
+        onOpenAiAssistant={() => setShowAiAssistant(true)}
         runningCount={runningCount}
         canGoBack={navIndex > 0}
         canGoForward={navIndex < navHistory.length - 1}
@@ -372,6 +395,20 @@ export default function App() {
           version={updater.currentVersion}
           releaseNotes={updater.updateInfo?.releaseNotes}
           onClose={updater.dismissChangelogSheet}
+          theme={theme}
+          language={language}
+        />
+
+        {/* Floating AI Infrastructure & Database Assistant Dock */}
+        <AiAssistantDock
+          isOpen={showAiAssistant}
+          onClose={() => setShowAiAssistant(false)}
+          projects={projects}
+          customDatabases={customDatabases}
+          logs={logs}
+          onOpenSettings={(tab) => {
+            setShowSettings(true);
+          }}
           theme={theme}
           language={language}
         />

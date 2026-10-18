@@ -1,28 +1,37 @@
 import React, { lazy, Suspense } from 'react';
-import Header from './components/common/Header';
-import HomeDashboard from './components/views/HomeDashboard';
-import ProjectsPanel from './components/views/ProjectsPanel';
-import DatabasesPanel from './components/views/DatabasesPanel';
-import LogsConsole from './components/common/LogsConsole';
+import HeaderRaw from './components/common/Header';
+import HomeDashboardRaw from './components/views/HomeDashboard';
+import ProjectsPanelRaw from './components/views/ProjectsPanel';
+import DatabasesPanelRaw from './components/views/DatabasesPanel';
+import LogsConsoleRaw from './components/common/LogsConsole';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import UserErrorModal from './components/modals/UserErrorModal';
-import PostUpdateBanner from './components/common/PostUpdateBanner';
-import ChangelogSheet from './components/common/ChangelogSheet';
+import UserErrorModalRaw from './components/modals/UserErrorModal';
+import PostUpdateBannerRaw from './components/common/PostUpdateBanner';
+import ChangelogSheetRaw from './components/common/ChangelogSheet';
 import { useLummoState } from './context/useLummoState';
 import { useAppUpdater } from './hooks/useAppUpdater';
+import type { LummoProject, DatabaseConfig } from './types/lummo';
 
-// Code Splitting with React.lazy for heavy modals and detail pages
-const SettingsModal = lazy(() => import('./components/modals/SettingsModal'));
-const CommandPaletteModal = lazy(() => import('./components/modals/CommandPaletteModal'));
-const NewTabActionModal = lazy(() => import('./components/modals/NewTabActionModal'));
-const ImportProjectModal = lazy(() => import('./components/modals/ImportProjectModal'));
-const OnboardingWizard = lazy(() => import('./components/views/OnboardingWizard'));
-const StandaloneLogWindow = lazy(() => import('./components/views/StandaloneLogWindow'));
-const StandaloneApiHubWindow = lazy(() => import('./components/views/StandaloneApiHubWindow'));
-const StandaloneGitWindow = lazy(() => import('./components/views/StandaloneGitWindow'));
-const ProjectDetailPage = lazy(() => import('./components/views/ProjectDetailPage'));
-const DatabaseDetailPage = lazy(() => import('./components/views/DatabaseDetailPage'));
-const AiAssistantDock = lazy(() => import('./components/ai/AiAssistantDock'));
+const Header = HeaderRaw as React.ComponentType<any>;
+const HomeDashboard = HomeDashboardRaw as React.ComponentType<any>;
+const ProjectsPanel = ProjectsPanelRaw as React.ComponentType<any>;
+const DatabasesPanel = DatabasesPanelRaw as React.ComponentType<any>;
+const LogsConsole = LogsConsoleRaw as React.ComponentType<any>;
+const UserErrorModal = UserErrorModalRaw as React.ComponentType<any>;
+const PostUpdateBanner = PostUpdateBannerRaw as React.ComponentType<any>;
+const ChangelogSheet = ChangelogSheetRaw as React.ComponentType<any>;
+
+const SettingsModal = lazy(() => import('./components/modals/SettingsModal')) as React.ComponentType<any>;
+const CommandPaletteModal = lazy(() => import('./components/modals/CommandPaletteModal')) as React.ComponentType<any>;
+const NewTabActionModal = lazy(() => import('./components/modals/NewTabActionModal')) as React.ComponentType<any>;
+const ImportProjectModal = lazy(() => import('./components/modals/ImportProjectModal')) as React.ComponentType<any>;
+const OnboardingWizard = lazy(() => import('./components/views/OnboardingWizard')) as React.ComponentType<any>;
+const StandaloneLogWindow = lazy(() => import('./components/views/StandaloneLogWindow')) as React.ComponentType<any>;
+const StandaloneApiHubWindow = lazy(() => import('./components/views/StandaloneApiHubWindow')) as React.ComponentType<any>;
+const StandaloneGitWindow = lazy(() => import('./components/views/StandaloneGitWindow')) as React.ComponentType<any>;
+const ProjectDetailPage = lazy(() => import('./components/views/ProjectDetailPage')) as React.ComponentType<any>;
+const DatabaseDetailPage = lazy(() => import('./components/views/DatabaseDetailPage')) as React.ComponentType<any>;
+const AiAssistantDock = lazy(() => import('./components/ai/AiAssistantDock')) as React.ComponentType<any>;
 
 export default function App() {
   const {
@@ -71,7 +80,7 @@ export default function App() {
   } = useLummoState();
 
   const updater = useAppUpdater();
-  const [showAiAssistant, setShowAiAssistant] = React.useState(false);
+  const [showAiAssistant, setShowAiAssistant] = React.useState<boolean>(false);
 
   const {
     openTabs,
@@ -89,7 +98,6 @@ export default function App() {
     handleGoForward
   } = tabNav;
 
-  // Check Hash for Standalone Log Window route: #/logs/{projectId}
   const hash = window.location.hash;
   if (hash.startsWith('#/logs/')) {
     const projectId = hash.replace('#/logs/', '').split('?')[0];
@@ -103,7 +111,6 @@ export default function App() {
     );
   }
 
-  // Check Hash for Standalone API & Webhook Hub route: #/api-hub/{projectId}
   if (hash.startsWith('#/api-hub/')) {
     const projectId = hash.replace('#/api-hub/', '').split('?')[0];
     const searchParams = new URLSearchParams(hash.split('?')[1] || '');
@@ -124,7 +131,6 @@ export default function App() {
     );
   }
 
-  // Check Hash for Standalone Git Inspector route: #/git-inspector/{projectId}
   if (hash.startsWith('#/git-inspector/')) {
     const projectId = hash.replace('#/git-inspector/', '').split('?')[0];
     const searchParams = new URLSearchParams(hash.split('?')[1] || '');
@@ -143,18 +149,17 @@ export default function App() {
     );
   }
 
-  const runningCount = projects.filter(p => p.status === 'RUNNING').length;
-  const activeTabObj = openTabs.find(t => t.id === activeTabId) || openTabs[0];
+  const runningCount = projects.filter((p) => p.status === 'RUNNING').length;
+  const activeTabObj = openTabs.find((tab) => tab.id === activeTabId) || openTabs[0];
 
-  const cleanSQLite = {
+  const cleanSQLite: DatabaseConfig = {
     id: 'sqlite-custom',
     name: 'Nueva Base de Datos SQLite',
     type: 'sqlite',
-    port: null,
+    port: undefined,
     status: 'READY'
   };
 
-  // IF FIRST TIME USER ONBOARDING: Render standalone setup wizard
   if (showOnboarding) {
     return (
       <OnboardingWizard
@@ -166,7 +171,7 @@ export default function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
         language={language}
-        onSelectLanguage={(lang) => setLanguage(lang)}
+        onSelectLanguage={(lang: string) => setLanguage(lang)}
         detectedLang={langDetection.detectedLang}
         isLangSupported={langDetection.isSupported}
       />
@@ -174,15 +179,16 @@ export default function App() {
   }
 
   return (
-    <div className={`h-screen w-screen flex flex-col font-sans overflow-hidden transition-colors duration-200 ${
-      theme === 'dark' ? 'bg-[#141414] text-[#E5E5E5]' : 'bg-slate-50 text-slate-900'
-    }`}>
-      {/* Header */}
+    <div
+      className={`h-screen w-screen flex flex-col font-sans overflow-hidden transition-colors duration-200 ${
+        theme === 'dark' ? 'bg-[#141414] text-[#E5E5E5]' : 'bg-slate-50 text-slate-900'
+      }`}
+    >
       <Header
         updater={updater}
         openTabs={openTabs}
         activeTabId={activeTabId}
-        onSelectTab={(id) => setActiveTabId(id)}
+        onSelectTab={(id: string) => setActiveTabId(id)}
         onCloseTab={closeTab}
         onPlusClick={() => setShowNewTabModal(true)}
         onOpenCommandPalette={() => setShowCommandPalette(true)}
@@ -201,7 +207,6 @@ export default function App() {
         language={language}
       />
 
-      {/* Notificación Superior al actualizar la versión (Zona Círculo Negro) */}
       <PostUpdateBanner
         version={updater.currentVersion}
         show={updater.showPostUpdateBanner}
@@ -211,8 +216,11 @@ export default function App() {
         language={language}
       />
 
-      {/* Main Content Pane rendered according to Active Tab */}
-      <main className={`flex-1 flex flex-col ${activeTabObj?.type === 'home' ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'}`}>
+      <main
+        className={`flex-1 flex flex-col ${
+          activeTabObj?.type === 'home' ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'
+        }`}
+      >
         <ErrorBoundary>
           {activeTabObj?.type === 'home' && (
             <HomeDashboard
@@ -220,13 +228,35 @@ export default function App() {
               customDatabases={customDatabases}
               onAddProject={() => setShowImportModal(true)}
               onImportFolder={handleImportFolderPath}
-              onOpenProjectsTab={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
-              onOpenDatabasesTab={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
+              onOpenProjectsTab={() =>
+                openTab({ id: 'projects', title: t.projects, type: 'projects' })
+              }
+              onOpenDatabasesTab={() =>
+                openTab({ id: 'databases', title: t.databases, type: 'databases' })
+              }
               onOpenSettings={() => setShowSettings(true)}
               onToggleProject={handleToggleProject}
               onRemoveProject={handleRemoveProject}
-              onSelectProjectDetail={(project) => openTab({ id: project.id, title: `${t.projectTitlePrefix || (language === 'es' ? 'Proyecto' : 'Project')} / ${project.name}`, type: 'project-detail', project })}
-              onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+              onSelectProjectDetail={(project: LummoProject) =>
+                openTab({
+                  id: project.id,
+                  title: `${
+                    t.projectTitlePrefix || (language === 'es' ? 'Proyecto' : 'Project')
+                  } / ${project.name}`,
+                  type: 'project-detail',
+                  project
+                })
+              }
+              onSelectDatabaseDetail={(dbItem: DatabaseConfig) =>
+                openTab({
+                  id: `db-${dbItem.id}`,
+                  title: `${
+                    t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')
+                  } / ${dbItem.name}`,
+                  type: 'database-detail',
+                  db: dbItem
+                })
+              }
               onAddCustomDatabase={handleAddCustomDatabase}
               onRemoveDatabase={handleRemoveDatabase}
               theme={theme}
@@ -244,11 +274,20 @@ export default function App() {
               onRemoveProject={handleRemoveProject}
               onUpdateProject={handleUpdateProject}
               onUpdatePort={handleUpdatePort}
-              onToggleLogs={(id) => {
-                const project = projects.find(p => p.id === id || p.path === id);
+              onToggleLogs={(id: string) => {
+                const project = projects.find((p) => p.id === id || p.path === id);
                 if (project) handleOpenLogWindow(project);
               }}
-              onSelectProjectDetail={(project) => openTab({ id: project.id, title: `${t.projectTitlePrefix || (language === 'es' ? 'Proyecto' : 'Project')} / ${project.name}`, type: 'project-detail', project })}
+              onSelectProjectDetail={(project: LummoProject) =>
+                openTab({
+                  id: project.id,
+                  title: `${
+                    t.projectTitlePrefix || (language === 'es' ? 'Proyecto' : 'Project')
+                  } / ${project.name}`,
+                  type: 'project-detail',
+                  project
+                })
+              }
               activeLogsProject={activeLogsProject}
               theme={theme}
               language={language}
@@ -260,20 +299,39 @@ export default function App() {
               envStatus={envStatus}
               customDatabases={customDatabases}
               onAddCustomDatabase={handleAddCustomDatabase}
-              onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+              onSelectDatabaseDetail={(dbItem: DatabaseConfig) =>
+                openTab({
+                  id: `db-${dbItem.id}`,
+                  title: `${
+                    t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')
+                  } / ${dbItem.name}`,
+                  type: 'database-detail',
+                  db: dbItem
+                })
+              }
               theme={theme}
               language={language}
             />
           )}
 
-          <Suspense fallback={
-            <div className="flex items-center justify-center p-12 text-xs font-mono text-slate-500">
-              <span className="animate-pulse">{language === 'es' ? 'Cargando módulo de Lummo Studio...' : 'Loading Lummo Studio module...'}</span>
-            </div>
-          }>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center p-12 text-xs font-mono text-slate-500">
+                <span className="animate-pulse">
+                  {language === 'es'
+                    ? 'Cargando módulo de Lummo Studio...'
+                    : 'Loading Lummo Studio module...'}
+                </span>
+              </div>
+            }
+          >
             {activeTabObj?.type === 'project-detail' && activeTabObj.project && (
               <ProjectDetailPage
-                project={projects.find(p => p.id === activeTabObj.project.id || p.path === activeTabObj.project.path) || activeTabObj.project}
+                project={
+                  projects.find(
+                    (p) => p.id === activeTabObj.project?.id || p.path === activeTabObj.project?.path
+                  ) || activeTabObj.project
+                }
                 onBack={() => setActiveTabId('home')}
                 onToggleProject={handleToggleProject}
                 onOpenBrowser={handleOpenBrowser}
@@ -300,7 +358,6 @@ export default function App() {
       </main>
 
       <Suspense fallback={null}>
-        {/* Real-time Console Logs Drawer (Fallback) */}
         {activeLogsProject && (
           <LogsConsole
             logs={logs}
@@ -313,7 +370,6 @@ export default function App() {
           />
         )}
 
-        {/* Settings Modal */}
         {showSettings && (
           <SettingsModal
             updater={updater}
@@ -324,33 +380,42 @@ export default function App() {
             theme={theme}
             onToggleTheme={toggleTheme}
             language={language}
-            onSelectLanguage={(lang) => setLanguage(lang)}
+            onSelectLanguage={(lang: string) => setLanguage(lang)}
             onOpenOnboarding={() => setShowOnboarding(true)}
             onClearAllLogs={handleClearAllLogs}
             projects={projects}
             onSaveProjects={saveProjects}
             onRemoveProject={handleRemoveProject}
-            onOpenFolder={(folderPath) => {
-              if (window.electronAPI?.openFolder) {
-                window.electronAPI.openFolder(folderPath);
+            onOpenFolder={(folderPath: string) => {
+              if (window.electronAPI?.openInEditor) {
+                window.electronAPI.openInEditor(folderPath, 'explorer');
               }
             }}
           />
         )}
 
-        {/* New Tab Action Picker Modal */}
         <NewTabActionModal
           isOpen={showNewTabModal}
           onClose={() => setShowNewTabModal(false)}
           onOpenProjects={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
-          onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
+          onOpenDatabases={() =>
+            openTab({ id: 'databases', title: t.databases, type: 'databases' })
+          }
           onAddProject={() => setShowImportModal(true)}
-          onOpenSQLiteWorkbench={() => openTab({ id: 'db-sqlite', title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / SQLite`, type: 'database-detail', db: cleanSQLite })}
+          onOpenSQLiteWorkbench={() =>
+            openTab({
+              id: 'db-sqlite',
+              title: `${
+                t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')
+              } / SQLite`,
+              type: 'database-detail',
+              db: cleanSQLite
+            })
+          }
           theme={theme}
           language={language}
         />
 
-        {/* Import Project Modal with Drag and Drop Zone */}
         <ImportProjectModal
           isOpen={showImportModal}
           onClose={() => setShowImportModal(false)}
@@ -360,7 +425,6 @@ export default function App() {
           language={language}
         />
 
-        {/* Quick Command Omnibox (Ctrl + K) */}
         <CommandPaletteModal
           isOpen={showCommandPalette}
           onClose={() => setShowCommandPalette(false)}
@@ -368,16 +432,26 @@ export default function App() {
           customDatabases={customDatabases}
           onAddProject={() => setShowImportModal(true)}
           onOpenProjects={() => openTab({ id: 'projects', title: t.projects, type: 'projects' })}
-          onOpenDatabases={() => openTab({ id: 'databases', title: t.databases, type: 'databases' })}
+          onOpenDatabases={() =>
+            openTab({ id: 'databases', title: t.databases, type: 'databases' })
+          }
           onOpenSettings={() => setShowSettings(true)}
           onToggleProject={handleToggleProject}
-          onSelectDatabaseDetail={(dbItem) => openTab({ id: `db-${dbItem.id}`, title: `${t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')} / ${dbItem.name}`, type: 'database-detail', db: dbItem })}
+          onSelectDatabaseDetail={(dbItem: DatabaseConfig) =>
+            openTab({
+              id: `db-${dbItem.id}`,
+              title: `${
+                t.databaseTitlePrefix || (language === 'es' ? 'Base de Datos' : 'Database')
+              } / ${dbItem.name}`,
+              type: 'database-detail',
+              db: dbItem
+            })
+          }
           onOpenOnboarding={() => setShowOnboarding(true)}
           theme={theme}
           language={language}
         />
 
-        {/* Simplified User-Friendly Error Modal */}
         {userError && (
           <UserErrorModal
             error={userError.error}
@@ -389,7 +463,6 @@ export default function App() {
           />
         )}
 
-        {/* Hoja Flotante de Actualización / Novedades (Zona Círculo Rojo) */}
         <ChangelogSheet
           show={updater.showChangelogSheet}
           version={updater.currentVersion}
@@ -399,14 +472,14 @@ export default function App() {
           language={language}
         />
 
-        {/* Floating AI Infrastructure & Database Assistant Dock */}
         <AiAssistantDock
           isOpen={showAiAssistant}
           onClose={() => setShowAiAssistant(false)}
           projects={projects}
           customDatabases={customDatabases}
           logs={logs}
-          onOpenSettings={(tab) => {
+          activeTab={activeTabObj}
+          onOpenSettings={() => {
             setShowSettings(true);
           }}
           theme={theme}

@@ -36,6 +36,7 @@ export default function StandaloneGitWindow({
     }`}>
       {/* Titlebar Row (Frameless & Draggable) */}
       <div 
+        data-tauri-drag-region
         className={`h-11 pl-4 pr-0 flex items-center justify-between border-b shrink-0 ${
           isDark ? 'bg-[#161619] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
         }`}

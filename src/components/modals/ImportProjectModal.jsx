@@ -40,6 +40,19 @@ export default function ImportProjectModal({
       setScanProgress(0);
       setScanMessage('');
       setTargetPath('');
+      return;
+    }
+
+    if (window.electronAPI?.onFileDrop) {
+      const unsubscribe = window.electronAPI.onFileDrop((paths) => {
+        if (paths && paths.length > 0 && paths[0]) {
+          setIsDragging(false);
+          processFolderPath(paths[0]);
+        }
+      });
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
     }
   }, [isOpen]);
 

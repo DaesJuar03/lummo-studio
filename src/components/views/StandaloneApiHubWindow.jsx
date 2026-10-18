@@ -120,6 +120,7 @@ export default function StandaloneApiHubWindow({
     }`}>
       {/* Titlebar Header */}
       <header 
+        data-tauri-drag-region
         className={`pl-4 pr-0 h-11 border-b flex items-center justify-between select-none shrink-0 ${
           isDark ? 'bg-[#12141c] border-[#1e212b]' : 'bg-white border-slate-200'
         }`}

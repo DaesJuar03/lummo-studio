@@ -79,7 +79,7 @@ const targets = [
     replace: (content) => content.replace(/version = '\d+\.\d+\.\d+'/g, `version = '${targetVersion}'`)
   },
   {
-    filePath: path.join(rootDir, 'src/hooks/useAppUpdater.js'),
+    filePath: path.join(rootDir, 'src/hooks/useAppUpdater.ts'),
     replace: (content) => content.replace(/packageInfo\.version \|\| '\d+\.\d+\.\d+'/g, `packageInfo.version || '${targetVersion}'`)
   },
   {
@@ -93,6 +93,18 @@ const targets = [
         .replace(/Lummo Studio v\d+\.\d+\.\d+/g, `Lummo Studio v${targetVersion}`)
         .replace(/Version-\d+\.\d+\.\d+-blue/g, `Version-${targetVersion}-blue`);
     }
+  },
+  {
+    filePath: path.join(rootDir, 'src-tauri/tauri.conf.json'),
+    replace: (content) => {
+      const json = JSON.parse(content);
+      json.version = targetVersion;
+      return JSON.stringify(json, null, 2) + '\n';
+    }
+  },
+  {
+    filePath: path.join(rootDir, 'src-tauri/Cargo.toml'),
+    replace: (content) => content.replace(/^version = "\d+\.\d+\.\d+"/m, `version = "${targetVersion}"`)
   }
 ];
 

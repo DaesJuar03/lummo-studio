@@ -2,7 +2,7 @@
 <html lang="es" class="h-screen w-screen overflow-hidden">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' http: https: ws: wss:;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' ipc: http://ipc.localhost; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: http://asset.localhost data: https:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost http: https: ws: wss:;" />
     <link rel="icon" type="image/png" href="/Lummo.png" />
     <link rel="shortcut icon" href="/Lummo.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,6 +10,6 @@
   </head>
   <body class="bg-[#141414] text-neutral-200 antialiased selection:bg-neutral-700 selection:text-white font-sans overflow-hidden h-screen w-screen m-0 p-0">
     <div id="root" class="h-screen w-screen overflow-hidden flex flex-col"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,5 @@
+lummo_*.json
+*.db
+*.sqlite
+*.log
+target/

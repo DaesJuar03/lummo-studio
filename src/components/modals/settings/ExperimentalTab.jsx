@@ -62,7 +62,8 @@ export default function ExperimentalTab({
 
   const [aiApiKey, setAiApiKey] = useState(() => {
     try {
-      return localStorage.getItem('lummo-ai-apikey') || '';
+      const p = localStorage.getItem('lummo-ai-provider') || 'ollama';
+      return localStorage.getItem(`lummo-ai-apikey-${p}`) || localStorage.getItem('lummo-ai-apikey') || '';
     } catch {
       return '';
     }
@@ -100,6 +101,7 @@ export default function ExperimentalTab({
     setGitEnabled(next);
     try {
       localStorage.setItem('lummo-exp-git', String(next));
+      window.dispatchEvent(new Event('lummo-exp-updated'));
     } catch {}
     setHasPendingRestart(true);
   };
@@ -109,6 +111,7 @@ export default function ExperimentalTab({
     setAiEnabled(next);
     try {
       localStorage.setItem('lummo-exp-ai', String(next));
+      window.dispatchEvent(new Event('lummo-exp-updated'));
     } catch {}
     setHasPendingRestart(true);
   };
@@ -118,9 +121,12 @@ export default function ExperimentalTab({
     const prov = AI_PROVIDERS.find(p => p.id === provId);
     if (prov) {
       setAiModel(prov.defaultModel);
+      const savedKey = localStorage.getItem(`lummo-ai-apikey-${provId}`) || (provId === aiProvider ? aiApiKey : '');
+      setAiApiKey(savedKey);
       try {
         localStorage.setItem('lummo-ai-provider', provId);
         localStorage.setItem('lummo-ai-model', prov.defaultModel);
+        localStorage.setItem('lummo-ai-apikey', savedKey);
       } catch {}
     }
     setTestResult(null);
@@ -129,6 +135,14 @@ export default function ExperimentalTab({
   const handleSaveAiConfig = (key, val) => {
     try {
       localStorage.setItem(key, val);
+    } catch {}
+  };
+
+  const handleSaveApiKey = (val) => {
+    setAiApiKey(val);
+    try {
+      localStorage.setItem(`lummo-ai-apikey-${aiProvider}`, val);
+      localStorage.setItem('lummo-ai-apikey', val);
     } catch {}
   };
 
@@ -167,11 +181,8 @@ export default function ExperimentalTab({
   };
 
   const handleRelaunchApp = () => {
-    if (window.electronAPI?.relaunchApp) {
-      window.electronAPI.relaunchApp();
-    } else {
-      window.location.reload();
-    }
+    window.dispatchEvent(new Event('lummo-exp-updated'));
+    window.location.reload();
   };
 
   const selectedProvObj = AI_PROVIDERS.find(p => p.id === aiProvider) || AI_PROVIDERS[0];
@@ -375,11 +386,16 @@ export default function ExperimentalTab({
                     <input
                       type={showApiKey ? 'text' : 'password'}
                       value={aiApiKey}
-                      onChange={(e) => {
-                        setAiApiKey(e.target.value);
-                        handleSaveAiConfig('lummo-ai-apikey', e.target.value);
-                      }}
-                      placeholder={`sk-... (${selectedProvObj.name})`}
+                      onChange={(e) => handleSaveApiKey(e.target.value)}
+                      placeholder={
+                        selectedProvObj.id === 'gemini' 
+                          ? 'AIzaSy... (Google Gemini)' 
+                          : selectedProvObj.id === 'groq'
+                            ? 'gsk_... (Groq)'
+                            : selectedProvObj.id === 'anthropic'
+                              ? 'sk-ant-... (Claude)'
+                              : `sk-... (${selectedProvObj.name})`
+                      }
                       className={`w-full px-3.5 py-2.5 pr-10 rounded-xl border text-xs font-mono outline-none transition-all ${
                         isDark 
                           ? 'bg-[#202024] border-white/[0.08] text-white focus:border-purple-500' 

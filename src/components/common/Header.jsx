@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft,
@@ -44,6 +44,23 @@ export default function Header({
   const t = getTranslations(language);
   const [draggedTabId, setDraggedTabId] = useState(null);
   const [contextMenu, setContextMenu] = useState(null); // { x, y, tab }
+  const [isAiEnabled, setIsAiEnabled] = useState(
+    () => typeof localStorage !== 'undefined' && localStorage.getItem('lummo-exp-ai') === 'true'
+  );
+
+  useEffect(() => {
+    const syncExp = () => {
+      try {
+        setIsAiEnabled(localStorage.getItem('lummo-exp-ai') === 'true');
+      } catch {}
+    };
+    window.addEventListener('lummo-exp-updated', syncExp);
+    window.addEventListener('storage', syncExp);
+    return () => {
+      window.removeEventListener('lummo-exp-updated', syncExp);
+      window.removeEventListener('storage', syncExp);
+    };
+  }, []);
 
   const handleMinimize = () => {
     if (window.electronAPI?.windowMinimize) window.electronAPI.windowMinimize();
@@ -102,6 +119,7 @@ export default function Header({
     }`} onClick={closeContextMenu}>
       {/* Top Titlebar Row */}
       <div 
+        data-tauri-drag-region
         className={`h-11 pl-3 pr-0 flex items-center justify-between border-b ${
           isDark ? 'bg-[#141414]/95 backdrop-blur-md border-white/[0.08] text-[#E5E5E5]' : 'bg-slate-200/80 border-slate-300/70 text-slate-900'
         }`}
@@ -137,17 +155,17 @@ export default function Header({
             </button>
           </div>
 
-          <div className="flex items-center space-x-2 pl-1">
+          <div className="flex items-center space-x-2 pl-1" data-tauri-drag-region>
             <img 
               src="Lummo.png" 
               onError={(e) => { e.target.src = 'public/Lummo.png'; }} 
               alt="Lummo Studio Logo" 
-              className="w-5 h-5 object-contain" 
+              className="w-5 h-5 object-contain pointer-events-none" 
             />
-            <span className={`font-extrabold text-xs tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <span data-tauri-drag-region className={`font-extrabold text-xs tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Lummo Studio
             </span>
-            <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
+            <span data-tauri-drag-region className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
               isDark 
                 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
                 : 'bg-blue-50 text-blue-600 border border-blue-200'
@@ -158,7 +176,7 @@ export default function Header({
         </div>
 
         {/* Center: Quick Command Omnibox Search */}
-        <div className="flex-1 flex justify-center items-center px-4" style={{ WebkitAppRegion: 'no-drag' }}>
+        <div data-tauri-drag-region className="flex-1 flex justify-center items-center px-4" style={{ WebkitAppRegion: 'no-drag' }}>
           <button
             onClick={onOpenCommandPalette}
             className={`w-60 sm:w-72 md:w-80 flex items-center justify-between px-3 py-1 rounded-xl border text-xs transition-all shadow-2xs cursor-pointer ${
@@ -190,7 +208,7 @@ export default function Header({
           )}
 
           {/* Botón Asistente IA (Si está habilitado en Experimental) */}
-          {(typeof localStorage !== 'undefined' && localStorage.getItem('lummo-exp-ai') === 'true') && (
+          {isAiEnabled && (
             <button
               onClick={onOpenAiAssistant}
               className={`mr-2 px-2.5 py-1 rounded-xl border flex items-center space-x-1.5 text-xs font-bold transition-all cursor-pointer ${
@@ -250,6 +268,7 @@ export default function Header({
 
       {/* Tabs Row Bar */}
       <div 
+        data-tauri-drag-region
         className={`flex items-center px-2 py-1 space-x-1 select-none overflow-x-auto no-scrollbar ${
           isDark ? 'bg-[#181818]' : 'bg-slate-200/90'
         }`}

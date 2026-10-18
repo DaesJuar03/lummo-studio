@@ -82,10 +82,26 @@ export default function ProjectDetailPage({
   const [showDockerModal, setShowDockerModal] = useState(false);
   const [showGitModal, setShowGitModal] = useState(false);
 
-  const isGitExpEnabled = typeof localStorage !== 'undefined' && localStorage.getItem('lummo-exp-git') === 'true';
+  const [isGitExpEnabled, setIsGitExpEnabled] = useState(
+    () => typeof localStorage !== 'undefined' && localStorage.getItem('lummo-exp-git') === 'true'
+  );
   const [hasGitRepo, setHasGitRepo] = useState(false);
   const [gitBranchName, setGitBranchName] = useState('');
   const [activeRightTab, setActiveRightTab] = useState('env'); // 'env' | 'git'
+
+  useEffect(() => {
+    const syncExp = () => {
+      try {
+        setIsGitExpEnabled(localStorage.getItem('lummo-exp-git') === 'true');
+      } catch {}
+    };
+    window.addEventListener('lummo-exp-updated', syncExp);
+    window.addEventListener('storage', syncExp);
+    return () => {
+      window.removeEventListener('lummo-exp-updated', syncExp);
+      window.removeEventListener('storage', syncExp);
+    };
+  }, []);
 
   useEffect(() => {
     if (project?.path && window.electronAPI?.git?.getStatus) {

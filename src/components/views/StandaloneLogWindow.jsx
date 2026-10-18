@@ -66,6 +66,7 @@ export default function StandaloneLogWindow({ projectId, projectName, language =
   return (
     <div className="h-screen bg-slate-900 text-slate-100 flex flex-col font-sans select-none selection:bg-blue-600 selection:text-white">
       <header 
+        data-tauri-drag-region
         className="pl-4 pr-0 h-11 bg-white border-b border-slate-200 flex items-center justify-between select-none"
         style={{ WebkitAppRegion: 'drag' }}
       >

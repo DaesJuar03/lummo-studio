@@ -24,6 +24,7 @@ export default function AiAssistantDock({
   projects = [],
   customDatabases = [],
   logs = {},
+  activeTab = null,
   onOpenSettings,
   theme,
   language = 'es'
@@ -57,15 +58,26 @@ export default function AiAssistantDock({
     ];
   });
 
+  const loadAiSettings = () => {
+    try {
+      const p = localStorage.getItem('lummo-ai-provider') || 'ollama';
+      const k = localStorage.getItem(`lummo-ai-apikey-${p}`) || localStorage.getItem('lummo-ai-apikey') || '';
+      const m = localStorage.getItem('lummo-ai-model') || (p === 'gemini' ? 'gemini-1.5-flash' : p === 'openai' ? 'gpt-4o-mini' : 'llama3:latest');
+      const e = localStorage.getItem('lummo-ai-endpoint') || 'http://127.0.0.1:11434';
+      setProvider(p);
+      setApiKey(k);
+      setModel(m);
+      setAiEndpoint(e);
+      return { p, k, m, e };
+    } catch {
+      return { p: 'ollama', k: '', m: 'llama3:latest', e: 'http://127.0.0.1:11434' };
+    }
+  };
+
   // Reload AI settings when dock opens
   useEffect(() => {
     if (isOpen) {
-      try {
-        setProvider(localStorage.getItem('lummo-ai-provider') || 'ollama');
-        setApiKey(localStorage.getItem('lummo-ai-apikey') || '');
-        setModel(localStorage.getItem('lummo-ai-model') || 'llama3:latest');
-        setAiEndpoint(localStorage.getItem('lummo-ai-endpoint') || 'http://127.0.0.1:11434');
-      } catch {}
+      loadAiSettings();
     }
   }, [isOpen]);
 
@@ -108,27 +120,73 @@ export default function AiAssistantDock({
     setInputMessage('');
     setIsLoading(true);
 
-    // Build context
+    const { p: activeProvider, k: activeApiKey, m: activeModel, e: activeEndpoint } = loadAiSettings();
+
+    if (activeProvider !== 'ollama' && (!activeApiKey || !activeApiKey.trim())) {
+      setIsLoading(false);
+      setMessages([
+        ...updatedMessages,
+        {
+          role: 'assistant',
+          content: language === 'es'
+            ? `⚠️ **API Key no configurada para ${activeProvider.toUpperCase()}**\n\nNo se encontró una clave de acceso guardada. Ve a **Ajustes > Experimental** para ingresar tu API Key.`
+            : `⚠️ **API Key required for ${activeProvider.toUpperCase()}**\n\nNo saved API key was found. Go to **Settings > Experimental** to enter your API key.`
+        }
+      ]);
+      return;
+    }
+
+    // Build context dynamically based on active tab and running services
     const runningProjects = projects.filter(p => p.status === 'RUNNING');
+    
+    let currentProject = null;
+    let activeDbInfo = null;
     const recentLogsArray = [];
-    Object.keys(logs).forEach(pId => {
-      const pLogs = logs[pId] || [];
-      if (pLogs.length > 0) {
-        recentLogsArray.push(...pLogs.slice(-10));
+
+    // If user is currently inspecting a specific project tab
+    if (activeTab?.type === 'project-detail') {
+      const p = activeTab.project || projects.find(proj => proj.id === activeTab.id);
+      if (p) {
+        currentProject = {
+          name: p.name,
+          techStack: p.techStack || 'Desconocido',
+          port: p.port || 3000,
+          status: p.status || 'STOPPED'
+        };
+        const pId = p.id;
+        if (logs[pId] && logs[pId].length > 0) {
+          recentLogsArray.push(...logs[pId].slice(-15));
+        }
       }
-    });
+    } 
+    // If user is currently inspecting a specific database tab
+    else if (activeTab?.type === 'database-detail') {
+      const db = activeTab.db || customDatabases.find(d => `db-${d.id}` === activeTab.id || d.id === activeTab.id);
+      if (db) {
+        activeDbInfo = {
+          name: db.name,
+          type: db.type,
+          tables: db.tables || []
+        };
+      }
+    }
+    // If not in a specific tab, but there are running projects, include their logs
+    else if (runningProjects.length > 0) {
+      runningProjects.forEach(p => {
+        if (logs[p.id] && logs[p.id].length > 0) {
+          recentLogsArray.push(...logs[p.id].slice(-5));
+        }
+      });
+    }
 
     const context = {
+      currentView: activeTab?.type || 'home',
+      currentProject,
+      activeDatabase: activeDbInfo,
+      totalProjectsCount: projects.length,
       runningProjectsCount: runningProjects.length,
-      projectName: runningProjects[0]?.name || projects[0]?.name || '',
-      projectType: runningProjects[0]?.techStack || '',
-      port: runningProjects[0]?.port || 3000,
-      recentLogs: recentLogsArray.slice(-15),
-      databaseInfo: customDatabases[0] ? {
-        name: customDatabases[0].name,
-        type: customDatabases[0].type,
-        tables: customDatabases[0].tables || []
-      } : null
+      runningProjectsNames: runningProjects.map(p => `${p.name} (${p.techStack || 'Web'} en puerto ${p.port || 3000})`),
+      recentLogs: recentLogsArray.slice(-15)
     };
 
     try {
@@ -143,10 +201,10 @@ export default function AiAssistantDock({
       }));
 
       const res = await window.electronAPI.ai.chatCompletion({
-        provider,
-        apiKey,
-        model,
-        endpoint,
+        provider: activeProvider,
+        apiKey: activeApiKey,
+        model: activeModel,
+        endpoint: activeEndpoint,
         messages: apiMessages,
         context
       });
@@ -158,7 +216,7 @@ export default function AiAssistantDock({
           ...updatedMessages,
           {
             role: 'assistant',
-            content: `⚠️ **${language === 'es' ? 'Error del Asistente' : 'Assistant Error'}:** ${res?.error || 'No se pudo obtener respuesta del modelo.'}\n\n*${language === 'es' ? 'Verifica tu API Key o endpoint en Ajustes > Experimental.' : 'Check your API Key or endpoint in Settings > Experimental.'}*`
+            content: `⚠️ **${language === 'es' ? 'Error del Asistente' : 'Assistant Error'}:** ${res?.error || 'No se pudo obtener respuesta del modelo.'}\n\n*${language === 'es' ? 'Verifica tu API Key o modelo en Ajustes > Experimental.' : 'Check your API Key or model in Settings > Experimental.'}*`
           }
         ]);
       }

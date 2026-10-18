@@ -136,12 +136,15 @@ function registerSystemHandlers(getMainWindow, appIconPath) {
     return { success: true, results };
   });
 
-  // Reinicio instantáneo para aplicar configuraciones y módulos experimentales
-  safeHandle('relaunch-app', () => {
+  // Recarga instantánea sin destruir la clase nativa Chrome_WidgetWin_0 (evita Error 1412 en Windows)
+  safeHandle('relaunch-app', (event) => {
     try {
-      const { app } = require('electron');
-      app.relaunch();
-      app.exit(0);
+      const win = (event && event.sender)
+        ? (BrowserWindow.fromWebContents(event.sender) || getMainWindow())
+        : getMainWindow();
+      if (win && !win.isDestroyed()) {
+        win.webContents.reload();
+      }
       return { success: true };
     } catch (err) {
       console.error('[Lummo Relaunch Error]:', err);

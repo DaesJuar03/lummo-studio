@@ -1,27 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
 import packageInfo from '../../package.json';
 
-const CURRENT_VERSION = packageInfo.version || '2.4.69';
+const CURRENT_VERSION: string = packageInfo.version || '2.4.69';
 const STORAGE_KEY_LAST_VERSION = 'lummo_last_seen_version';
 const STORAGE_KEY_CHANGELOG_DISMISSED = 'lummo_changelog_dismissed_version';
 
+export type UpdaterStatus = 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
+
+export interface UpdateInfo {
+  version: string;
+  releaseNotes: string;
+  releaseDate?: string;
+}
+
 export function useAppUpdater() {
-  const [status, setStatus] = useState('idle'); // 'idle' | 'checking' | 'downloading' | 'ready' | 'error'
-  const [progress, setProgress] = useState(0); // 0 - 100
-  const [updateInfo, setUpdateInfo] = useState({
+  const [status, setStatus] = useState<UpdaterStatus>('idle');
+  const [progress, setProgress] = useState<number>(0);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo>({
     version: '',
     releaseNotes: '',
     releaseDate: ''
   });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  // Post-update notification banner & Changelog sheet states
-  const [showPostUpdateBanner, setShowPostUpdateBanner] = useState(false);
-  const [showChangelogSheet, setShowChangelogSheet] = useState(false);
-  const [activeVersion, setActiveVersion] = useState(CURRENT_VERSION);
+  const [showPostUpdateBanner, setShowPostUpdateBanner] = useState<boolean>(false);
+  const [showChangelogSheet, setShowChangelogSheet] = useState<boolean>(false);
+  const [activeVersion, setActiveVersion] = useState<string>(CURRENT_VERSION);
 
-  // Helper para comparar si v1 es mayor que v2
-  const isNewer = (v1, v2) => {
+  const isNewer = (v1?: string, v2?: string): boolean => {
     if (!v1 || !v2) return false;
     const p1 = v1.replace(/^v/, '').split('.').map(Number);
     const p2 = v2.replace(/^v/, '').split('.').map(Number);
@@ -34,7 +40,6 @@ export function useAppUpdater() {
     return false;
   };
 
-  // 1. Detectar si la app acaba de actualizarse (comparando con localStorage)
   useEffect(() => {
     try {
       if (typeof localStorage === 'undefined') return;
@@ -55,21 +60,23 @@ export function useAppUpdater() {
     }
   }, []);
 
-  // 2. Suscribirse a los eventos de Electron Updater
   useEffect(() => {
     if (!window.electronAPI?.updater) return;
 
-    window.electronAPI.updater.getVersion?.().then((ver) => {
-      if (ver) setActiveVersion(ver);
-    }).catch(() => {});
+    window.electronAPI.updater
+      .getVersion?.()
+      .then((ver: string) => {
+        if (ver) setActiveVersion(ver);
+      })
+      .catch(() => {});
 
-    const unsubStatus = window.electronAPI.updater.onUpdateStatus?.((data) => {
+    const unsubStatus = window.electronAPI.updater.onUpdateStatus?.((data: any) => {
       if (data?.state === 'checking') {
         setStatus('checking');
       }
     });
 
-    const unsubAvailable = window.electronAPI.updater.onUpdateAvailable?.((info) => {
+    const unsubAvailable = window.electronAPI.updater.onUpdateAvailable?.((info: any) => {
       setStatus('downloading');
       setProgress(5);
       setUpdateInfo({
@@ -79,14 +86,14 @@ export function useAppUpdater() {
       });
     });
 
-    const unsubProgress = window.electronAPI.updater.onDownloadProgress?.((data) => {
+    const unsubProgress = window.electronAPI.updater.onDownloadProgress?.((data: any) => {
       setStatus('downloading');
       if (typeof data?.percent === 'number') {
         setProgress(Math.round(data.percent));
       }
     });
 
-    const unsubDownloaded = window.electronAPI.updater.onUpdateDownloaded?.((info) => {
+    const unsubDownloaded = window.electronAPI.updater.onUpdateDownloaded?.((info: any) => {
       setStatus('ready');
       setProgress(100);
       if (info) {
@@ -98,7 +105,7 @@ export function useAppUpdater() {
       }
     });
 
-    const unsubError = window.electronAPI.updater.onUpdateError?.((err) => {
+    const unsubError = window.electronAPI.updater.onUpdateError?.((err: any) => {
       console.warn('[useAppUpdater] Error recibido:', err);
       setErrorMessage(err?.message || 'Error en la actualización');
       setTimeout(() => setStatus('idle'), 4000);
@@ -134,7 +141,8 @@ export function useAppUpdater() {
       setProgress(10);
       setUpdateInfo({
         version: targetVer,
-        releaseNotes: '⚡ Mayor velocidad en servidores locales.\n🛡️ Nuevo sistema de túneles públicos.\n📊 Monitoreo de memoria RAM y CPU en tiempo real.\n🎨 Interfaz pulida con animaciones fluidas.'
+        releaseNotes:
+          '⚡ Mayor velocidad en servidores locales.\n🛡️ Nuevo sistema de túneles públicos.\n📊 Monitoreo de memoria RAM y CPU en tiempo real.\n🎨 Interfaz pulida con animaciones fluidas.'
       });
       let current = 10;
       const interval = setInterval(() => {
@@ -172,7 +180,8 @@ export function useAppUpdater() {
     setShowChangelogSheet(true);
     setUpdateInfo({
       version: targetVer,
-      releaseNotes: '⚡ Sistema de Auto-Update Integrado y fluidez mejorada.\n🚀 Arranque acelerado de proyectos React y Vite.\n🛡️ Aislamiento de procesos y telemetría en tiempo real.\n🎨 Interfaz 100% traducida en Español e Inglés.'
+      releaseNotes:
+        '⚡ Sistema de Auto-Update Integrado y fluidez mejorada.\n🚀 Arranque acelerado de proyectos React y Vite.\n🛡️ Aislamiento de procesos y telemetría en tiempo real.\n🎨 Interfaz 100% traducida en Español e Inglés.'
     });
   }, []);
 
@@ -195,3 +204,5 @@ export function useAppUpdater() {
     triggerTestPostUpdate
   };
 }
+
+export default useAppUpdater;

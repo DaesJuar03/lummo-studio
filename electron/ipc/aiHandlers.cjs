@@ -24,12 +24,15 @@ const DEFAULT_MODELS = {
 };
 
 async function callOpenAiCompatible({ url, apiKey, model, messages, temperature = 0.7 }) {
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-  if (apiKey) {
-    headers['Authorization'] = `Bearer ${apiKey}`;
+  const trimmedKey = (apiKey || '').trim();
+  if (!trimmedKey) {
+    throw new Error('API Key no proporcionada o vacía.');
   }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${trimmedKey}`
+  };
 
   const res = await fetch(url, {
     method: 'POST',
@@ -45,9 +48,17 @@ async function callOpenAiCompatible({ url, apiKey, model, messages, temperature 
     const errorText = await res.text();
     let parsedMsg = `HTTP Error ${res.status}`;
     try {
-      const errObj = JSON.parse(errorText);
-      parsedMsg = errObj?.error?.message || errObj?.message || errorText;
+      let errObj = JSON.parse(errorText);
+      if (Array.isArray(errObj) && errObj.length > 0) {
+        errObj = errObj[0];
+      }
+      parsedMsg = errObj?.error?.message || errObj?.message || (typeof errObj?.error === 'string' ? errObj.error : null) || errorText;
     } catch {}
+
+    if (parsedMsg.includes('The caller does not have permission') || parsedMsg.includes('PERMISSION_DENIED')) {
+      parsedMsg += ' (Asegúrate de obtener tu clave desde Google AI Studio: https://aistudio.google.com/api-keys y que la API "Generative Language" esté habilitada sin restricciones de IP/Referrer).';
+    }
+
     throw new Error(parsedMsg);
   }
 
@@ -60,9 +71,14 @@ async function callOpenAiCompatible({ url, apiKey, model, messages, temperature 
 }
 
 async function callAnthropic({ apiKey, model, messages, systemPrompt }) {
+  const trimmedKey = (apiKey || '').trim();
+  if (!trimmedKey) {
+    throw new Error('API Key no proporcionada para Anthropic Claude.');
+  }
+
   const headers = {
     'Content-Type': 'application/json',
-    'x-api-key': apiKey,
+    'x-api-key': trimmedKey,
     'anthropic-version': '2023-06-01'
   };
 
@@ -89,8 +105,11 @@ async function callAnthropic({ apiKey, model, messages, systemPrompt }) {
     const errorText = await res.text();
     let parsedMsg = `HTTP Error ${res.status}`;
     try {
-      const errObj = JSON.parse(errorText);
-      parsedMsg = errObj?.error?.message || errorText;
+      let errObj = JSON.parse(errorText);
+      if (Array.isArray(errObj) && errObj.length > 0) {
+        errObj = errObj[0];
+      }
+      parsedMsg = errObj?.error?.message || errObj?.message || (typeof errObj?.error === 'string' ? errObj.error : null) || errorText;
     } catch {}
     throw new Error(parsedMsg);
   }
@@ -146,8 +165,9 @@ function registerAiHandlers() {
         };
       }
 
-      if (!apiKey && provider !== 'ollama') {
-        return { success: false, error: 'API Key requerida' };
+      const trimmedKey = (apiKey || '').trim();
+      if (!trimmedKey && provider !== 'ollama') {
+        return { success: false, error: `API Key requerida para ${provider.toUpperCase()}` };
       }
 
       // Quick test query (1 token)
@@ -155,10 +175,10 @@ function registerAiHandlers() {
       let testModel = model || DEFAULT_MODELS[provider] || 'gpt-4o-mini';
 
       if (provider === 'anthropic') {
-        await callAnthropic({ apiKey, model: testModel, messages: testMessages, systemPrompt: 'Ping test' });
+        await callAnthropic({ apiKey: trimmedKey, model: testModel, messages: testMessages, systemPrompt: 'Ping test' });
       } else {
         const url = PROVIDER_ENDPOINTS[provider] || PROVIDER_ENDPOINTS.openai;
-        await callOpenAiCompatible({ url, apiKey, model: testModel, messages: testMessages });
+        await callOpenAiCompatible({ url, apiKey: trimmedKey, model: testModel, messages: testMessages });
       }
 
       return {
@@ -183,20 +203,38 @@ function registerAiHandlers() {
     context = {}
   }) => {
     try {
+      const trimmedKey = (apiKey || '').trim();
+      if (provider !== 'ollama' && !trimmedKey) {
+        return {
+          success: false,
+          error: `API Key no configurada para ${provider.toUpperCase()}. Ve a Ajustes > Experimental para ingresar tu clave.`
+        };
+      }
+
       // Build System Prompt with real contextual infrastructure information
       let sysContext = `Eres Lummo AI, el copiloto inteligente de desarrollo local, servidores e infraestructura para Lummo Studio.
 Tus capacidades:
 - Diagnosticar y resolver errores de terminal (Node.js, Vite, Next.js, Python, PHP, Docker, etc.).
 - Diseñar esquemas y generar consultas SQL para MySQL, PostgreSQL, SQLite y comandos Redis.
 - Proponer arquitecturas de carpetas, dependencias y optimizaciones de rendimiento.
-- Sé conciso, directo al grano y utiliza bloques de código con sintaxis markdown clara.`;
+- Sé conciso, directo al grano y utiliza bloques de código con sintaxis markdown clara.
+- IMPORTANTE: No asumas que el usuario está trabajando en un proyecto o base de datos específica a menos que te lo pregunten o esté inspeccionando su pestaña activamente. Si te saludan o hacen preguntas generales, responde de forma general y abierta sin encasillarte en un proyecto en particular.`;
 
-      if (context.projectName) {
-        sysContext += `\n\n[CONTEXTO DEL PROYECTO ACTUAL]:
-- Nombre: ${context.projectName}
-- Tipo: ${context.projectType || 'Desconocido'}
-- Puerto: ${context.port || 3000}
-- Estado: ${context.status || 'STOPPED'}`;
+      if (context.currentProject?.name || context.projectName) {
+        const projName = context.currentProject?.name || context.projectName;
+        const projType = context.currentProject?.techStack || context.projectType || 'Desconocido';
+        const port = context.currentProject?.port || context.port || 3000;
+        const status = context.currentProject?.status || context.status || 'STOPPED';
+
+        sysContext += `\n\n[PROYECTO EN PANTALLA ACTIVA]:
+- Nombre: ${projName}
+- Tipo: ${projType}
+- Puerto: ${port}
+- Estado: ${status}`;
+      } else if (context.runningProjectsCount > 0 && context.runningProjectsNames?.length > 0) {
+        sysContext += `\n\n[SERVIDORES ACTIVOS EN EJECUCIÓN (${context.runningProjectsCount})]:\n${context.runningProjectsNames.map(p => `- ${p}`).join('\n')}`;
+      } else {
+        sysContext += `\n\n[VISTA ACTUAL]: El usuario está en la vista general (${context.currentView || 'Inicio'}). No hay proyectos seleccionados ni servidores corriendo en este momento.`;
       }
 
       if (context.recentLogs && context.recentLogs.length > 0) {
@@ -204,11 +242,12 @@ Tus capacidades:
         sysContext += `\n\n[ÚLTIMOS LOGS DE CONSOLA]:\n${logsText}`;
       }
 
-      if (context.databaseInfo) {
-        sysContext += `\n\n[BASE DE DATOS ACTIVA]:
-- Tipo: ${context.databaseInfo.type}
-- Nombre: ${context.databaseInfo.name}
-- Tablas: ${(context.databaseInfo.tables || []).join(', ')}`;
+      const activeDb = context.activeDatabase || context.databaseInfo;
+      if (activeDb && activeDb.name) {
+        sysContext += `\n\n[BASE DE DATOS EN PANTALLA ACTIVA]:
+- Tipo: ${activeDb.type}
+- Nombre: ${activeDb.name}
+- Tablas: ${(activeDb.tables || []).join(', ')}`;
       }
 
       const finalMessages = [
@@ -222,10 +261,10 @@ Tus capacidades:
       if (provider === 'ollama') {
         result = await callOllama({ endpoint, model: selectedModel, messages: finalMessages });
       } else if (provider === 'anthropic') {
-        result = await callAnthropic({ apiKey, model: selectedModel, messages: finalMessages, systemPrompt: sysContext });
+        result = await callAnthropic({ apiKey: trimmedKey, model: selectedModel, messages: finalMessages, systemPrompt: sysContext });
       } else {
         const url = PROVIDER_ENDPOINTS[provider] || PROVIDER_ENDPOINTS.openai;
-        result = await callOpenAiCompatible({ url, apiKey, model: selectedModel, messages: finalMessages });
+        result = await callOpenAiCompatible({ url, apiKey: trimmedKey, model: selectedModel, messages: finalMessages });
       }
 
       return {
@@ -233,7 +272,7 @@ Tus capacidades:
         message: result
       };
     } catch (err) {
-      console.error('[Lummo AI Handler Error]:', err);
+      console.error('[Lummo AI Handler Error]:', err.message || err);
       return {
         success: false,
         error: err.message || 'Error al procesar la solicitud con el modelo de IA'

@@ -12,6 +12,8 @@ node_modules
 dist
 dist-ssr
 release
+src-tauri/target
+src-tauri/gen/schemas
 *.exe
 *.7z
 *.jsc

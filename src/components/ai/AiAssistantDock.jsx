@@ -4,7 +4,6 @@ import {
   Bot, 
   X, 
   Send, 
-  Sparkles, 
   Trash2, 
   Copy, 
   Check, 
@@ -271,21 +270,16 @@ export default function AiAssistantDock({
           <div className={`px-5 py-4 border-b flex items-center justify-between shrink-0 ${
             isDark ? 'bg-[#16171b] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
-            <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.25)]">
-                <Sparkles className="w-4.5 h-4.5" />
-              </div>
-              <div>
-                <h3 className="font-extrabold text-sm flex items-center gap-2">
-                  <span>Lummo AI</span>
-                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30 font-bold uppercase">
-                    {provider} ({model})
-                  </span>
-                </h3>
-                <p className="text-[11px] text-slate-400">
-                  {language === 'es' ? 'Copiloto de Infraestructura & Bases de Datos' : 'Infrastructure & Database Copilot'}
-                </p>
-              </div>
+            <div>
+              <h3 className="font-extrabold text-sm flex items-center gap-2">
+                <span>Lummo AI</span>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30 font-bold uppercase">
+                  {provider} ({model})
+                </span>
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                {language === 'es' ? 'Copiloto de Infraestructura & Bases de Datos' : 'Infrastructure & Database Copilot'}
+              </p>
             </div>
 
             <div className="flex items-center space-x-1">

@@ -2,6 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { getTranslations, detectSystemLanguage } from '../locales';
 import { useTabNavigation } from '../hooks/useTabNavigation';
 import type { LummoProject, DatabaseConfig, SystemEnvironmentResult } from '../types/lummo';
+import { 
+  parseTransientDiagnostic, 
+  isCleanCompilationLog, 
+  type SyntaxGuardDiagnostic 
+} from '../utils/syntaxGuardParser';
 
 export interface UserErrorState {
   error: any;
@@ -26,6 +31,7 @@ export function useLummoState() {
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [logs, setLogs] = useState<Record<string, string[]>>({});
   const [activeLogsProject, setActiveLogsProject] = useState<string | null>(null);
+  const [activeDiagnostics, setActiveDiagnostics] = useState<Record<string, SyntaxGuardDiagnostic | null>>({});
   const [userError, setUserError] = useState<UserErrorState | null>(null);
 
   const [langDetection] = useState(() => detectSystemLanguage());
@@ -247,6 +253,25 @@ export function useLummoState() {
           ...prev,
           [projectId]: [...(prev[projectId] || []), message]
         }));
+
+        // Runtime Crash Guard: Detect transient compiler / syntax errors & recovery
+        const crashGuardEnabled = typeof localStorage === 'undefined' || localStorage.getItem('lummo-exp-crashguard') !== 'false';
+        if (crashGuardEnabled && message) {
+          if (isCleanCompilationLog(message)) {
+            setActiveDiagnostics((prev) => {
+              if (!prev[projectId]) return prev;
+              return { ...prev, [projectId]: null };
+            });
+          } else {
+            const diag = parseTransientDiagnostic(message, projectId);
+            if (diag) {
+              setActiveDiagnostics((prev) => ({
+                ...prev,
+                [projectId]: diag
+              }));
+            }
+          }
+        }
       });
 
       const unsubscribeStatus = window.electronAPI.onProcessStatus(({ projectId, status }) => {
@@ -262,8 +287,10 @@ export function useLummoState() {
       const unsubscribeCleared = window.electronAPI.onLogsCleared?.(({ projectId, all }) => {
         if (all) {
           setLogs({});
+          setActiveDiagnostics({});
         } else if (projectId) {
           setLogs((prev) => ({ ...prev, [projectId]: [] }));
+          setActiveDiagnostics((prev) => ({ ...prev, [projectId]: null }));
         }
       });
 
@@ -277,6 +304,7 @@ export function useLummoState() {
 
   const handleClearProjectLogs = useCallback(async (projectId: string) => {
     setLogs((prev) => ({ ...prev, [projectId]: [] }));
+    setActiveDiagnostics((prev) => ({ ...prev, [projectId]: null }));
     if (window.electronAPI?.clearProjectLogs) {
       await window.electronAPI.clearProjectLogs(projectId);
     }
@@ -284,9 +312,14 @@ export function useLummoState() {
 
   const handleClearAllLogs = useCallback(async () => {
     setLogs({});
+    setActiveDiagnostics({});
     if (window.electronAPI?.clearAllLogs) {
       await window.electronAPI.clearAllLogs();
     }
+  }, []);
+
+  const handleDismissDiagnostic = useCallback((projectId: string) => {
+    setActiveDiagnostics((prev) => ({ ...prev, [projectId]: null }));
   }, []);
 
   const handleAddCustomDatabase = useCallback(
@@ -570,6 +603,8 @@ export function useLummoState() {
     handleOpenLogWindow,
     handleOpenBrowser,
     handleOpenEditor,
+    activeDiagnostics,
+    handleDismissDiagnostic,
     handleRemoveProject,
     handleUpdateProject,
     handleUpdatePort,

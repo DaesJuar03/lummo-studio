@@ -76,7 +76,9 @@ export default function App() {
     handleRemoveProject,
     handleUpdateProject,
     handleUpdatePort,
-    handleUpdateCommand
+    handleUpdateCommand,
+    activeDiagnostics,
+    handleDismissDiagnostic
   } = useLummoState();
 
   const updater = useAppUpdater();
@@ -332,6 +334,14 @@ export default function App() {
                     (p) => p.id === activeTabObj.project?.id || p.path === activeTabObj.project?.path
                   ) || activeTabObj.project
                 }
+                activeDiagnostic={
+                  activeDiagnostics[activeTabObj.project?.id || ''] || 
+                  activeDiagnostics[activeTabObj.project?.path || ''] || 
+                  null
+                }
+                onDismissDiagnostic={() => 
+                  handleDismissDiagnostic(activeTabObj.project?.id || activeTabObj.project?.path || '')
+                }
                 onBack={() => setActiveTabId('home')}
                 onToggleProject={handleToggleProject}
                 onOpenBrowser={handleOpenBrowser}
@@ -340,6 +350,14 @@ export default function App() {
                 onUpdateProject={handleUpdateProject}
                 onUpdatePort={handleUpdatePort}
                 onUpdateCommand={handleUpdateCommand}
+                projectLogs={
+                  logs[activeTabObj.project?.id || ''] || 
+                  logs[activeTabObj.project?.path || ''] || 
+                  []
+                }
+                onClearProjectLogs={() => 
+                  handleClearProjectLogs(activeTabObj.project?.id || activeTabObj.project?.path || '')
+                }
                 theme={theme}
                 language={language}
               />

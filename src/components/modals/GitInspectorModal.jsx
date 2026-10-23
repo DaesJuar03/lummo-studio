@@ -31,7 +31,7 @@ export default function GitInspectorModal({
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ type: 'spring', stiffness: 350, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
-          className={`w-full max-w-4xl max-h-[90vh] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
+          className={`w-full max-w-5xl h-[88vh] rounded-3xl border shadow-2xl overflow-hidden flex flex-col ${
             isDark ? 'bg-[#141414] border-white/[0.08] text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
@@ -66,7 +66,7 @@ export default function GitInspectorModal({
           </div>
 
           {/* Body */}
-          <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+          <div className="p-4 sm:p-5 flex-1 min-h-0 overflow-hidden flex flex-col">
             <GitInspectorView
               folderPath={project.path}
               theme={theme}

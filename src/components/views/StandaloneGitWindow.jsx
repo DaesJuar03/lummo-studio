@@ -89,7 +89,7 @@ export default function StandaloneGitWindow({
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 min-h-0 p-3 sm:p-4 overflow-hidden flex flex-col">
         <GitInspectorView
           folderPath={projectPath}
           theme={theme}

@@ -13,7 +13,7 @@ import {
   PinOff,
   Copy,
   FolderX,
-  Sparkles
+  MessageSquare
 } from 'lucide-react';
 import { getTranslations } from '../../locales';
 import HeaderUpdateWidget from './HeaderUpdateWidget';
@@ -207,7 +207,7 @@ export default function Header({
             />
           )}
 
-          {/* Botón Asistente IA (Si está habilitado en Experimental) */}
+          {/* Botón Chat / Asistente (Si está habilitado en Experimental) */}
           {isAiEnabled && (
             <button
               onClick={onOpenAiAssistant}
@@ -216,10 +216,10 @@ export default function Header({
                   ? 'bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.2)]' 
                   : 'bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 shadow-xs'
               }`}
-              title={language === 'es' ? 'Abrir Asistente Lummo IA' : 'Open Lummo AI Assistant'}
+              title={language === 'es' ? 'Abrir Chat de Lummo' : 'Open Lummo Chat'}
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-              <span>AI</span>
+              <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+              <span>Chat</span>
             </button>
           )}
 

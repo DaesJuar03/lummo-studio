@@ -2385,7 +2385,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 
 [[package]]
 name = "lummo-studio"
-version = "2.4.69"
+version = "3.0.0-rc.1"
 dependencies = [
  "chrono",
  "dirs 5.0.1",

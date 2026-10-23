@@ -311,11 +311,55 @@ pub fn git_get_status(folder_path: &str) -> Value {
 
     let (_, st_out, _) = run_hidden_cmd("git", &["status", "--porcelain=v1"], Some(folder_path));
     let mut files = Vec::new();
+    let mut staged_files = Vec::new();
+    let mut unstaged_files = Vec::new();
     for line in st_out.lines().filter(|l| l.len() >= 3) {
         let idx_st = &line[0..1];
         let wt_st = &line[1..2];
-        let fp = line[3..].trim();
-        let status_type = if idx_st == "?" || wt_st == "?" {
+        let raw_fp = line[3..].trim().trim_matches('"');
+        let (current_path, old_path) = if let Some((old_p, new_p)) = raw_fp.split_once(" -> ") {
+            (new_p.to_string(), Some(old_p.to_string()))
+        } else {
+            (raw_fp.to_string(), None)
+        };
+
+        if idx_st != " " && idx_st != "?" && idx_st != "!" {
+            let status_type = match idx_st {
+                "A" => "ADDED",
+                "D" => "DELETED",
+                "R" => "RENAMED",
+                _ => "MODIFIED",
+            };
+            staged_files.push(json!({
+                "path": &current_path,
+                "oldPath": &old_path,
+                "status": status_type,
+                "letter": idx_st,
+                "isStaged": true
+            }));
+        }
+
+        if idx_st == "?" || wt_st != " " {
+            let status_type = if idx_st == "?" || wt_st == "?" {
+                "UNTRACKED"
+            } else if wt_st == "D" {
+                "DELETED"
+            } else if wt_st == "A" {
+                "ADDED"
+            } else {
+                "MODIFIED"
+            };
+            let letter = if idx_st == "?" || wt_st == "?" { "?" } else { wt_st };
+            unstaged_files.push(json!({
+                "path": &current_path,
+                "oldPath": &old_path,
+                "status": status_type,
+                "letter": letter,
+                "isStaged": false
+            }));
+        }
+
+        let general_type = if idx_st == "?" || wt_st == "?" {
             "UNTRACKED"
         } else if idx_st == "A" || wt_st == "A" {
             "ADDED"
@@ -327,8 +371,9 @@ pub fn git_get_status(folder_path: &str) -> Value {
             "MODIFIED"
         };
         files.push(json!({
-            "path": fp,
-            "status": status_type,
+            "path": &current_path,
+            "oldPath": &old_path,
+            "status": general_type,
             "isStaged": idx_st != " " && idx_st != "?"
         }));
     }
@@ -340,39 +385,65 @@ pub fn git_get_status(folder_path: &str) -> Value {
         None
     };
 
-    let count = files.len();
+    let staged_count = staged_files.len();
+    let unstaged_count = unstaged_files.len();
     json!({
         "hasGit": true,
         "currentBranch": current_branch,
         "files": files,
+        "stagedFiles": staged_files,
+        "unstagedFiles": unstaged_files,
+        "stagedCount": staged_count,
+        "unstagedCount": unstaged_count,
         "ahead": 0,
         "behind": 0,
         "remoteUrl": remote_url,
-        "uncommittedCount": count
+        "uncommittedCount": staged_count + unstaged_count
     })
 }
 
-pub fn git_get_history(folder_path: &str, limit: Option<u32>) -> Value {
-    let lim = limit.unwrap_or(50).to_string();
-    let (code, stdout, _) = run_hidden_cmd(
-        "git",
-        &[
-            "log",
-            "-n",
-            &lim,
-            "--pretty=format:%H||%h||%an||%ae||%cr||%s||%d",
-        ],
-        Some(folder_path),
-    );
+pub fn git_get_history(folder_path: &str, limit: Option<u32>, skip: Option<u32>, branch_filter: Option<&str>) -> Value {
+    let lim = limit.unwrap_or(40).to_string();
+    let sk = skip.unwrap_or(0);
+    let filter = branch_filter.unwrap_or("all");
+
+    let mut args = vec!["log"];
+    if filter == "all" {
+        args.push("--all");
+    }
+    args.push("--topo-order");
+    args.push("-n");
+    args.push(&lim);
+    let skip_str = format!("--skip={}", sk);
+    if sk > 0 {
+        args.push(&skip_str);
+    }
+    args.push("--pretty=format:%H||%h||%P||%an||%ae||%cr||%s||%d");
+
+    let (code, stdout, _) = run_hidden_cmd("git", &args, Some(folder_path));
+
+    let count_args = if filter == "all" {
+        vec!["rev-list", "--count", "--all"]
+    } else {
+        vec!["rev-list", "--count", "HEAD"]
+    };
+    let (_, count_out, _) = run_hidden_cmd("git", &count_args, Some(folder_path));
+    let total_count: u32 = count_out.trim().parse().unwrap_or(0);
+
     if code != 0 {
-        return json!({ "commits": [] });
+        return json!({ "commits": [], "totalCount": total_count });
     }
     let commits: Vec<Value> = stdout
         .lines()
         .filter(|l| !l.trim().is_empty())
         .map(|line| {
             let parts: Vec<&str> = line.split("||").collect();
-            let refs_raw = parts.get(6).copied().unwrap_or("");
+            let parents_raw = parts.get(2).copied().unwrap_or("");
+            let parents: Vec<String> = parents_raw
+                .split_whitespace()
+                .map(|p| p.to_string())
+                .collect();
+            let refs_raw = parts.get(7).copied().unwrap_or("");
             let refs: Vec<String> = refs_raw
                 .trim_matches(|c| c == '(' || c == ')')
                 .split(',')
@@ -382,15 +453,16 @@ pub fn git_get_history(folder_path: &str, limit: Option<u32>) -> Value {
             json!({
                 "hash": parts.first().copied().unwrap_or(""),
                 "shortHash": parts.get(1).copied().unwrap_or(""),
-                "author": parts.get(2).copied().unwrap_or("Developer"),
-                "email": parts.get(3).copied().unwrap_or(""),
-                "date": parts.get(4).copied().unwrap_or("recent"),
-                "message": parts.get(5).copied().unwrap_or("Commit"),
+                "parents": parents,
+                "author": parts.get(3).copied().unwrap_or("Developer"),
+                "email": parts.get(4).copied().unwrap_or(""),
+                "date": parts.get(5).copied().unwrap_or("recent"),
+                "message": parts.get(6).copied().unwrap_or("Commit"),
                 "refs": refs
             })
         })
         .collect();
-    json!({ "commits": commits })
+    json!({ "commits": commits, "totalCount": total_count })
 }
 
 pub fn git_get_branches(folder_path: &str) -> Value {
@@ -423,19 +495,129 @@ pub fn git_checkout_branch(folder_path: &str, branch_name: &str) -> Value {
     }
 }
 
-pub fn git_stage_all(folder_path: &str) -> Value {
-    let (code, _, stderr) = run_hidden_cmd("git", &["add", "-A"], Some(folder_path));
-    json!({ "success": code == 0, "error": stderr })
-}
-
-pub fn git_commit(folder_path: &str, message: &str) -> Value {
-    let _ = run_hidden_cmd("git", &["add", "-A"], Some(folder_path));
-    let (code, _, stderr) = run_hidden_cmd("git", &["commit", "-m", message], Some(folder_path));
+pub fn git_checkout(folder_path: &str, ref_name: &str) -> Value {
+    let (code, _, stderr) = run_hidden_cmd("git", &["checkout", ref_name], Some(folder_path));
     if code == 0 {
         json!({ "success": true })
     } else {
         json!({ "success": false, "error": stderr })
     }
+}
+
+pub fn git_stage_file(folder_path: &str, file_path: &str) -> Value {
+    let (code, _, stderr) = run_hidden_cmd("git", &["add", "--", file_path], Some(folder_path));
+    json!({ "success": code == 0, "error": stderr })
+}
+
+pub fn git_unstage_file(folder_path: &str, file_path: &str) -> Value {
+    let (mut code, _, mut stderr) = run_hidden_cmd("git", &["restore", "--staged", "--", file_path], Some(folder_path));
+    if code != 0 {
+        let (c2, _, e2) = run_hidden_cmd("git", &["reset", "HEAD", "--", file_path], Some(folder_path));
+        code = c2;
+        stderr = e2;
+    }
+    json!({ "success": code == 0, "error": stderr })
+}
+
+pub fn git_stage_all(folder_path: &str) -> Value {
+    let (code, _, stderr) = run_hidden_cmd("git", &["add", "-A"], Some(folder_path));
+    json!({ "success": code == 0, "error": stderr })
+}
+
+pub fn git_unstage_all(folder_path: &str) -> Value {
+    let (mut code, _, mut stderr) = run_hidden_cmd("git", &["restore", "--staged", "."], Some(folder_path));
+    if code != 0 {
+        let (c2, _, e2) = run_hidden_cmd("git", &["reset", "HEAD"], Some(folder_path));
+        code = c2;
+        stderr = e2;
+    }
+    json!({ "success": code == 0, "error": stderr })
+}
+
+pub fn git_discard_file(folder_path: &str, file_path: &str, is_untracked: bool) -> Value {
+    if is_untracked {
+        let p = Path::new(folder_path).join(file_path);
+        if p.exists() {
+            let _ = if p.is_dir() { std::fs::remove_dir_all(&p) } else { std::fs::remove_file(&p) };
+            return json!({ "success": true });
+        }
+        let (c, _, e) = run_hidden_cmd("git", &["clean", "-f", "-d", "--", file_path], Some(folder_path));
+        return json!({ "success": c == 0, "error": e });
+    }
+    let (mut code, _, mut stderr) = run_hidden_cmd("git", &["restore", "--", file_path], Some(folder_path));
+    if code != 0 {
+        let (c2, _, e2) = run_hidden_cmd("git", &["checkout", "--", file_path], Some(folder_path));
+        code = c2;
+        stderr = e2;
+    }
+    json!({ "success": code == 0, "error": stderr })
+}
+
+pub fn git_discard_all(folder_path: &str) -> Value {
+    let (mut code, _, mut stderr) = run_hidden_cmd("git", &["restore", "."], Some(folder_path));
+    if code != 0 {
+        let (c2, _, e2) = run_hidden_cmd("git", &["checkout", "--", "."], Some(folder_path));
+        code = c2;
+        stderr = e2;
+    }
+    json!({ "success": code == 0, "error": stderr })
+}
+
+pub fn git_get_diff(folder_path: &str, file_path: &str, staged: bool) -> Value {
+    let args = if staged {
+        vec!["diff", "--cached", "--", file_path]
+    } else {
+        vec!["diff", "--", file_path]
+    };
+    let (code, stdout, stderr) = run_hidden_cmd("git", &args, Some(folder_path));
+    let mut diff = stdout;
+    if !staged && diff.trim().is_empty() {
+        let p = Path::new(folder_path).join(file_path);
+        if p.exists() && p.is_file() {
+            if let Ok(content) = std::fs::read_to_string(&p) {
+                let lines: Vec<&str> = content.lines().collect();
+                diff = format!(
+                    "diff --git a/{0} b/{0}\nnew file mode 100644\n--- /dev/null\n+++ b/{0}\n@@ -0,0 +1,{1} @@\n{2}",
+                    file_path,
+                    lines.len(),
+                    lines.iter().map(|l| format!("+{}", l)).collect::<Vec<_>>().join("\n")
+                );
+            }
+        }
+    }
+    json!({ "diff": diff, "error": if code != 0 { Some(stderr) } else { None } })
+}
+
+pub fn git_commit(folder_path: &str, message: &str, body: Option<&str>) -> Value {
+    let mut args = vec!["commit", "-m", message];
+    let body_str;
+    if let Some(b) = body {
+        if !b.trim().is_empty() {
+            body_str = b.trim();
+            args.push("-m");
+            args.push(&body_str);
+        }
+    }
+    let (code, _, stderr) = run_hidden_cmd("git", &args, Some(folder_path));
+    if code == 0 {
+        json!({ "success": true })
+    } else {
+        json!({ "success": false, "error": stderr })
+    }
+}
+
+pub fn git_create_branch(folder_path: &str, branch_name: &str, start_point: Option<&str>) -> Value {
+    let mut args = vec!["checkout", "-b", branch_name];
+    if let Some(sp) = start_point {
+        args.push(sp);
+    }
+    let (code, _, stderr) = run_hidden_cmd("git", &args, Some(folder_path));
+    json!({ "success": code == 0, "error": stderr })
+}
+
+pub fn git_revert_commit(folder_path: &str, hash: &str) -> Value {
+    let (code, _, stderr) = run_hidden_cmd("git", &["revert", "--no-edit", hash], Some(folder_path));
+    json!({ "success": code == 0, "error": stderr })
 }
 
 pub fn git_push(folder_path: &str) -> Value {

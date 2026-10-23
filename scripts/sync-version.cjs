@@ -25,7 +25,7 @@ if (argVersion && !argVersion.startsWith('--')) {
   console.log(`[Version Sync] 🔄 Sincronizando con versión actual de package.json: v${targetVersion}`);
 }
 
-const semverRegex = /\d+\.\d+\.\d+/g;
+const semverRegex = /\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?/g;
 
 // Archivos a sincronizar automáticamente
 const targets = [
@@ -46,7 +46,7 @@ const targets = [
   },
   {
     filePath: path.join(rootDir, 'public/splash.html'),
-    replace: (content) => content.replace(/<div class="top-badge">v\d+\.\d+\.\d+<\/div>/g, `<div class="top-badge">v${targetVersion}</div>`)
+    replace: (content) => content.replace(/<div class="top-badge">v\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?<\/div>/g, `<div class="top-badge">v${targetVersion}</div>`)
   },
   {
     filePath: path.join(rootDir, 'src/locales/es.json'),
@@ -68,30 +68,30 @@ const targets = [
   },
   {
     filePath: path.join(rootDir, 'src/components/modals/settings/GeneralTab.jsx'),
-    replace: (content) => content.replace(/Versión instalada: v\d+\.\d+\.\d+/g, `Versión instalada: v${targetVersion}`)
+    replace: (content) => content.replace(/Versión instalada: v\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?/g, `Versión instalada: v${targetVersion}`)
   },
   {
     filePath: path.join(rootDir, 'src/components/common/ChangelogSheet.jsx'),
-    replace: (content) => content.replace(/version = '\d+\.\d+\.\d+'/g, `version = '${targetVersion}'`)
+    replace: (content) => content.replace(/version = '\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?'/g, `version = '${targetVersion}'`)
   },
   {
     filePath: path.join(rootDir, 'src/components/common/PostUpdateBanner.jsx'),
-    replace: (content) => content.replace(/version = '\d+\.\d+\.\d+'/g, `version = '${targetVersion}'`)
+    replace: (content) => content.replace(/version = '\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?'/g, `version = '${targetVersion}'`)
   },
   {
     filePath: path.join(rootDir, 'src/hooks/useAppUpdater.ts'),
-    replace: (content) => content.replace(/packageInfo\.version \|\| '\d+\.\d+\.\d+'/g, `packageInfo.version || '${targetVersion}'`)
+    replace: (content) => content.replace(/packageInfo\.version \|\| '\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?'/g, `packageInfo.version || '${targetVersion}'`)
   },
   {
     filePath: path.join(rootDir, 'src/types/lummo.d.ts'),
-    replace: (content) => content.replace(/Lummo Studio v\d+\.\d+\.\d+/g, `Lummo Studio v${targetVersion}`)
+    replace: (content) => content.replace(/Lummo Studio v\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?/g, `Lummo Studio v${targetVersion}`)
   },
   {
     filePath: path.join(rootDir, 'README.md'),
     replace: (content) => {
       return content
-        .replace(/Lummo Studio v\d+\.\d+\.\d+/g, `Lummo Studio v${targetVersion}`)
-        .replace(/Version-\d+\.\d+\.\d+-blue/g, `Version-${targetVersion}-blue`);
+        .replace(/Lummo Studio v\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?/g, `Lummo Studio v${targetVersion}`)
+        .replace(/Version-\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?-blue/g, `Version-${targetVersion}-blue`);
     }
   },
   {
@@ -104,7 +104,7 @@ const targets = [
   },
   {
     filePath: path.join(rootDir, 'src-tauri/Cargo.toml'),
-    replace: (content) => content.replace(/^version = "\d+\.\d+\.\d+"/m, `version = "${targetVersion}"`)
+    replace: (content) => content.replace(/^version = "\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?\"/m, `version = "${targetVersion}"`)
   }
 ];
 

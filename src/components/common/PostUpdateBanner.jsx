@@ -4,7 +4,7 @@ import { Check, FileText, X } from 'lucide-react';
 import { getTranslations } from '../../locales';
 
 export default function PostUpdateBanner({
-  version = '2.4.69',
+  version = '3.0.0-rc.1',
   show,
   onDismiss,
   onOpenChangelog,

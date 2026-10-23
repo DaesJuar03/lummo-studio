@@ -219,11 +219,25 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Git Inspector & Visual Graph API
   git: {
     getStatus: (folderPath) => ipcRenderer.invoke('git-get-status', folderPath),
-    getHistory: (folderPath, limit) => ipcRenderer.invoke('git-get-history', { folderPath, limit }),
+    getHistory: (folderPathOrOptions, limit, skip, branchFilter) => {
+      if (typeof folderPathOrOptions === 'object' && folderPathOrOptions !== null) {
+        return ipcRenderer.invoke('git-get-history', folderPathOrOptions);
+      }
+      return ipcRenderer.invoke('git-get-history', { folderPath: folderPathOrOptions, limit, skip, branchFilter });
+    },
     getBranches: (folderPath) => ipcRenderer.invoke('git-get-branches', folderPath),
     checkoutBranch: (folderPath, branchName) => ipcRenderer.invoke('git-checkout-branch', { folderPath, branchName }),
+    checkout: (folderPath, ref) => ipcRenderer.invoke('git-checkout', { folderPath, ref }),
+    stageFile: (folderPath, filePath) => ipcRenderer.invoke('git-stage-file', { folderPath, filePath }),
+    unstageFile: (folderPath, filePath) => ipcRenderer.invoke('git-unstage-file', { folderPath, filePath }),
     stageAll: (folderPath) => ipcRenderer.invoke('git-stage-all', folderPath),
-    commit: (folderPath, message) => ipcRenderer.invoke('git-commit', { folderPath, message }),
+    unstageAll: (folderPath) => ipcRenderer.invoke('git-unstage-all', folderPath),
+    discardFile: (folderPath, filePath, isUntracked) => ipcRenderer.invoke('git-discard-file', { folderPath, filePath, isUntracked }),
+    discardAll: (folderPath) => ipcRenderer.invoke('git-discard-all', folderPath),
+    getDiff: (folderPath, filePath, staged) => ipcRenderer.invoke('git-get-diff', { folderPath, filePath, staged }),
+    commit: (folderPath, message, body) => ipcRenderer.invoke('git-commit', { folderPath, message, body }),
+    createBranch: (folderPath, branchName, startPoint) => ipcRenderer.invoke('git-create-branch', { folderPath, branchName, startPoint }),
+    revertCommit: (folderPath, hash) => ipcRenderer.invoke('git-revert-commit', { folderPath, hash }),
     push: (folderPath) => ipcRenderer.invoke('git-push', folderPath),
     pull: (folderPath) => ipcRenderer.invoke('git-pull', folderPath)
   },

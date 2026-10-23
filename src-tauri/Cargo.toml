@@ -1,6 +1,6 @@
 [package]
 name = "lummo-studio"
-version = "2.4.69"
+version = "3.0.0-rc.1"
 description = "Lummo Studio - Modern Dev Server & Database Control Panel (Native Rust Core)"
 authors = ["DaesJuar03"]
 license = "MIT"

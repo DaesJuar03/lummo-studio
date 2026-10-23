@@ -1044,10 +1044,12 @@ async fn git_get_status(folder_path: String) -> Value {
 }
 
 #[tauri::command]
-async fn git_get_history(folder_path: String, limit: Option<u32>) -> Value {
-    tauri::async_runtime::spawn_blocking(move || integrations::git_get_history(&folder_path, limit))
-        .await
-        .unwrap_or_else(|_| json!({ "commits": [] }))
+async fn git_get_history(folder_path: String, limit: Option<u32>, skip: Option<u32>, branch_filter: Option<String>) -> Value {
+    tauri::async_runtime::spawn_blocking(move || {
+        integrations::git_get_history(&folder_path, limit, skip, branch_filter.as_deref())
+    })
+    .await
+    .unwrap_or_else(|_| json!({ "commits": [], "totalCount": 0 }))
 }
 
 #[tauri::command]
@@ -1067,6 +1069,29 @@ async fn git_checkout_branch(folder_path: String, branch_name: String) -> Value 
 }
 
 #[tauri::command]
+async fn git_checkout(folder_path: String, ref_name: String) -> Value {
+    tauri::async_runtime::spawn_blocking(move || {
+        integrations::git_checkout(&folder_path, &ref_name)
+    })
+    .await
+    .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_stage_file(folder_path: String, file_path: String) -> Value {
+    tauri::async_runtime::spawn_blocking(move || integrations::git_stage_file(&folder_path, &file_path))
+        .await
+        .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_unstage_file(folder_path: String, file_path: String) -> Value {
+    tauri::async_runtime::spawn_blocking(move || integrations::git_unstage_file(&folder_path, &file_path))
+        .await
+        .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
 async fn git_stage_all(folder_path: String) -> Value {
     tauri::async_runtime::spawn_blocking(move || integrations::git_stage_all(&folder_path))
         .await
@@ -1074,8 +1099,58 @@ async fn git_stage_all(folder_path: String) -> Value {
 }
 
 #[tauri::command]
-async fn git_commit(folder_path: String, message: String) -> Value {
-    tauri::async_runtime::spawn_blocking(move || integrations::git_commit(&folder_path, &message))
+async fn git_unstage_all(folder_path: String) -> Value {
+    tauri::async_runtime::spawn_blocking(move || integrations::git_unstage_all(&folder_path))
+        .await
+        .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_discard_file(folder_path: String, file_path: String, is_untracked: Option<bool>) -> Value {
+    tauri::async_runtime::spawn_blocking(move || {
+        integrations::git_discard_file(&folder_path, &file_path, is_untracked.unwrap_or(false))
+    })
+    .await
+    .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_discard_all(folder_path: String) -> Value {
+    tauri::async_runtime::spawn_blocking(move || integrations::git_discard_all(&folder_path))
+        .await
+        .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_get_diff(folder_path: String, file_path: String, staged: Option<bool>) -> Value {
+    tauri::async_runtime::spawn_blocking(move || {
+        integrations::git_get_diff(&folder_path, &file_path, staged.unwrap_or(false))
+    })
+    .await
+    .unwrap_or_else(|e| json!({ "diff": "", "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_commit(folder_path: String, message: String, body: Option<String>) -> Value {
+    tauri::async_runtime::spawn_blocking(move || {
+        integrations::git_commit(&folder_path, &message, body.as_deref())
+    })
+    .await
+    .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_create_branch(folder_path: String, branch_name: String, start_point: Option<String>) -> Value {
+    tauri::async_runtime::spawn_blocking(move || {
+        integrations::git_create_branch(&folder_path, &branch_name, start_point.as_deref())
+    })
+    .await
+    .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
+}
+
+#[tauri::command]
+async fn git_revert_commit(folder_path: String, hash: String) -> Value {
+    tauri::async_runtime::spawn_blocking(move || integrations::git_revert_commit(&folder_path, &hash))
         .await
         .unwrap_or_else(|e| json!({ "success": false, "error": e.to_string() }))
 }
@@ -1396,8 +1471,17 @@ pub fn run() {
             git_get_history,
             git_get_branches,
             git_checkout_branch,
+            git_checkout,
+            git_stage_file,
+            git_unstage_file,
             git_stage_all,
+            git_unstage_all,
+            git_discard_file,
+            git_discard_all,
+            git_get_diff,
             git_commit,
+            git_create_branch,
+            git_revert_commit,
             git_push,
             git_pull,
             ai_test_connection,

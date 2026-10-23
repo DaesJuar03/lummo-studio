@@ -2,7 +2,7 @@
   "name": "lummo",
   "productName": "Lummo Studio",
   "private": true,
-  "version": "2.4.69",
+  "version": "3.0.0-rc.1",
   "description": "Modern Dev Server & Database Control Panel",
   "author": "DaesJuar03",
   "main": "electron/main.cjs",

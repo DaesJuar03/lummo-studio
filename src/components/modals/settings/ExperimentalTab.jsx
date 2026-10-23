@@ -14,7 +14,8 @@ import {
   Eye, 
   EyeOff, 
   Zap,
-  Globe
+  Globe,
+  Terminal
 } from 'lucide-react';
 
 const AI_PROVIDERS = [
@@ -48,6 +49,14 @@ export default function ExperimentalTab({
       return localStorage.getItem('lummo-exp-ai') === 'true';
     } catch {
       return false;
+    }
+  });
+
+  const [crashGuardEnabled, setCrashGuardEnabled] = useState(() => {
+    try {
+      return localStorage.getItem('lummo-exp-crashguard') !== 'false';
+    } catch {
+      return true;
     }
   });
 
@@ -114,6 +123,15 @@ export default function ExperimentalTab({
       window.dispatchEvent(new Event('lummo-exp-updated'));
     } catch {}
     setHasPendingRestart(true);
+  };
+
+  const handleToggleCrashGuard = () => {
+    const next = !crashGuardEnabled;
+    setCrashGuardEnabled(next);
+    try {
+      localStorage.setItem('lummo-exp-crashguard', String(next));
+      window.dispatchEvent(new Event('lummo-exp-updated'));
+    } catch {}
   };
 
   const handleSelectProvider = (provId) => {
@@ -488,6 +506,54 @@ export default function ExperimentalTab({
             </div>
           </motion.div>
         )}
+      </div>
+
+      {/* Feature 3: Transient Crash Guard & Syntax Supervisor */}
+      <div className={`p-4 rounded-2xl border transition-all ${
+        isDark ? 'bg-[#18181b] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+      }`}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start space-x-3.5 min-w-0">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+              crashGuardEnabled
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                : isDark ? 'bg-[#222226] border-white/[0.06] text-slate-500' : 'bg-slate-200 border-slate-300 text-slate-400'
+            }`}>
+              <Terminal className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h5 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  {language === 'es' 
+                    ? 'Supervisor de Errores Transitorios & Crash Guard' 
+                    : 'Transient Error Supervisor & Crash Guard'}
+                </h5>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border border-amber-500/30 bg-amber-500/10 text-amber-300">
+                  SYNTAX_GUARD
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                {language === 'es'
+                  ? 'Captura en memoria errores transitorios de compilación (corchetes sin cerrar, referencias incompletas) mientras editas tu código. Muestra advertencias técnicas sin modificar tus archivos en disco.'
+                  : 'Captures transient in-memory compilation errors (unclosed brackets, unresolved references) while editing. Displays technical diagnostics without modifying your disk files.'}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleToggleCrashGuard}
+            className={`w-12 h-6.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+              crashGuardEnabled ? 'bg-amber-600' : isDark ? 'bg-[#2a2a2e]' : 'bg-slate-300'
+            }`}
+          >
+            <motion.div
+              animate={{ x: crashGuardEnabled ? 22 : 2 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              className="w-5 h-5 rounded-full bg-white shadow-xs"
+            />
+          </button>
+        </div>
       </div>
     </motion.div>
   );

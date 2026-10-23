@@ -239,11 +239,20 @@ export interface LummoBridgeAPI {
 
   git: {
     getStatus: (folderPath: string) => Promise<any>;
-    getHistory: (folderPath: string, limit?: number) => Promise<any>;
+    getHistory: (folderPathOrOptions: string | { folderPath: string; limit?: number; skip?: number; branchFilter?: string }, limit?: number, skip?: number, branchFilter?: string) => Promise<any>;
     getBranches: (folderPath: string) => Promise<any>;
     checkoutBranch: (folderPath: string, branchName: string) => Promise<any>;
+    checkout?: (folderPath: string, ref: string) => Promise<any>;
+    stageFile?: (folderPath: string, filePath: string) => Promise<any>;
+    unstageFile?: (folderPath: string, filePath: string) => Promise<any>;
     stageAll: (folderPath: string) => Promise<any>;
-    commit: (folderPath: string, message: string) => Promise<any>;
+    unstageAll?: (folderPath: string) => Promise<any>;
+    discardFile?: (folderPath: string, filePath: string, isUntracked?: boolean) => Promise<any>;
+    discardAll?: (folderPath: string) => Promise<any>;
+    getDiff?: (folderPath: string, filePath: string, staged?: boolean) => Promise<any>;
+    commit: (folderPath: string, message: string, body?: string) => Promise<any>;
+    createBranch?: (folderPath: string, branchName: string, startPoint?: string) => Promise<any>;
+    revertCommit?: (folderPath: string, hash: string) => Promise<any>;
     push: (folderPath: string) => Promise<any>;
     pull: (folderPath: string) => Promise<any>;
   };

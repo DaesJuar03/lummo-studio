@@ -5,7 +5,7 @@ import { getTranslations } from '../../locales';
 
 export default function ChangelogSheet({
   show,
-  version = '2.4.69',
+  version = '3.0.0-rc.1',
   releaseNotes,
   onClose,
   theme = 'dark',
@@ -17,36 +17,36 @@ export default function ChangelogSheet({
 
   const defaultFeatures = [
     {
-      icon: GitBranch,
-      color: 'emerald',
-      title: language === 'es' ? 'Inspector de Git & Ventana Independiente' : 'Git Inspector & Standalone Window',
-      desc: language === 'es' 
-        ? 'Detección automática de .git, selector de ramas, historial visual de commits, cambios pendientes y visor en ventana dedicada.' 
-        : 'Automatic .git detection, branch switcher, commit graph timeline, pending changes, and dedicated standalone window.'
+      icon: Zap,
+      color: 'amber',
+      title: language === 'es' ? 'Motor Nativo en Rust (Tauri 2.0)' : 'Native Rust Core (Tauri 2.0)',
+      desc: language === 'es'
+        ? 'Migración estructural al backend nativo en Rust con rendimiento ultraligero, menor consumo de memoria y arranque instantáneo.'
+        : 'Architectural migration to native Rust backend delivering ultra-light performance, minimal RAM usage, and instant startup.'
     },
     {
-      icon: Bot,
-      color: 'purple',
-      title: language === 'es' ? 'Agente Asistente de IA (Infraestructura & BD)' : 'AI Infrastructure & Database Copilot',
+      icon: GitBranch,
+      color: 'emerald',
+      title: language === 'es' ? 'Git Inspector & Grafo Visual Interactivo' : 'Git Inspector & Visual Commit Graph',
       desc: language === 'es' 
-        ? 'Asistente inteligente compatible con Ollama local (100% gratis), OpenAI, Gemini, Claude, DeepSeek y Groq con contexto de servidores y logs.' 
-        : 'Smart assistant supporting local Ollama (100% free), OpenAI, Gemini, Claude, DeepSeek, and Groq with live server & log context.'
+        ? 'Grafo SVG de ramas con topología de carriles paralelos, visor de diffs (unificado/dividido), preparación de cambios y hover cards.' 
+        : 'Interactive SVG commit graph with parallel lane allocation, unified/split diffs, staging/unstaging, and contextual hover cards.'
+    },
+    {
+      icon: ShieldCheck,
+      color: 'blue',
+      title: language === 'es' ? 'Supervisor de Sintaxis & Crash Guard' : 'Transient Syntax Guard & Crash Guard',
+      desc: language === 'es' 
+        ? 'Detección en tiempo real de errores transitorios de compilación en memoria sin tocar tus archivos en disco.' 
+        : 'Real-time in-memory transient compiler error supervisor keeping dev servers protected without touching disk files.'
     },
     {
       icon: Sliders,
-      color: 'blue',
-      title: language === 'es' ? 'Nueva Pestaña "Experimental" en Ajustes' : 'New "Experimental" Settings Tab',
+      color: 'purple',
+      title: language === 'es' ? 'Panel de Control con Sparklines y Logs en Vivo' : 'Dashboard with Sparklines & Live Logs',
       desc: language === 'es' 
-        ? 'Activa o desactiva funciones avanzadas bajo demanda con notificación de reinicio automático.' 
-        : 'Toggle advanced beta modules on demand with automatic application restart prompts.'
-    },
-    {
-      icon: Zap,
-      color: 'amber',
-      title: language === 'es' ? 'Nuevo Splash Screen e Instalador Minimalista' : 'New Minimalist Splash & Installer',
-      desc: language === 'es' 
-        ? 'Diseño dark mate con barra de progreso con profundidad y carga 100% opaca y sólida.' 
-        : 'Dark matte design with depth progress bar and 100% solid, opaque startup screen.'
+        ? 'Telemetría horizontal de CPU/RAM con sparklines activos, contenedor simétrico para .env y consola inferior colapsable.' 
+        : 'Horizontal CPU/RAM telemetry with live active sparklines, structured .env manager, and collapsible bottom terminal drawer.'
     }
   ];
 

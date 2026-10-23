@@ -226,12 +226,29 @@ export function createTauriBridge(): LummoBridgeAPI {
 
     git: {
       getStatus: (folderPath) => invoke('git_get_status', { folderPath }),
-      getHistory: (folderPath, limit = 50) => invoke('git_get_history', { folderPath, limit }),
+      getHistory: (folderPathOrOptions, limit = 50, skip = 0, branchFilter = 'all') => {
+        if (typeof folderPathOrOptions === 'object' && folderPathOrOptions !== null) {
+          return invoke('git_get_history', folderPathOrOptions);
+        }
+        return invoke('git_get_history', { folderPath: folderPathOrOptions, limit, skip, branchFilter });
+      },
       getBranches: (folderPath) => invoke('git_get_branches', { folderPath }),
       checkoutBranch: (folderPath, branchName) =>
         invoke('git_checkout_branch', { folderPath, branchName }),
+      checkout: (folderPath, ref) => invoke('git_checkout', { folderPath, ref }),
+      stageFile: (folderPath, filePath) => invoke('git_stage_file', { folderPath, filePath }),
+      unstageFile: (folderPath, filePath) => invoke('git_unstage_file', { folderPath, filePath }),
       stageAll: (folderPath) => invoke('git_stage_all', { folderPath }),
-      commit: (folderPath, message) => invoke('git_commit', { folderPath, message }),
+      unstageAll: (folderPath) => invoke('git_unstage_all', { folderPath }),
+      discardFile: (folderPath, filePath, isUntracked) =>
+        invoke('git_discard_file', { folderPath, filePath, isUntracked }),
+      discardAll: (folderPath) => invoke('git_discard_all', { folderPath }),
+      getDiff: (folderPath, filePath, staged) =>
+        invoke('git_get_diff', { folderPath, filePath, staged }),
+      commit: (folderPath, message, body) => invoke('git_commit', { folderPath, message, body }),
+      createBranch: (folderPath, branchName, startPoint) =>
+        invoke('git_create_branch', { folderPath, branchName, startPoint }),
+      revertCommit: (folderPath, hash) => invoke('git_revert_commit', { folderPath, hash }),
       push: (folderPath) => invoke('git_push', { folderPath }),
       pull: (folderPath) => invoke('git_pull', { folderPath })
     },
